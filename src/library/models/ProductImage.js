@@ -1,6 +1,6 @@
 /* eslint-disable */
 import {Model} from '@vuex-orm/core'
-import {Product, Variant} from './../database'
+import {Product, Variant} from './..'
 import {ShopifyMediaURL} from "./../scripts/shopify";
 
 export default class ProductImage extends Model {

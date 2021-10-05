@@ -1,5 +1,5 @@
 import {Model} from '@vuex-orm/core'
-import {Variant,ProductImage,ProductOption,ProductOptionValue}from './../database'
+import {Variant,ProductImage,ProductOption,ProductOptionValue}from './..'
 import {SHOPIFY_BASE_URL} from "./../settings";
 
 import * as R from 'ramda'

@@ -1,6 +1,6 @@
 import {Model} from '@vuex-orm/core'
 import {slugify} from "./../scripts/generic"
-import {Product, ProductImage,ProductOptionValue,VariantOption} from "./../database";
+import {Product, ProductImage,ProductOptionValue,VariantOption} from "./..";
 const MINIMUM_QUANTITY = 1;
 
 export default class Variant extends Model {

@@ -1,5 +1,5 @@
 import {Model} from '@vuex-orm/core'
-import {Variant} from "./../database";
+import {Variant} from "./..";
 import * as R from "ramda";
 
 export const Editable_Defaults = {

@@ -1,6 +1,6 @@
 import {Model} from '@vuex-orm/core'
 import {slugify} from "./../scripts/generic";
-import {Product, Variant, ProductImage} from "./../database";
+import {Product, Variant, ProductImage} from "./..";
 
 // Base entity.
 export class ProductOptionBase extends Model {
