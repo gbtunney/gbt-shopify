@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
+import database from '@/library/database'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -11,5 +11,8 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
-  }
+  },
+  plugins: [
+    database
+  ]
 })
