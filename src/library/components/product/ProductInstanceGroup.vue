@@ -1,6 +1,6 @@
 <script>
-import {ProductInstanceSingle, ProductInstanceGroup} from "../../models/ProductInstance";
-import {getRandomNumber} from "../../../../scripts/generic";
+import {ProductInstanceSingle, ProductInstanceGroup} from "../..";
+import {getRandomNumber} from "../../scripts/generic";
 
 export default {
   name: "ProductInstanceGroup",

@@ -1,15 +1,19 @@
 <script>
-import {getRandomNumber} from "@/scripts/generic";
-import {isShopifyID} from "@/scripts/shopify";
+import {getRandomNumber} from "./../../scripts/generic"
+import {isShopifyID} from "./../../scripts/shopify"
 import * as R from "ramda";
-import VuexORM from '@vuex-orm/core'
-import VuexORMSearch from '@vuex-orm/plugin-search'
-import {LoaderMixin} from '@orm/mixins/LoaderMixin'
-import {Editable_Defaults, ProductInstanceSingle} from "@orm/models/ProductInstance";
-import Product from "@orm/models/Product";
-import Variant from "@orm/models/Variant";
-import ProductOption, {ProductOptionValue, VariantOption} from "@orm/models/ProductOption";
-import ProductImage from "@orm/models/ProductImage";
+
+import {LoaderMixin} from './../../mixins/LoaderMixin'
+import {Editable_Defaults} from '../../settings'
+import {
+  ProductInstanceSingle,
+  Product,
+  Variant,
+  ProductImage,
+  ProductOption,
+  ProductOptionValue,
+  VariantOption
+} from '../..'
 
 export default {
   name: "ProductInstanceProvider",
@@ -74,7 +78,6 @@ export default {
     },
     variant: function (value) {
       console.log("variant changed.", value);
-
     },
   },
   created() {

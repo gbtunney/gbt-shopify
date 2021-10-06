@@ -1,13 +1,9 @@
 import {Model} from '@vuex-orm/core'
-import {Variant} from "./..";
+import {Variant,Product} from "./..";
 import * as R from "ramda";
-
-export const Editable_Defaults = {
-    quantity: true,
-    variant: true,
-    addToCart: false,
-    options: true,
-}
+import {Editable_Defaults} from "../settings";
+import {isShopifyID} from "../scripts/shopify";
+import {getContainsLetter, getHasLetter, stringContainsUppercase, toInteger} from "../scripts/generic";
 
 export class ProductInstanceSingle extends Model {
     static entity = 'productsingle'
@@ -36,6 +32,36 @@ export class ProductInstanceSingle extends Model {
     }
     static mutators() {
         return {
+            variant_id (value) {
+                if (!value) return value
+                console.log("trying to set id",value);
+                if ( isShopifyID(value) ) return toInteger(value)
+                if (R.is(String, value) && getContainsLetter(value)){
+                    if (stringContainsUppercase(value)) { ///if contains an uppercase, its not a handle
+                        let _variant = Variant.query().where("sku", value).first();
+                        console.log("searching for sku", _variant);
+                        if (_variant && _variant.id) return _variant.id
+                    }
+                    let search_handle = value;
+                    let search_position = 1;
+                    if (value.contains("|")) {
+                        console.log("contains pipe char, checking for handle and integer")
+                        let arr = value.split('|');
+                        if (arr && arr.length >= 2) {
+                            search_handle = arr[0];
+                            search_position = toInteger(arr[1], 1);
+                        }
+                    }
+                    let _product = Product.query().where("handle", search_handle).first();
+                    console.log(" ifffffs prodduct handle", search_handle, search_position, _product);
+                    if (_product && _product.id) {
+                        let foundVariant = Variant.query().where("product_id", _product.id).where("position", search_position).first()
+                        console.log(" foundVariante", foundVariant);
+                        if (foundVariant && foundVariant.id) return foundVariant.id
+                    }
+                }
+                return
+            },
             options_editable(value) {
                 if (R.is(Boolean, value)) return value;
                 else if (R.is(Array, value)) {     //expand to map
@@ -46,6 +72,12 @@ export class ProductInstanceSingle extends Model {
                 }
             }
         }
+    }
+    /**
+     * Add given prefix to the user's full name.
+     */
+    prefix (prefix) {
+        return `${prefix} ${this.variant_id}`
     }
     get TotalPrice() {
         return (this.Variant) ? (this.requested_quantity * this.Variant.price) : "not set"

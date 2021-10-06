@@ -1,18 +1,15 @@
 // {isVariantAvailable, isShopifyID, isGetMaxQuantity, shopifyMediaURL }
 
+import {getDigitCount, stringContainsNumber} from "./generic";
+
 /**
  * isShopifyID
  * @constructor
  * @param {*} value - value to validate
  * @return {boolean} bool if invalid
  * - isInteger = true AND value > 9 digits */
-export function isShopifyID(value = false) {
-  if (!value ||  isNaN(value) ) return;
-  //TODO: look into this isNAN bc that is a TOTAL PAIN IN THE ASS if ( Number.isNaN(value))
-
-  //TODO: Turn this into a real function in generic
-  var digitCount = Math.log(parseInt(value)) * Math.LOG10E + 1 | 0;
-  return (digitCount >= 9) ? true : false;
+export function isShopifyID(value = false, min_digits =9) {
+    return ( getDigitCount(value) >= min_digits ) ? true : false;
 }
 
 /**

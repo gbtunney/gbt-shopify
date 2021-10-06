@@ -1,8 +1,7 @@
 import {Model} from '@vuex-orm/core'
 import {slugify} from "./../scripts/generic"
 import {Product, ProductImage,ProductOptionValue,VariantOption} from "./..";
-const MINIMUM_QUANTITY = 1;
-
+import {MINIMUM_QUANTITY } from './../settings'
 export default class Variant extends Model {
   static entity = 'variants';
 
