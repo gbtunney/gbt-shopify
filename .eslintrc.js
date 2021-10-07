@@ -15,6 +15,10 @@ module.exports = {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-useless-escape': 'off',
-    'vue/no-unused-vars':'off',
+    'no-this-alias' : 'off',
+    '@typescript-eslint/no-this-alias' : 'off',
+    'vue/no-unused-vars': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'vue/no-unused-components': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'vue/no-reserved-keys':'off'
   }
 }

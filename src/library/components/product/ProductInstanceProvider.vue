@@ -129,7 +129,7 @@ export default {
       if (!option_value_array || option_value_array.length == 0) return false;
       if (option_value_array && option_value_array.length == 1) return option_value_array[0].Variants
 
-      var mappedArray = option_value_array.map(function (value) {
+      const mappedArray = option_value_array.map(function (value) {
         return value.Variants;
       }).filter(function (_variants) {
         //todo:ref.$props.ignoreInventory
@@ -148,11 +148,11 @@ export default {
     // merges 2 arrays of optionvalues by the option index.
     OptionValueList: function (option) {
       if (!this.Ready || !option) return false;
+      let that = this;
       let _option = false;
       if (R.is(String, option)) {
         _option = this.getOption(option, "handle")
       } else if (R.is(Object, option) && R.propIs(String, 'id', option)) _option = option;
-      let that = this;
       let _selectedOptions = this.SelectedOptionList
       let valueListForOption = ProductOptionValue
           .query()
@@ -185,6 +185,7 @@ export default {
     },
     //these are good.  change to 'update selected'
     updateOption(option) {
+      console.log("calling update option!!", option)
       if (!this.$props.enableoptions || !this.Product || !this.Product.id) return false
       if (option.product_id != this.Product.id) return
       //if option is editable , then search for it.
@@ -270,6 +271,7 @@ export default {
     Handle: {
       get: function () {   //variant_id
         if (this.$data._handle) return this.$data._handle;
+        return this.$props.handle
       },
       set: function (value) {
         this.$data._handle = value;
@@ -281,8 +283,6 @@ export default {
       },
       set: async function (value) {
         console.log("tring to set instance!!!!!!!!!!!!!!!", this.insertOrUpdateInstance())
-
-        //   this.$data._refID = value;
       }
     },
     SelectedVariant: {
@@ -343,7 +343,7 @@ export default {
     Images: function () {
       if (!this.Product) return;
       if (!this.Variants) return;
-      return ProductImage.query().where("product_id", this.Product.id).orderBy('position').withAll().all()
+      return ProductImage.query().where("product_id", this.Product.id).orderBy('position').with('Variants.options.Variants').all()
     },
   },
   render() {

@@ -26,8 +26,39 @@ export default class ProductImage extends Model {
     get aspect_ratio() {
         return parseInt(this.width) / parseInt(this.height);
     }
+
+    get srcset() {
+        return {
+            "desktop": {
+                "url": this.getSrc(600, 1200)
+            },
+            "mobile": {
+                "url": this.getSrc(200, 200)
+            },
+            "zoom": {
+                "url": this.getSrc(2000, 2000)
+            },
+            "alt": this.alt
+        }
+    }
 }
 //note: must be called with ()
 ProductImage.prototype.getSrc = function (_width = false, _height = false) {
+    //console.log("getting hheight", _height, ShopifyMediaURL(this.src, _width, _height))
     return ShopifyMediaURL(this.src, _width, _height);
 }
+/* SRC SET!!!!!!!!!
+    [
+      {
+            "desktop": {
+                "url": "assets/storybook/SfGallery/productB.jpg"
+            },
+            "mobile": {
+                "url": "assets/storybook/SfGallery/productB.jpg"
+            },
+            "zoom": {
+                "url": "assets/storybook/SfGallery/productB.jpg"
+            },
+            "alt": "Product B"
+        }
+    ]*/

@@ -75,16 +75,10 @@ export default class Variant extends Model {
     return false;
   }
   get Options() { ///returns an array of handles.....
-    this.options;
+    return this.options;
   }
   get OptionValues() { ///returns an array of handles.....
-    this.options;
-  }
-  get OptionMap() { ///returns an obbject with product_option_id as index
-    if (!this.options) return;
-    return this.options.reduce((accumulator, currentValue, currentIndex, array) => {
-      return accumulator.set(currentValue.option_id, currentValue)
-    }, new Map() );
+    return this.options;
   }
 }
 //could be id, handle or objject.

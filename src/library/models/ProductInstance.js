@@ -34,7 +34,7 @@ export class ProductInstanceSingle extends Model {
         return {
             variant_id (value) {
                 if (!value) return value
-                console.log("trying to set id",value);
+                //console.log("trying to set id",value);
                 if ( isShopifyID(value) ) return toInteger(value)
                 if (R.is(String, value) && getContainsLetter(value)){
                     if (stringContainsUppercase(value)) { ///if contains an uppercase, its not a handle

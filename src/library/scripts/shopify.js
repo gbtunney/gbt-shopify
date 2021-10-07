@@ -1,6 +1,6 @@
 // {isVariantAvailable, isShopifyID, isGetMaxQuantity, shopifyMediaURL }
 
-import {getDigitCount, stringContainsNumber} from "./generic";
+import {getDigitCount, stringContainsNumber, toInteger} from "./generic";
 
 /**
  * isShopifyID
@@ -22,12 +22,10 @@ export function isShopifyID(value = false, min_digits =9) {
  */
 export function ShopifyMediaURL(src = "", width = false, height = false) {
     if (!width) return src;
-    let _width = width;
-    let _height;
-    if (!height) _height = _width;
-    // else if (!height || !isInteger(height)) return src; ///todo: need to see about shopify's image crop mode etc.
-    const dimensions = `${parseInt(_width)}x${parseInt(_height)}`;
-
+    let _width = toInteger(width)
+    let _height = toInteger(height)
+    if (_height == 0) _height = _width;
+    const dimensions = `${_width}x${_height}`
     // remove any current image size then add the new image size
     return src
         .replace(/_(pico|icon|thumb|small|compact|medium|large|grande|original|1024x1024|2048x2048|master)+\./g, '.')
