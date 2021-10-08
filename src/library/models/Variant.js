@@ -11,6 +11,8 @@ export default class Variant extends Model {
     if (model.option2) temp_option_array.push(`[${model.product_id},"${model.option2}"]`);
     if (model.option3) temp_option_array.push(`[${model.product_id},"${model.option3}"]`);
     model.option_ids = temp_option_array;
+    //TODO: this causes a bug in line item. maybe extend instance instead
+    console.log("push!!!!",temp_option_array)
   }
   static fields() {
     return {
@@ -28,8 +30,6 @@ export default class Variant extends Model {
 
       option_ids: this.attr( []),
       options: this.hasManyBy(ProductOptionValue,"option_ids","$id"),
-
-     // optionpivot: this.belongsToMany(ProductOptionValue, VariantOption, "variant_id","option_value_id" ),
 
       option1: this.string(null, value => slugify(value)),  //todo: NEEDS TO BE MADE NULLABLE!!!!!!!!!
       option2: this.string(null, value => slugify(value)),   //todo: Needs to be switched to array via function
@@ -82,15 +82,15 @@ export default class Variant extends Model {
   }
 }
 //could be id, handle or objject.
-Variant.prototype.getOptionValue = function( index = false ,index_by= "id") {
+Variant.prototype.getOptionValue = function (index = false, index_by = "id") {
   if (!index) return
-  const _map =   this.getOptionValueMap(this.options,index_by) // this.getOptionMap(option_value_array,"handle");
+  const _map = this.getOptionValueMap(this.options, index_by) // this.getOptionMap(option_value_array,"handle");
   return (_map.get(index)) ? _map.get(index) : false;
 }
 
-Variant.prototype.getOptionValueMap   = function(optionArray = [] ,index_by= "id", _map = new Map()) {
-  return   optionArray.reduce((accumulator, currentValue, currentIndex, array) => {
-    if ( currentValue.Option && currentValue.Option[index_by] ) {
+Variant.prototype.getOptionValueMap = function (optionArray = [], index_by = "id", _map = new Map()) {
+  return optionArray.reduce((accumulator, currentValue, currentIndex, array) => {
+    if (currentValue.Option && currentValue.Option[index_by]) {
       return accumulator.set(currentValue.Option[index_by], currentValue)
     }
   }, _map);

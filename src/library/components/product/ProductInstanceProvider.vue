@@ -12,7 +12,9 @@ import {
   ProductImage,
   ProductOption,
   ProductOptionValue,
-  VariantOption
+  VariantOption,
+    Cart,
+  LineItem
 } from '../..'
 
 export default {
@@ -206,7 +208,7 @@ export default {
         return {
           id: this.$data._refID,
           /* variant_id: this.DefaultVariant.id,*/
-          message: message,
+          message: "gillian t",
           quantity_editable: quantity_editable,
           variant_editable: variant_editable,
           options_editable: options_editable, //future pref dont know when implement
@@ -258,10 +260,11 @@ export default {
         return accumulator.set(currentValue.option_id, currentValue)
       }, workingOptions).values())
     },
-    addToCart() {
-      console.log("adding to cart", this.Instance.$toJson())
+    async addToCart() {
+      var itemaddresponse = await Cart.api().addItems([this.Instance.LineItem,junkitem])
 
-      //addToCart: (variant: ShopifyBuy.ProductVariant, qty: number) => Shopify.addItem(variant, qty),
+      var cartresponse = await Cart.api().fetchCart()
+      console.log("reloaded cart",cartresponse, this.Instance.$toJson())
     }
   },
   computed: {

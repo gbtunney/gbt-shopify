@@ -55,7 +55,10 @@ export class ProductOptionValue extends ProductOptionBase {
     //todo: idk these pivots need help - this does not work... !!
     get Thumbnail() {
         if (this.thumbnail_id) return ProductImage.query().whereId(this.thumbnail_id).withAll().first();
-        if (this.Images && this.Images.length > 0) return this.Images[0];
+        if (this.Variants && this.Variants.length > 0) {
+            const [firstvariant] = this.Variants;
+            return firstvariant.Image;
+        }
         return false;
     }
 

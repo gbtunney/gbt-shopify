@@ -85,6 +85,19 @@ export class ProductInstanceSingle extends Model {
     get IsAvailable() {
         return this.Variant.IsAvailaxble;
     }
+    get LineItem(){
+       let cartMeta ;
+        if ( this.message ){
+            cartMeta=  {
+              message: this.message
+            }
+        }
+        console.log("cart meta", cartMeta)
+       return { id :this.variant_id,
+            quantity: this.requested_quantity,
+            properties: cartMeta
+        }
+    }
 }
 ProductInstanceSingle.prototype.get_option_editable = function (_key = false) {
     if (R.is(Boolean, this.options_editable)) return this.options_editable;

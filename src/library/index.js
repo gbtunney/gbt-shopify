@@ -9,7 +9,7 @@ import Variant from './models/Variant'
 import ProductImage from './models/ProductImage'
 import {ProductOptionBase, ProductOption, VariantOption, ProductOptionValue} from './models/ProductOption'
 import {ProductInstanceSingle, ProductInstanceGroup} from './models/ProductInstance'
-
+import {Cart,LineItem} from './models/Cart'
 const _database = new Database()
 export {
     Product,
@@ -20,10 +20,10 @@ export {
     VariantOption,
     ProductOptionValue,
     ProductInstanceSingle,
-    ProductInstanceGroup
+    ProductInstanceGroup,
+    Cart,
+    LineItem
 }
-
-
 
 _database.register(ProductInstanceSingle)
 _database.register(ProductInstanceGroup)
@@ -37,6 +37,8 @@ _database.register(ProductImage)
 _database.register(Variant);
 _database.register(VariantOption);
 
+_database.register(Cart)
+_database.register(LineItem)
 VuexORM.use(VuexORMAxios, {axios})
 export const database = VuexORM.install(_database)
 

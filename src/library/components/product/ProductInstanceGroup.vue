@@ -11,6 +11,10 @@ export default {
     }
   },
   props: {
+    instance: {
+      type: [Object, Boolean],
+      default: false,
+    },
     children: { //dont know if i need
       type: Array,
       default: function () {
@@ -23,6 +27,19 @@ export default {
     },
   },
   methods: {
+    async addToCart() {
+      var junkitem = {
+        id: 22589265510518,
+        quantity: 2,
+        properties: {
+          message: "color b"
+        }
+      }
+      var itemaddresponse = await Cart.api().addItems([this.Instance.LineItem,junkitem])
+
+      var cartresponse = await Cart.api().fetchCart()
+      console.log("reloaded cart",cartresponse, this.Instance.$toJson())
+    },
     async initializeInstanceGroup(dataObj) {
       const _testData = {
         message: "this is a test grtoup[ instance",

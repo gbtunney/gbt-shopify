@@ -108,17 +108,10 @@ class="color-primary"
               <div
                   :class="isSelected? 'bg-primary-lt' : '' "
                   class="flex font-secondary uppercase items-center text-lg flex-row h-full w-full p-2.5">
-                &lt;!&ndash;
-<!--                <span :style="image? '' : 'hidden' " style="height: 1.5em; width:auto;aspect-ratio: 1; " class=" border border-primary-dk  mr-8 ">
-                  <img v-if='image' :src="image.src" class="object-cover"/>
-                </span>&ndash;&gt;-->
-
                 <SfProductOption color="#ff0000" :label="title">
                   <template #color="" >
-                    <div
-                        v-if="image"
-                        class="sf-product-option__color"
-                    >
+                    <div v-if="image"
+                        class="sf-product-option__color">
                       <img v-if='image' :src="image.src" class="object-cover"/>
                     </div>
 
@@ -300,7 +293,8 @@ export default Vue.extend({
     HelloWorld,ProductInstanceProvider,vSelect,
     ProductInstanceGroup,
     gQuantityPicker,
-    ProductImageGrid,SfProductOption,SfQuantitySelector,SfProperty,SfButton,SfIcon,SfGallery,SfImage
+    ProductImageGrid,
+    SfProductOption,SfQuantitySelector,SfProperty,SfButton,SfIcon,SfGallery,SfImage
   }, data() {
     return {
       image_index: 1
