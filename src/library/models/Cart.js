@@ -1,5 +1,7 @@
 import { Model } from '@vuex-orm/core'
-import { Variant} from './..'
+import {ProductInstanceGroup, Variant} from './..'
+import {getRandomNumber} from "../scripts/generic";
+
 export const testdata =
     {
         "token": "38bef5ca80e2663b6f5a1301cea97087",
@@ -19,78 +21,48 @@ export const testdata =
     }
 
 
-export class Cart extends Model {
+export class Cart extends ProductInstanceGroup {
     static entity ="cart"
+     static baseEntity = 'productgroup' /// TODO: extend instance instead?
 
      static state ()  {
          return {
              cart: false,
              checkoutId:false,
              fetching: false,
-             fetching_cart: false,
-             fetching_add: false,
-             fetching_update: false,
          }
      }
-
      static apiConfig = {
         actions: {
             addItems(item_array) {
                 let _items = item_array;
                 Cart.commit((state) => {
-                    console.log("setting varianble", state)
-                    state.fetching_add = true
+                    state.fetching = true
                 })
-
                 return this.post(`/cart/add.js`,
                     {
                         save: false,
-                        items: _items,
-                        onSuccess(state, payload, axios, {params, data}) {
-                            alert();
-                            Cart.commit((state) => {
-                                state.fetching_add = false
-                            })
-                            console.log(`add to  cart successfully done.`, payload,data,state._cart);
-                        },
-                        onError(state, error, axios, {params, data}) {
-                            // if you define the onSuccess function you have to set the state by yourself
-                            //	state.post = null;
-                            throw "REST ERROR"
-                        }
+                        items: _items
                     }
                 )
             },
-            fetchCart(data = {} ) {
-
-                let _data = data
-                console.log("thhe state is!!!" , this.$store )
-
-                Cart.commit((   state) => {
-                    console.log("etting cart fetch false", state)
-                    state.fetching_cart = true,
-                        state.cart = _data
+            fetchCart(data = {}) {
+                Cart.commit((state) => {
+                    state.fetching_cart = true
                 })
-
-                return this.get(`/cart.js`);
-
-                    /*  return this.get(`/cart.js`)/*.then(function (response) {
-                     Cart.commit((state) => {
-                        console.log("setting cart fetch false", state)
-                        state.fetching_cart = false;
-                    })
-                    console.log(response);
-                    Cart.commit((state) => {
-                        console.log("setting checkout id", state)
-                        state.checkoutId = true
-                    })*!/
-                })
-                    .catch(function (error) {
-                        console.log(error);
-                    })
-                    .then(function () {
-                        // always executed
-                    });*/
+                return this.get(`/cart.js`, {
+                        dataTransformer: (response) => {
+                            const _cart = response.data
+                            if (_cart && _cart.token) {
+                                Cart.commit((state) => {
+                                    state.fetching_cart = false
+                                    state.checkoutId = _cart.token;
+                                })
+                            }
+                            return {..._cart, id: getRandomNumber(10000)}
+                        }
+                    }
+                )
             },
            /* getCart() {
 
@@ -123,15 +95,23 @@ export class Cart extends Model {
 
      static fields() {
          return {
-             id: this.uid(),
+             ...super.fields(),
              token: this.string(null),
              note: this.string(null),
              attributes: this.attr(null),
+             item_count: this.number(0),
+
+             items: this.hasMany(LineItem, "cart_id"),
+
+             /* pricing stuff */
+             currency: this.string("USD"),
              original_total_price: this.number(null),
              total_price: this.number(null),
              total_discount: this.number(null),
-             item_count: this.number(0),
-             items: this.hasMany(LineItem, "cart_id")
+             line_level_total_discount: this.number(null),
+             requires_shipping: this.boolean(false),
+             items_subtotal_price: this.number(null),
+             cart_level_discount_applications: this.attr([])
          }
      }
 }

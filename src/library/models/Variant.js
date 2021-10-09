@@ -11,8 +11,6 @@ export default class Variant extends Model {
     if (model.option2) temp_option_array.push(`[${model.product_id},"${model.option2}"]`);
     if (model.option3) temp_option_array.push(`[${model.product_id},"${model.option3}"]`);
     model.option_ids = temp_option_array;
-    //TODO: this causes a bug in line item. maybe extend instance instead
-    console.log("push!!!!",temp_option_array)
   }
   static fields() {
     return {
