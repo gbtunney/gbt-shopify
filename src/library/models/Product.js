@@ -30,7 +30,6 @@ export default class Product extends Model {
             fetchByHandle(handle) {
                 return this.get(`/products/${handle}.json`,
                     {
-                        baseURL: SHOPIFY_BASE_URL,
                         dataTransformer: (response) => {
                             return Product.prototype.APITransformProductData(response.data.product)
                         }
@@ -40,7 +39,6 @@ export default class Product extends Model {
             fetchAll() {
                 return this.get(`/products.json`,
                     {
-                        baseURL: SHOPIFY_BASE_URL,
                         dataTransformer: (response) => {
                             return response.data.products
                         }

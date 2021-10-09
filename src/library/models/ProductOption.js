@@ -36,9 +36,6 @@ export class ProductOptionValue extends ProductOptionBase {
     static baseEntity = 'productoptionbase'
     static primaryKey = ['product_id', 'handle']
 
-    static beforeCreate(model) {
-    }
-
     static fields() {
         return {
             ...super.fields(),
@@ -65,6 +62,7 @@ export class ProductOptionValue extends ProductOptionBase {
     get Option() { //this is incase its undefined
         if (this.option) return this.option
         if (this.option_id && !this.option) return ProductOption.query().whereId(this.option_id).first();
+        return false;
     }
 }
 

@@ -1,5 +1,4 @@
 import { Model } from '@vuex-orm/core'
-import {SHOPIFY_BASE_URL} from "@/settings";
 import { Variant} from './..'
 export const testdata =
     {
@@ -12,7 +11,7 @@ export const testdata =
         "total_weight": 16510.7623,
         "item_count": 130,
         "items":[],
-        "line_level_total_discount": 101250
+        "line_level_total_discount": 101250,
         "requires_shipping": true,
         "currency": "USD",
         "items_subtotal_price": 131625,
@@ -20,32 +19,105 @@ export const testdata =
     }
 
 
- export class Cart extends Model {
+export class Cart extends Model {
     static entity ="cart"
+
+     static state ()  {
+         return {
+             cart: false,
+             checkoutId:false,
+             fetching: false,
+             fetching_cart: false,
+             fetching_add: false,
+             fetching_update: false,
+         }
+     }
 
      static apiConfig = {
         actions: {
             addItems(item_array) {
                 let _items = item_array;
+                Cart.commit((state) => {
+                    console.log("setting varianble", state)
+                    state.fetching_add = true
+                })
+
                 return this.post(`/cart/add.js`,
                     {
                         save: false,
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': '*/*',
-                        },
                         items: _items,
-                        baseURL: SHOPIFY_BASE_URL,
+                        onSuccess(state, payload, axios, {params, data}) {
+                            alert();
+                            Cart.commit((state) => {
+                                state.fetching_add = false
+                            })
+                            console.log(`add to  cart successfully done.`, payload,data,state._cart);
+                        },
+                        onError(state, error, axios, {params, data}) {
+                            // if you define the onSuccess function you have to set the state by yourself
+                            //	state.post = null;
+                            throw "REST ERROR"
+                        }
                     }
                 )
             },
-            fetchCart() {
-                return this.get(`/cart.js`,
-                    {
-                        baseURL: SHOPIFY_BASE_URL,
-                    }
-                )
+            fetchCart(data = {} ) {
+
+                let _data = data
+                console.log("thhe state is!!!" , this.$store )
+
+                Cart.commit((   state) => {
+                    console.log("etting cart fetch false", state)
+                    state.fetching_cart = true,
+                        state.cart = _data
+                })
+
+                return this.get(`/cart.js`);
+
+                    /*  return this.get(`/cart.js`)/*.then(function (response) {
+                     Cart.commit((state) => {
+                        console.log("setting cart fetch false", state)
+                        state.fetching_cart = false;
+                    })
+                    console.log(response);
+                    Cart.commit((state) => {
+                        console.log("setting checkout id", state)
+                        state.checkoutId = true
+                    })*!/
+                })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
+                    .then(function () {
+                        // always executed
+                    });*/
             },
+           /* getCart() {
+
+                return new Promise<ShopifyBuy.Cart>(async (resolve) => {
+                    let cart = null
+
+                    if (State.checkoutId.length === 0) {
+                        cart = await this.getClient().checkout.create()
+                        State.checkoutId = cart.id as string
+                        window.localStorage.setItem(CHECKOUT_ID_STORAGE_KEY, cart.id as string)
+
+                        this.updateCart(cart)
+                        resolve(cart)
+                    } else if (!State.cart) {
+                        cart = await this.getClient().checkout.fetch(State.checkoutId)
+
+                        if (!cart) {
+                            cart = await this.getClient().checkout.create()
+                        }
+
+                        this.updateCart(cart)
+                        resolve(cart)
+                    } else {
+                        resolve(State.cart)
+                    }
+                })
+            },*/
         }
     }
 
@@ -74,13 +146,31 @@ export class LineItem extends Model {
             //*********** The Child value instances
             variant_id: this.number(null),
             cart_id: this.attr(null),
+            key: this.string(null),
+            quantity: this.number(1),
             Cart: this.belongsTo(Cart, "cart_id"),
-            key: this.string(null)
+        }
+    }
+    static apiConfig = {
+        actions: {
+            updateItem(line_item) {
+               const _line_item = line_item;
+                return this.post(`/cart/update.js`,
+                    {
+                        save: false,
+                        updates: {
+                            [_line_item.id] : _line_item.quantity
+                        }
+                    }
+                )
+            },
         }
     }
 }
 export default Cart
 /*
+1	jQuery.post('/cart/update.js', {updates: {794864053: 5}});
+
             {"id": 22589283041398,
             "properties": {},
             "quantity": 100,

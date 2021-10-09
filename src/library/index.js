@@ -10,6 +10,8 @@ import ProductImage from './models/ProductImage'
 import {ProductOptionBase, ProductOption, VariantOption, ProductOptionValue} from './models/ProductOption'
 import {ProductInstanceSingle, ProductInstanceGroup} from './models/ProductInstance'
 import {Cart,LineItem} from './models/Cart'
+import {SHOPIFY_BASE_URL} from "./settings";
+
 const _database = new Database()
 export {
     Product,
@@ -39,7 +41,12 @@ _database.register(VariantOption);
 
 _database.register(Cart)
 _database.register(LineItem)
-VuexORM.use(VuexORMAxios, {axios})
+VuexORM.use(VuexORMAxios, {axios,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    baseURL: SHOPIFY_BASE_URL
+})
 export const database = VuexORM.install(_database)
 
 export default database

@@ -261,7 +261,7 @@ export default {
       }, workingOptions).values())
     },
     async addToCart() {
-      var itemaddresponse = await Cart.api().addItems([this.Instance.LineItem,junkitem])
+      var itemaddresponse = await Cart.api().addItems([this.Instance.LineItem])
 
       var cartresponse = await Cart.api().fetchCart()
       console.log("reloaded cart",cartresponse, this.Instance.$toJson())
