@@ -1,29 +1,45 @@
 import { Model } from '@vuex-orm/core'
-import {ProductInstanceGroup, Variant} from './..'
+import {ProductInstanceSingle,LineItem,  Variant} from './..'
 import {getRandomNumber} from "../scripts/generic";
 
-export const testdata =
-    {
-        "token": "38bef5ca80e2663b6f5a1301cea97087",
-        "note": "",
-        "attributes": {},
-        "original_total_price": 263250,
-        "total_price": 131625,
-        "total_discount": 131625,
-        "total_weight": 16510.7623,
-        "item_count": 130,
-        "items":[],
-        "line_level_total_discount": 101250,
-        "requires_shipping": true,
-        "currency": "USD",
-        "items_subtotal_price": 131625,
-        "cart_level_discount_applications": []
+export class ProductGroupBase extends Model {
+    static entity ="productgroupbase"
+
+    static types () {
+        return {
+            GROUP: ProductInstanceGroup,
+            CART: Cart
+        }
     }
 
+    static fields() {
+        return {
+            id: this.uid(),
+            timestamp: this.number(0, value => Date.now()),
+            type: this.attr('GROUP'),
 
-export class Cart extends ProductInstanceGroup {
+            token: this.string(null),
+            item_count: this.number(0),
+            note: this.string(null), ///CART
+            attributes: this.attr(null),
+
+            /* pricing stuff */
+            items_subtotal_price: this.number(null),
+            original_total_price: this.number(null),
+            total_price: this.number(null), //quantity * price
+
+            total_discount: this.number(null),
+            line_level_total_discount: this.number(null),
+
+            currency: this.string("USD"),
+        }
+    }
+
+}
+
+export class Cart extends ProductGroupBase {
     static entity ="cart"
-     static baseEntity = 'productgroup' /// TODO: extend instance instead?
+     static baseEntity = 'productgroupbase' /// TODO: extend instance instead?
 
      static state ()  {
          return {
@@ -64,89 +80,62 @@ export class Cart extends ProductInstanceGroup {
                     }
                 )
             },
-           /* getCart() {
-
-                return new Promise<ShopifyBuy.Cart>(async (resolve) => {
-                    let cart = null
-
-                    if (State.checkoutId.length === 0) {
-                        cart = await this.getClient().checkout.create()
-                        State.checkoutId = cart.id as string
-                        window.localStorage.setItem(CHECKOUT_ID_STORAGE_KEY, cart.id as string)
-
-                        this.updateCart(cart)
-                        resolve(cart)
-                    } else if (!State.cart) {
-                        cart = await this.getClient().checkout.fetch(State.checkoutId)
-
-                        if (!cart) {
-                            cart = await this.getClient().checkout.create()
-                        }
-
-                        this.updateCart(cart)
-                        resolve(cart)
-                    } else {
-                        resolve(State.cart)
-                    }
-                })
-            },*/
         }
     }
-
      static fields() {
          return {
              ...super.fields(),
-             token: this.string(null),
-             note: this.string(null),
-             attributes: this.attr(null),
-             item_count: this.number(0),
-
-             items: this.hasMany(LineItem, "cart_id"),
-
-             /* pricing stuff */
-             currency: this.string("USD"),
-             original_total_price: this.number(null),
-             total_price: this.number(null),
-             total_discount: this.number(null),
-             line_level_total_discount: this.number(null),
+             items: this.hasMany(LineItem, "group_id"),
+             total_weight: this.number(null),
              requires_shipping: this.boolean(false),
-             items_subtotal_price: this.number(null),
              cart_level_discount_applications: this.attr([])
          }
      }
 }
 
-export class LineItem extends Model {
-    static entity = 'lineitem'
-   // static baseEntity = 'variants'  TODO: extend instance instead?
-
-    static fields() {
+export class ProductInstanceGroup extends ProductGroupBase {
+    static entity = 'productgroup'
+   static baseEntity = 'productgroupbase'
+    static fields() { //this used ti be inherited but it was a pain in the ass
         return {
-            /*...super.fields(),*/
-            //*********** The Child value instances
-            variant_id: this.number(null),
-            cart_id: this.attr(null),
-            key: this.string(null),
-            quantity: this.number(1),
-            Cart: this.belongsTo(Cart, "cart_id"),
+            ...super.fields(),
+
+            //*** variant linked with instance ( ie could be not for sale variant with group etc.
+           // variant_id: this.number(null),
+           // Variant: this.hasOne(Variant, "id", "variant_id"),
+
+            //*** preferences
+            add_to_cart_enabled: this.boolean(false), /// this is bool to allow a add to cart button for TOTAL GROUP.
+
+            //*********** The Child instances in group.
+            items: this.hasMany(ProductInstanceSingle, "group_id"),
+            max_children: this.number(1), //the max instanxes per group
         }
     }
-    static apiConfig = {
-        actions: {
-            updateItem(line_item) {
-               const _line_item = line_item;
-                return this.post(`/cart/update.js`,
-                    {
-                        save: false,
-                        updates: {
-                            [_line_item.id] : _line_item.quantity
-                        }
-                    }
-                )
-            },
+
+    get TotalPrice() {
+        let accumulator = 0;
+        if (this.ProductInstances) {
+            this.ProductInstances.forEach(function (item) {
+                if (item && item.Variant) {
+                    accumulator = Number(item.TotalPrice) + accumulator;
+                }
+            })
         }
+        return accumulator;
+        //add the array of item prices.
+    }
+
+    get IsAvailable() {
+        return this.ProductInstances.reduce(function (item, bool) {
+            if (!item.IsAvailable) return false;
+            return bool;
+        }, true);
+        //if one is unavailable the rest are false.
     }
 }
+
+
 export default Cart
 /*
 1	jQuery.post('/cart/update.js', {updates: {794864053: 5}});

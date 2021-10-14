@@ -1,10 +1,10 @@
 <script>
-import {ProductInstanceSingle, ProductInstanceGroup, Cart} from "../..";
+import {ProductInstanceSingle, ProductInstanceGroup, LineItem,Cart} from "../..";
 import {getRandomNumber} from "../../scripts/generic";
 import {mapState} from "vuex";
 
 export default {
-  name: "ProductInstanceGroup",
+  name: "cart",
   components: {},
   data: function () {
     return {
@@ -84,17 +84,21 @@ export default {
     Instance: function () {
       return ProductInstanceGroup.query().where("id", this.$data._refID).withAllRecursive().first();
     },
-    Children: function () {
-      return ProductInstanceSingle.query().where("group_id", this.$data._refID).withAll().all();
+    Items: function () {
+      return LineItem.query().where("group_id", this.$data._refID).withAll().all();
     },
   },
   async mounted() {
-    var response = await Cart.api().fetchCart();
+
+    let that = this
+    const response = await Cart.api().fetchCart();
+
     await Cart.commit((state) => {
 
       if (state.checkoutId) {
         console.log("qurrrtrrrrring gggggg", state, Cart.query().where("token", state.checkoutId).withAll().first())
         state.cart = Cart.query().where("token", state.checkoutId).withAll().first();
+        if ( state.cart && state.cart.id) that.$data._refID  = state.cart.id;
       }
 
     })
@@ -102,12 +106,12 @@ export default {
   render() {
     return this.$scopedSlots.default(
         {
-          GroupInstance: this.Instance,
-          Children: this.Children,
           Cart: this.cart,
+          isCartLoading: this.isCartLoading,
           TotalPrice: () => (this.Instance) ? this.Instance.TotalPrice : false,
           ItemsAvailable: () => (this.Instance) ? this.Instance.IsAvailable : false,
-          registerChild: this.registerChild,
+          Children: this.Items,
+          LineItems: this.Items
         }
     )
   },

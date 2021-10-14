@@ -35,18 +35,19 @@ export default {
           message: "color b"
         }
       }
-      var itemaddresponse = await Cart.api().addItems([this.Instance.LineItem,junkitem])
+      //var itemaddresponse = await Cart.api().addItems([this.Instance.LineItem,junkitem])
 
-      var cartresponse = await Cart.api().fetchCart()
-      console.log("reloaded cart",cartresponse, this.Instance.$toJson())
+     // var cartresponse = await Cart.api().fetchCart()
+     //  console.log("reloaded cart",cartresponse, this.Instance.$toJson())
     },
     async initializeInstanceGroup(dataObj) {
       const _testData = {
         message: "this is a test grtoup[ instance",
-        ProductInstances: [
+        items: [
           {
+            type: "INSTANCE",
             variant_id: 22589282975862,
-            group_id: this.$data._refID,
+         /*   group_id: this.$data._refID,*/
             message: "thhis is a test"
           }
         ]
@@ -89,10 +90,10 @@ export default {
     const mydata = {
       id: this.$data._refID,
       message: "i am a group",
-      ProductInstances: [
+      items: [
         {
           variant_id: 22589282975862,
-          group_id: this.$data._refID,
+         /* group_id: this.$data._refID,*/
           message: "thhis is a test"
         }
       ]

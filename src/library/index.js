@@ -8,8 +8,8 @@ import Product from './models/Product'
 import Variant from './models/Variant'
 import ProductImage from './models/ProductImage'
 import {ProductOptionBase, ProductOption, VariantOption, ProductOptionValue} from './models/ProductOption'
-import {ProductInstanceSingle, ProductInstanceGroup} from './models/ProductInstance'
-import {Cart,LineItem} from './models/Cart'
+import {ProductInstanceBase,ProductInstanceSingle, LineItem} from './models/ProductInstance'
+import {Cart,ProductInstanceGroup,ProductGroupBase} from './models/Cart'
 import {SHOPIFY_BASE_URL} from "./settings";
 
 const _database = new Database()
@@ -21,12 +21,16 @@ export {
     ProductOption,
     VariantOption,
     ProductOptionValue,
+    ProductInstanceBase,
     ProductInstanceSingle,
+    LineItem,
+    ProductGroupBase,
     ProductInstanceGroup,
-    Cart,
-    LineItem
+    Cart
 }
+_database.register(ProductGroupBase);
 
+_database.register(ProductInstanceBase)
 _database.register(ProductInstanceSingle)
 _database.register(ProductInstanceGroup)
 

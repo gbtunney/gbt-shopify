@@ -2,12 +2,9 @@
   <div class="home">
     <button v-tooltip="'You hav new messages.'">GILLIA  BUT%</button>
 
-    <cart-provider>
-      <div slot-scope="{Cart}">
-      </div>
-    </cart-provider>
     <product-instance-group>
       <div slot-scope="{GroupInstance,Children,registerChild}">
+       {{Children}}
         <div v-for="child in Children" v-bind:key="child.id">
           <product-instance-provider v-if="child.Variant && child.Variant.id" :variant="child.Variant.id" :instance="child">
             <div slot-scope="{Ready, Product,SelectedVariant,RequestedQuantity}">
@@ -289,7 +286,6 @@ import ProductInstanceProvider from '@/library/components/product/ProductInstanc
 import gQuantityPicker from '@/library/components/ui/gQuantityPicker.vue';
 import ProductImageGrid from '@/library/components/images/ProductImageGrid.vue';
 import ProductInstanceGroup from '@/library/components/product/ProductInstanceGroup.vue'; // @ is an alias to /src
-import CartProvider from '@/library/components/CartProvider.vue'
 import { SfProductOption ,SfQuantitySelector,SfProperty,SfButton,SfIcon,SfGallery,SfImage} from "@storefront-ui/vue";
 
 export default Vue.extend({
@@ -298,7 +294,6 @@ export default Vue.extend({
     HelloWorld,ProductInstanceProvider,vSelect,
     ProductInstanceGroup,
     gQuantityPicker,
-    CartProvider,
     ProductImageGrid,
     SfProductOption,SfQuantitySelector,SfProperty,SfButton,SfIcon,SfGallery,SfImage
   }, data() {
