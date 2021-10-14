@@ -1,5 +1,5 @@
 <script>
-import {ProductInstanceSingle, ProductInstanceGroup, LineItem,Cart} from "../..";
+import {ProductInstanceSingle, ProductInstanceGroup, LineItem,Cart,ProductGroupBase} from "../..";
 import {getRandomNumber} from "../../scripts/generic";
 import {mapState} from "vuex";
 
@@ -21,7 +21,11 @@ export default {
       default: 1,
     },
   },
-
+  watch: {
+    instance(newValue) {
+      console.log("instance changed ", newValue)
+    }
+  },
   methods: {
     removeItem(item) {
       // Shopify.removeItem(item)
@@ -78,11 +82,11 @@ export default {
   },
   computed: {
     ...mapState('entities/cart', {   //cartLoading
-      isCartLoading: (state) => state.fetching_cart,
+      isCartLoading: (state) => state.fetching,
       cart: (state) => state.cart
     }),
     Instance: function () {
-      return ProductInstanceGroup.query().where("id", this.$data._refID).withAllRecursive().first();
+      return Cart.query().where("id", this.$data._refID).withAllRecursive().first();
     },
     Items: function () {
       return LineItem.query().where("group_id", this.$data._refID).withAll().all();
@@ -90,6 +94,27 @@ export default {
   },
   async mounted() {
 
+    let that = this
+    //Cart HAS TO BE merged with an id with a number.
+    if ( this.$props.instance ){
+     const response = await Cart.insert({
+       data: { ...this.$props.instance, id: this.$data._refID}
+     })
+      if (this.Instance){
+
+        await Cart.commit((state) => {
+          state.checkoutId = that.Instance.token
+          //if (state.checkoutId) {
+           // console.log("qurrrtrrrrring gggggg", state, Cart.query().where("token", state.checkoutId).withAll().first())
+            state.cart = that.Instance;//Cart.query().where("token", state.checkoutId).withAll().first();
+          //  if ( state.cart && state.cart.id) that.$data._refID  = state.cart.id;
+
+
+        })
+      }
+        console.log("response ", response)
+    }
+    /*
     let that = this
     const response = await Cart.api().fetchCart();
 
@@ -102,11 +127,12 @@ export default {
       }
 
     })
+    console.log("completess")*/
   },
   render() {
     return this.$scopedSlots.default(
         {
-          Cart: this.cart,
+          Cart: this.Instance,
           isCartLoading: this.isCartLoading,
           TotalPrice: () => (this.Instance) ? this.Instance.TotalPrice : false,
           ItemsAvailable: () => (this.Instance) ? this.Instance.IsAvailable : false,
