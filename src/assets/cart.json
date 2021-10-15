@@ -1,0 +1,149 @@
+{
+  "token": "ad26a1e978a54dd1d088d5911de66431",
+  "type": "CART",
+  "note": null,
+  "attributes": {},
+  "original_total_price": 2699,
+  "total_price": 2249,
+  "total_discount": 450,
+  "total_weight": 239.9957,
+  "item_count": 2,
+  "items": [
+    {
+      "id": 22620513632374,
+      "properties": null,
+      "quantity": 2,
+      "variant_id": 22620513632374,
+      "key": "22620513632374:c8e86847f207f1a6148f73b405098027",
+      "title": "Local (worsted) - Wissahickon / Mini-skein",
+      "price": 900,
+      "original_price": 900,
+      "discounted_price": 450,
+      "line_price": 450,
+      "original_line_price": 900,
+      "total_discount": 450,
+      "discounts": [
+        {
+          "amount": 450,
+          "title": "Test Discount"
+        }
+      ],
+      "sku": "Local:LWissahickon",
+      "grams": 127,
+      "vendor": "O-Wool",
+      "taxable": true,
+      "product_id": 2651981938806,
+      "product_has_only_default_variant": false,
+      "gift_card": false,
+      "final_price": 450,
+      "final_line_price": 450,
+      "url": "/products/local?variant=22620513632374",
+      "featured_image": {
+        "aspect_ratio": 0.667,
+        "alt": "Wissahickon",
+        "height": 2048,
+        "url": "https://cdn.shopify.com/s/files/1/0084/4044/7094/products/LWissahickon.jpg?v=1570355350",
+        "width": 1365
+      },
+      "image": "https://cdn.shopify.com/s/files/1/0084/4044/7094/products/LWissahickon.jpg?v=1570355350",
+      "handle": "local",
+      "requires_shipping": true,
+      "product_type": "Yarns",
+      "product_title": "Local (worsted)",
+      "product_description": "Worsted WeightFiber Content:50% alpaca from local farms in NJ & PA50% certified organic merinoPut-up: 3.5 oz / 100gYardage: 240 yds / 219mGauge: 18 - 20 sts = 4” / 10cm Needle: 7 - 9 US / 4.5 - 5.5mm How about Local dyed with Natural Dyes!?\nClick here for patterns in Local\nWant to see all of the colors in person before ordering? Order a Shade Card.\n\nWant your yarn wound into balls? Look here.\nAfter one adventurous drive in a minivan brimming with alpaca fiber, O-Wool Local was born. Since then, I've visited farms all around the Philadelphia area collecting fiber. Local is processed in the Northeastern USA. It is squishy and soft, and still has that alpaca smell and some lanolin left in the fiber. It is a truly rustic, minimally processed yarn - if that's your thing, you're going to love this yarn.\nHand wash in cold water with gentle detergent. Lay flat to dry.\n ",
+      "variant_title": "Wissahickon / Mini-skein",
+      "variant_options": [
+        "Wissahickon",
+        "Mini-skein"
+      ],
+      "options_with_values": [
+        {
+          "name": "Color",
+          "value": "Wissahickon"
+        },
+        {
+          "name": "Size",
+          "value": "Mini-skein"
+        }
+      ],
+      "line_level_discount_allocations": [
+        {
+          "amount": 450,
+          "discount_application": {
+            "type": "automatic",
+            "key": "ee9627bc-852f-4d62-b883-57d97c897d11",
+            "title": "Test Discount",
+            "description": "",
+            "value": "50.0",
+            "created_at": "2021-10-14T19:35:48.249Z",
+            "value_type": "percentage",
+            "allocation_method": "across",
+            "target_selection": "entitled",
+            "target_type": "line_item",
+            "total_allocated_amount": 450
+          }
+        }
+      ],
+      "line_level_total_discount": 450
+    },
+    {
+      "id": 22589264494710,
+      "properties": {},
+      "quantity": 1,
+      "variant_id": 22589264494710,
+      "key": "22589264494710:31b6654450ef84226bd29d20b2264cf4",
+      "title": "O-Wash Sport - Barn Owl / Full / 100g / 304yds",
+      "price": 1799,
+      "original_price": 1799,
+      "discounted_price": 1799,
+      "line_price": 1799,
+      "original_line_price": 1799,
+      "total_discount": 0,
+      "discounts": [],
+      "sku": "O-Wash Sport:OSBarnOwl",
+      "grams": 113,
+      "vendor": "O-Wool",
+      "taxable": true,
+      "product_id": 2651977187446,
+      "product_has_only_default_variant": false,
+      "gift_card": false,
+      "final_price": 1799,
+      "final_line_price": 1799,
+      "url": "/products/o-wash-sport?variant=22589264494710",
+      "featured_image": {
+        "aspect_ratio": 0.667,
+        "alt": "Barn Owl",
+        "height": 2048,
+        "url": "https://cdn.shopify.com/s/files/1/0084/4044/7094/products/OSBarnOwl_43538f6f-44f3-4b0a-913d-64ba34ba3b44.jpg?v=1570355348",
+        "width": 1366
+      },
+      "image": "https://cdn.shopify.com/s/files/1/0084/4044/7094/products/OSBarnOwl_43538f6f-44f3-4b0a-913d-64ba34ba3b44.jpg?v=1570355348",
+      "handle": "o-wash-sport",
+      "requires_shipping": true,
+      "product_type": "Yarns",
+      "product_title": "O-Wash Sport",
+      "product_description": "Sport Weight\nFiber Content: 100% machine-washable certified organic merino\nPut-up: Full: 3.5 oz / 100g; Mini: approx. .7 ounces / 20gYardage: Full: 304 yards / 278m; Mini: approx. 61 yds / 56mGauge: 26 sts = 4 in / 10cmNeedle: 3 - 4 US / 3.25 - 3.5mm\n\nMachine wash in cold water. Machine dry on low heat.Click here for patterns in O-Wash Sport\nWant to see all of the colors in person before ordering? Order a Shade Card.Want your yarn wound into balls? Look here.\n*Please note this yarn is not suitable for felting projects*Unlike conventional superwashing processes where scales are burned off of the wool fiber with acid, O-Wash uses a GOTS certified organic compound to create washability. This compound holds the wool fibers in place during washing and drying, preventing them from interlocking during agitation which is what causes shrinkage and felting.\nThis yarn is dyed \"tonally\". Think of this more like a hand-dyed yarn - alternate skeins while knitting.",
+      "variant_title": "Barn Owl / Full / 100g / 304yds",
+      "variant_options": [
+        "Barn Owl",
+        "Full / 100g / 304yds"
+      ],
+      "options_with_values": [
+        {
+          "name": "Color",
+          "value": "Barn Owl"
+        },
+        {
+          "name": "Size",
+          "value": "Full / 100g / 304yds"
+        }
+      ],
+      "line_level_discount_allocations": [],
+      "line_level_total_discount": 0
+    }
+  ],
+  "requires_shipping": true,
+  "currency": "USD",
+  "items_subtotal_price": 2249,
+  "cart_level_discount_applications": []
+}

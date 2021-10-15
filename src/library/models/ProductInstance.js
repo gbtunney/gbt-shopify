@@ -18,7 +18,7 @@ export class ProductInstanceBase extends Model {
         return {
             id: this.uid(),
             type: this.attr('INSTANCE'),
-            timestamp: this.number(0, value => Date.now()),
+           /* timestamp: this.number(0, value => Date.now()),*/
             properties: this.attr({message:false}),
             meta: this.string(null),
             url:this.string(null),
@@ -35,50 +35,29 @@ export class ProductInstanceBase extends Model {
             options_editable: this.attr(Editable_Defaults["options"]), //future pref dont know when implement
         }
     }
-    static beforeCreate (model) {
-        // Do something.
-        if (model && model.handle){
-            const {handle } = model;
-            const product =  Product.query().where("handle", handle ).withAll().first();
-            console.log("__________trying to get a product !!!!!",handle);
-            if (!product )  Product.api().fetchByHandle(handle)
+
+    get VariantID() {
+        if (this.variant_id) {
+            if (isShopifyID(this.variant_id)) return toInteger(this.variant_id)
+            if (this.handle) {
+                const _product_id = Product.handleToID(this.handle);
+                const position_index = (toInteger(this.variant_id) > 0) ? toInteger(this.variant_id) : 1;
+                const _variant = Variant.query()
+                    .where("product_id", _product_id)
+                    .where("position", position_index)
+                    .withAll().first()
+                if (_variant && _variant.id && isShopifyID(_variant.id)) {
+                    this.variant_id = toInteger(_variant.id);
+                    return toInteger(_variant.id);
+                }
+            }
         }
-        /* if (!this.Product) {
-      const response = await Product.api().fetchByHandle(this.Handle)
-    }*/
+        return false;
     }
+   /* static beforeCreate (model) {
+    }*/
     static mutators() {
         return {
-            variant_id (value) {
-                if (!value) return value
-                //console.log("trying to set id",value);
-                if ( isShopifyID(value) ) return toInteger(value)
-                if (R.is(String, value) && getContainsLetter(value)){
-                    if (stringContainsUppercase(value)) { ///if contains an uppercase, its not a handle
-                        let _variant = Variant.query().where("sku", value).first();
-                        console.log("searching for sku", _variant);
-                        if (_variant && _variant.id) return _variant.id
-                    }
-                    let search_handle = value;
-                    let search_position = 1;
-                    if (value.contains("|")) {
-                        console.log("contains pipe char, checking for handle and integer")
-                        let arr = value.split('|');
-                        if (arr && arr.length >= 2) {
-                            search_handle = arr[0];
-                            search_position = toInteger(arr[1], 1);
-                        }
-                    }
-                    let _product = Product.query().where("handle", search_handle).first();
-                    console.log(" ifffffs prodduct handle", search_handle, search_position, _product);
-                    if (_product && _product.id) {
-                        let foundVariant = Variant.query().where("product_id", _product.id).where("position", search_position).first()
-                        console.log(" foundVariante", foundVariant);
-                        if (foundVariant && foundVariant.id) return foundVariant.id
-                    }
-                }
-                return
-            },
             options_editable(value) {
                 if (R.is(Boolean, value)) return value;
                 else if (R.is(Array, value)) {     //expand to map
@@ -107,7 +86,7 @@ export class ProductInstanceSingle extends ProductInstanceBase {
     }
     static mutators() {
         return {
-            variant_id (value) {
+           /* variant_id (value) {
                 if (!value) return value
                 //console.log("trying to set id",value);
                 if ( isShopifyID(value) ) return toInteger(value)
@@ -136,7 +115,7 @@ export class ProductInstanceSingle extends ProductInstanceBase {
                     }
                 }
                 return
-            },
+            },*/
             options_editable(value) {
                 if (R.is(Boolean, value)) return value;
                 else if (R.is(Array, value)) {     //expand to map
@@ -193,7 +172,7 @@ export class LineItem extends ProductInstanceBase {
             key: this.string(null),
             quantity: this.number(1),
 
-            Group: this.belongsTo(Cart, "group_id"),
+            Group: this.belongsTo(Cart, "id"),
 
             featured_image:this.attr(null),
             title: this.string(null),

@@ -4,24 +4,24 @@
 
     <cart-provider :instance="message">
       <div slot-scope="{Cart,isCartLoading , LineItems}">
-
         <div v-if="!isCartLoading">
           <div v-for="lineitem in LineItems" v-bind:key="lineitem.id">
-            <product-instance-provider :instance="lineitem">
+            <product-instance-provider2 v-bind="lineitem.$toJson()">
               <div slot-scope="{Ready, Product,SelectedVariant,RequestedQuantity}">
-              <div v-if="Ready">
-                - {{Product.title}} :: {{SelectedVariant.title}}
-              </div>
+                <div v-if="Ready">
+                 {{RequestedQuantity}} - {{ Product.title }} :: {{ SelectedVariant.title }}
+                </div>
 
               </div>
-            </product-instance-provider>
+            </product-instance-provider2>
           </div>
-
         </div>
       </div>
     </cart-provider>
+    <hr>
 
-    <product-instance-provider :options_editable="true" handle="local" :variant="3">
+    <button @click="Testing">CLICK MEEEEEE</button>
+    <product-instance-provider2 v-bind="$data.testing" >
       <!--ff
 //{ Loading,Variants,Images,Options,OptionValueList,
 // Product,ProductImage,SelectedVariant,SelectedVariantImage,SelectedOptionList,SelectedOption,
@@ -30,35 +30,50 @@
 
       <div slot-scope="{Loading,Variants,Images,Options,OptionValueList,
       Product,ProductImage,SelectedVariant,SelectedVariantImage,SelectedOptionList,SelectedOption,
-      RequestedQuantity ,Instance, UpdateInstance , UpdateOption,UpdateVariant,addToCartEnabled,addToCart
+      RequestedQuantity ,Instance, UpdateInstance , UpdateOption,UpdateVariant,addToCartEnabled,addToCart,initTest
        }"
           id="shopify-section-product-template" class="shopify-section">
 
+        <button @click="initTest">
+initialize hhhhhjhhhjhhjhjhjhhj
+        </button>
+{{Options}}
 
       </div>
-    </product-instance-provider>
+    </product-instance-provider2>
 
   </div>
 </template>
 
 <script>
 import CartData from "@/assets/cart.json"
-import ProductInstanceProvider from '@/library/components/product/ProductInstanceProvider.vue'; // @ is an alias to /src
+import ProductInstanceProvider2 from '@/library/components/product/ProductInstanceProvider2.vue'; // @ is an alias to /src
 import CartProvider from '@/library/components/cart/CartProvider.vue'; // @ is an alias to /src
 import {Product} from '@/library'
   export default {
   name: "App",
-  components: {CartProvider,ProductInstanceProvider},
+  components: {CartProvider,ProductInstanceProvider2},
   data: function () {
   return {
-  message: CartData
+  message: false,
+    testing: false
 }
 },
   props: {},
-    async created(){
+    async mounted(){
+      this.$data.message=  CartData
+   //  const response = await Product.api().fetchAll()
 
-      const response = await Product.api().fetchAll()
-      console.log("loading all!!!",response)
+    //const response = await Product.api().fetchByHandle('local')
+
+    //  console.log("CREAT77777777777777777777777", response,this.$data.message)
+     // const response = await Product.api().fetchAll()
+
+    },
+    methods:{
+    Testing(){
+      this.$data.testing={handle: 'balance' , variant_id : 8, options_editable: ['color']}
+    }
     }
 }
 </script>

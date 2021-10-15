@@ -1,10 +1,11 @@
 import {Model} from '@vuex-orm/core'
-import {Variant,ProductImage,ProductOption,ProductOptionValue}from './..'
+import {Variant, ProductImage, ProductOption, ProductOptionValue, VariantOption} from './..'
 import {SHOPIFY_BASE_URL} from "./../settings";
 
 import * as R from 'ramda'
 const {omit, pick} = R
-import {slugify} from "./../scripts/generic";
+import {slugify, toInteger} from "./../scripts/generic";
+import {isShopifyID} from "../scripts/shopify";
 
 //todo: get this from settings
 export default class Product extends Model {
@@ -18,16 +19,16 @@ export default class Product extends Model {
     }
 
     static afterCreate(model) {
-        ///so thhis calls after it is created.
-        Product.commit((state) => {
-          //  console.log("state", state)
-            state.ready = true
-        })
+        ///make pivot table.
+        model.createVariantOptionPivot()
     }
 
     static apiConfig = {
         actions: {
             fetchByHandle(handle) {
+                Product.commit((state) => {
+                    state.fetching = true
+                })
                 return this.get(`/products/${handle}.json`,
                     {
                         dataTransformer: (response) => {
@@ -37,10 +38,18 @@ export default class Product extends Model {
                 )
             },
             fetchAll() {
+                Product.commit((state) => {
+                    console.log("state commit6ing done", state)
+                    state.fetching = true
+                })
                 return this.get(`/products.json`,
                     {
                         dataTransformer: (response) => {
-                            return response.data.products
+                            let _products = response.data.products;
+                            if (_products.length > 0) return _products.map(function (_product) {
+                                return Product.prototype.APITransformProductData(_product)
+                            })
+                            else return _products;
                         }
                     }
                 )
@@ -78,6 +87,7 @@ export default class Product extends Model {
              download: this.hasOne()(ProductMetaAttr,  id) */
         }
     }
+
     get Images() {
         return this.images;
     }
@@ -85,11 +95,19 @@ export default class Product extends Model {
     get Variants() {
         return this.variants;
     }
+
     get Options(){
         return this.options
     }
+
+    static handleToID(handle) {
+        var _product = Product.query().where("handle", handle).first();
+        if (_product && _product.id && isShopifyID(_product.id)) return toInteger(_product.id)
+        return false;
+    }
 }
-/*INCOMING DATA: n*/
+
+/*INCOMING DATA: n*/ //TODO: shoud be switched to static method.
 Product.prototype.APITransformProductData = function (_product) {
     //make id public
     let product_ID = _product.id;
@@ -119,4 +137,27 @@ Product.prototype.APITransformProductData = function (_product) {
         })
     }
     return {..._product, ...{options: option_arr}};
+}
+
+Product.prototype.createVariantOptionPivot = async function () {
+    let _product_id = this.id;
+    if (_product_id) {
+        const _variants = await Variant.query().where("product_id", _product_id).with('options').all();
+        if (_variants && _variants.length > 0) {
+            await _variants.forEach(function (_variant) {
+                let variant = _variant;
+                if (_variant.options && _variant.options.length > 0) {
+                    _variant.options.forEach(function (option_value) {
+                        VariantOption.insert({
+                            data: {
+                                variant_id: variant.id,
+                                option_value_id: option_value.id,
+                                thumbnail_id: (variant.Image) ? variant.Image.id : false
+                            }
+                        })
+                    })
+                }
+            })
+        }
+    }
 }

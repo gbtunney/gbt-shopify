@@ -24,6 +24,7 @@ export default {
   watch: {
     instance(newValue) {
       console.log("instance changed ", newValue)
+      this.init();
     }
   },
   methods: {
@@ -78,7 +79,40 @@ export default {
         }
       })
       console.log("trying to register a child", this.Children, this.Instance)
-    }
+    },
+    async init() {
+
+      let that = this
+      //Cart HAS TO BE merged with an id with a number.
+      if ( this.$props.instance ){
+        const response = await Cart.insert({
+          data: { ...this.$props.instance, id: this.$data._refID}
+        })
+        if (this.Instance){
+
+          await Cart.commit((state) => {
+            state.checkoutId = that.Instance.token
+            state.cart = that.Instance;//Cart.query().where("token", state.checkoutId).withAll().first();
+            //  if ( state.cart && state.cart.id) that.$data._refID  = state.cart.id;
+          })
+        }
+        console.log("response ", response)
+      }
+      /*
+      let that = this
+      const response = await Cart.api().fetchCart();
+
+      await Cart.commit((state) => {
+
+        if (state.checkoutId) {
+          console.log("qurrrtrrrrring gggggg", state, Cart.query().where("token", state.checkoutId).withAll().first())
+          state.cart = Cart.query().where("token", state.checkoutId).withAll().first();
+          if ( state.cart && state.cart.id) that.$data._refID  = state.cart.id;
+        }
+
+      })
+      console.log("completess")*/
+    },
   },
   computed: {
     ...mapState('entities/cart', {   //cartLoading
@@ -93,41 +127,7 @@ export default {
     },
   },
   async mounted() {
-
-    let that = this
-    //Cart HAS TO BE merged with an id with a number.
-    if ( this.$props.instance ){
-     const response = await Cart.insert({
-       data: { ...this.$props.instance, id: this.$data._refID}
-     })
-      if (this.Instance){
-
-        await Cart.commit((state) => {
-          state.checkoutId = that.Instance.token
-          //if (state.checkoutId) {
-           // console.log("qurrrtrrrrring gggggg", state, Cart.query().where("token", state.checkoutId).withAll().first())
-            state.cart = that.Instance;//Cart.query().where("token", state.checkoutId).withAll().first();
-          //  if ( state.cart && state.cart.id) that.$data._refID  = state.cart.id;
-
-
-        })
-      }
-        console.log("response ", response)
-    }
-    /*
-    let that = this
-    const response = await Cart.api().fetchCart();
-
-    await Cart.commit((state) => {
-
-      if (state.checkoutId) {
-        console.log("qurrrtrrrrring gggggg", state, Cart.query().where("token", state.checkoutId).withAll().first())
-        state.cart = Cart.query().where("token", state.checkoutId).withAll().first();
-        if ( state.cart && state.cart.id) that.$data._refID  = state.cart.id;
-      }
-
-    })
-    console.log("completess")*/
+    this.init();
   },
   render() {
     return this.$scopedSlots.default(
