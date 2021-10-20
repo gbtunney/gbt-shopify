@@ -1,9 +1,9 @@
 import {Model} from '@vuex-orm/core'
 import  {Variant, Product, ProductInstanceGroup,Cart} from "./..";
 import * as R from "ramda";
-import {Editable_Defaults} from "../settings";
+import {Editable_Defaults, ID_LENGTH} from "../settings";
 import {isShopifyID} from "../scripts/shopify";
-import {getContainsLetter, getHasLetter, stringContainsUppercase, toInteger} from "../scripts/generic";
+import {getContainsLetter, getHasLetter, getRandomNumber, stringContainsUppercase, toInteger} from "../scripts/generic";
 
 export class ProductInstanceBase extends Model {
     static entity = 'productbase'
@@ -16,7 +16,7 @@ export class ProductInstanceBase extends Model {
 
     static fields() {
         return {
-            id: this.uid(),
+            id: this.number(getRandomNumber(ID_LENGTH)),
             type: this.attr('INSTANCE'),
            /* timestamp: this.number(0, value => Date.now()),*/
             properties: this.attr({message:false}),
@@ -174,7 +174,7 @@ export class LineItem extends ProductInstanceBase {
 
             Group: this.belongsTo(Cart, "id"),
 
-            featured_image:this.attr(null),
+            featured_image:this.attr(null), // TODO: this is an object, maybe convert to an image
             title: this.string(null),
             price: this.number(null),
             original_price: this.number(null),

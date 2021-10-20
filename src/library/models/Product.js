@@ -1,10 +1,10 @@
 import {Model} from '@vuex-orm/core'
 import {Variant, ProductImage, ProductOption, ProductOptionValue, VariantOption} from './..'
-import {SHOPIFY_BASE_URL} from "./../settings";
+import {SHOPIFY_BASE_URL,ID_LENGTH} from "./../settings";
 
 import * as R from 'ramda'
 const {omit, pick} = R
-import {slugify, toInteger} from "./../scripts/generic";
+import {getRandomNumber, slugify, toInteger} from "./../scripts/generic";
 import {isShopifyID} from "../scripts/shopify";
 
 //todo: get this from settings
@@ -12,7 +12,7 @@ export default class Product extends Model {
     static entity = 'products';
 
     static state ()  {
-        return {    testMe: true,
+        return {
             fetching: false,
             ready: false,
         }
@@ -59,7 +59,7 @@ export default class Product extends Model {
 
     static fields() {
         return {
-            id: this.number(null), //TODO: keeping this as a STRING (bc generic doesnt work wtf) type BC possibble string/int clash with shopify
+            id: this.number(getRandomNumber(ID_LENGTH)),
             handle: this.string(null), ///already a slug
             title: this.string(null),
             subtitle: this.string("tihs is a test subtitle"), //from defaults

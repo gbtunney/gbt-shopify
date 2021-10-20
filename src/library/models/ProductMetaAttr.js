@@ -1,11 +1,12 @@
 /* eslint-disable */
 import {Model} from '@vuex-orm/core'
+import {getRandomNumber} from "../scripts/generic";
 
 export default class ProductMetaAttr extends Model {
 
     static fields() {
         return {
-            id: this.uid(),
+            id: this.number(() => getRandomNumber(10000000)),
             handle: this.string(null),
             value: this.attr(null),
             title: this.string(null), ///IDK MAYBE NOT

@@ -1,6 +1,7 @@
 import { Model } from '@vuex-orm/core'
 import {ProductInstanceSingle,LineItem,  Variant} from './..'
 import {getRandomNumber} from "../scripts/generic";
+import {ID_LENGTH} from "../settings";
 
 export class ProductGroupBase extends Model {
     static entity ="productgroupbase"
@@ -14,7 +15,7 @@ export class ProductGroupBase extends Model {
 
     static fields() {
         return {
-            id: this.uid(),
+            id: this.number(getRandomNumber(ID_LENGTH)),
             timestamp: this.number(0, value => Date.now()),
             type: this.attr('GROUP'),
 
@@ -74,8 +75,10 @@ export class Cart extends ProductGroupBase {
                                     state.fetching_cart = false
                                     state.checkoutId = _cart.token;
                                 })
+                                //return _cart;
                             }
-                            return {..._cart, id: getRandomNumber(10000)}
+
+                           return {..._cart, id: getRandomNumber(10000)}
                         }
                     }
                 )

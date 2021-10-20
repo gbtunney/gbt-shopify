@@ -1,7 +1,7 @@
 import {Model} from '@vuex-orm/core'
-import {slugify} from "./../scripts/generic"
+import {getRandomNumber, slugify} from "./../scripts/generic"
 import {Product, ProductImage,ProductOptionValue,VariantOption} from "./..";
-import {MINIMUM_QUANTITY } from './../settings'
+import {ID_LENGTH, MINIMUM_QUANTITY} from './../settings'
 export default class Variant extends Model {
   static entity = 'variants';
 
@@ -14,7 +14,7 @@ export default class Variant extends Model {
   }
   static fields() {
     return {
-      id: this.number(null),//TODO: keeping this as a STRING (bc generic doesnt work wtf) type BC possibble string/int clash with shopify
+      id: this.number(getRandomNumber(ID_LENGTH)),
       // handle: maybe generate a slug from options??
       title: this.string(null),
       position: this.number(null), //the index  ///set this to increment?

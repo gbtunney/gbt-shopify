@@ -2,20 +2,22 @@
 import {Model} from '@vuex-orm/core'
 import {Product, Variant} from './..'
 import {ShopifyMediaURL} from "./../scripts/shopify";
+import {getRandomNumber} from "../scripts/generic";
+import {ID_LENGTH} from "../settings";
 
 export default class ProductImage extends Model {
     static entity = 'productimages'
 
     static fields() {
         return {
-            id: this.number(null),//TODO: keeping this as a STRING (bc generic doesnt work wtf) type BC possibble string/int clash with shopify
+            id: this.number(getRandomNumber(ID_LENGTH)),
             position: this.number(null),
             alt: this.string(null),
             width: this.number(500),
             height: this.number(500),
             src: this.string(null),
             product_id: this.number(null),
-            variant_ids: this.attr(null),
+            variant_ids: this.attr(null), //array of numbers
 
             ///*******CALCULATED FIELDS
             Product: this.belongsTo(Product, 'product_id'),

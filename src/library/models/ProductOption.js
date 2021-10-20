@@ -1,6 +1,7 @@
 import {Model} from '@vuex-orm/core'
-import {slugify} from "./../scripts/generic";
+import {getRandomNumber, slugify} from "./../scripts/generic";
 import {Product, Variant, ProductImage} from "./..";
+import {ID_LENGTH} from "../settings";
 
 // Base entity.
 export class ProductOptionBase extends Model {
@@ -16,7 +17,7 @@ export class ProductOptionBase extends Model {
 
     static fields() {
         return {
-            id: this.uid(),
+            id: this.number(getRandomNumber(ID_LENGTH)),
             type: this.attr('VALUE'), // Exposing the discriminator field.
 
             handle: this.string(null, value => slugify(value)),
@@ -40,8 +41,8 @@ export class ProductOptionValue extends ProductOptionBase {
         return {
             ...super.fields(),
             alt: this.string(),
-            option_id: this.attr(null),//the parent option,
-            thumbnail_id: this.attr(null),
+            option_id: this.number(null),//the parent option,
+            thumbnail_id: this.number(null),
             option: this.belongsTo(ProductOption, "option_id"),
             Variants: this.belongsToMany(Variant, VariantOption, "option_value_id", "variant_id"),
             Images: this.belongsToMany(ProductImage, VariantOption, "option_value_id", "thumbnail_id"),
@@ -88,9 +89,9 @@ export class VariantOption extends Model {
 
     static fields() {
         return {
-            variant_id: this.attr(null),
-            option_value_id: this.attr(null),
-            thumbnail_id: this.attr(null)
+            variant_id: this.number(null),
+            option_value_id: this.number(null),
+            thumbnail_id: this.number(null)
         }
     }
 }
