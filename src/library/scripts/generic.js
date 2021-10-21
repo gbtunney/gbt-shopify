@@ -26,6 +26,10 @@ export function toInteger(value , _default =0 ) {
     return _default;
 }
 
+export function isInteger(value) {
+    return (Number(value) == toInteger(value)) ? true : false
+}
+
 export function getDigitCount(value) {
     return Math.log(toInteger(value)) * Math.LOG10E + 1 | 0;
 }

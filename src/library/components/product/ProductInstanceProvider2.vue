@@ -1,9 +1,9 @@
 <script>
-import {getRandomNumber} from "./../../scripts/generic"
+import {getRandomNumber, isInteger, toInteger} from "./../../scripts/generic"
 import {isShopifyID} from "./../../scripts/shopify"
 import * as R from "ramda";
 import {LoaderMixin} from './../../mixins/LoaderMixin'
-import {Editable_Defaults, USE_SERVER} from '../../settings'
+import {Editable_Defaults, LOAD_MODE, SELECTION_MODE_OPTIONS, USE_SERVER} from '../../settings'
 import {
   ProductInstanceSingle,
   Product,
@@ -17,6 +17,8 @@ import {
 } from '../..'
 import {mapState} from "vuex";
 
+const defaultInstance = ProductInstanceSingle.fields();
+
 export default {
   name: "ProductInstanceProvider",
   mixins: [LoaderMixin],
@@ -25,7 +27,8 @@ export default {
     return {
       _refID: getRandomNumber(1000000),
       _handle: false,
-      _initialized:false
+      _initialized:false,
+      _load_mode : 'LOAD_HANDLE_ALWAYS'
     }
   },
   props: {
@@ -35,7 +38,7 @@ export default {
     },
     id : {
       type: [Number],
-      default: 666666666666
+      default: getRandomNumber(1000000),
     },
     instance: {
       type: [Object, Boolean],
@@ -43,19 +46,26 @@ export default {
     },
     variant_id: {
       type: Number,  /* ID OR SID */
-      default: 1,
+      default: defaultInstance.variant_id.value,
     },
     handle: {
       type: [Boolean,String],  /* ID OR SID */
-      default: false,
+      default:  defaultInstance.handle.value,
     },
     type:{
       type: String,
-      default: "INSTANCE",
+      default:  defaultInstance.type.value,
     },
     message: {
       type: String,  /* ID OR SID */
       default: 'test nessage1111',
+    },
+    selection_mode:{
+      type: [String,Boolean],
+      default: defaultInstance.selection_mode.value,
+      validator: function(value){
+      return   Object.keys(SELECTION_MODE_OPTIONS).indexOf(value) >= 0
+      }
     },
     quantity_editable: {
       type: Boolean,
@@ -73,6 +83,20 @@ export default {
       type: Boolean,
       default: Editable_Defaults["addToCart"]
     },
+    load_mode: {
+      type: [String, Boolean, Number],
+      default:'LOAD_HANDLE_NOT_IN_DATABASE',
+      validator: function (value) {
+        if (isInteger(value)) {
+          console.log("value is integer ", value, isInteger(value))
+
+          return (LOAD_MODE[toInteger(value)] && LOAD_MODE.length >= toInteger(value)) ? LOAD_MODE[toInteger(value)] : false
+        } else if (typeof value == "string") {
+          console.log("value is string ", value, LOAD_MODE.includes(value))
+          return (LOAD_MODE.includes(value) >= 0) ? true : false
+        }else return false
+      }
+    },
     enableoptions: {
       type: Boolean,
       default: true,
@@ -83,6 +107,18 @@ export default {
     }
   },
   watch: {
+    load_mode: {
+      immediate: true,
+      handler(value, oldValue) {
+        if (isInteger(value)) {
+          this.$data._load_mode = (LOAD_MODE[toInteger(value)] && LOAD_MODE.length >= toInteger(value)) ? LOAD_MODE[toInteger(value)] : false
+        } else if (typeof value == "string") {
+          this.$data._load_mode = (LOAD_MODE.includes(value) >= 0) ? value : false
+        } else this.$data._load_mode = false
+        //TODO: PICK UP HEREE
+        const response = this.doLoader(this.$data._load_mode);//await Product.api().fetchByHandle(this.Handle)
+      }
+    },
     instance: function (value, old) {
       console.log("instance changed.", value,old);
     // this.Instance = value;
@@ -90,32 +126,49 @@ export default {
     variant: function (value) {
       console.log("variant changed.", value);
     },
-    handle: function (value) {
-       if ( value ){
-         this.$data._refID = this.$props.id
-         this.Handle = value;
-         this.insertOrUpdateInstance(this.$props);
-         console.log("handle changed.", value);
-
-         if (!this.Product && this.Handle) {
-           const response =  Product.api().fetchByHandle(this.Handle)
-           console.error("loaded", response)
-         }
-       }
-
-    },
+    handle: {
+      immediate: true,
+      handler(value) {
+        if (value) {
+          this.$data._refID = this.$props.id
+          this.Handle = value;
+          this.insertOrUpdateInstance(this.$props, this.$data._load_mode);
+          console.log("handle changed!!.", value);
+        }
+      }
+    }
   },
   async mounted() {
-    console.log("propes" ,this.$props)
+    console.log("propes" ,this.$props,defaultInstance)
+
     this.$data._refID = this.$props.id
     this.Handle = this.$props.handle;
     this.insertOrUpdateInstance(this.$props);
-    if (!this.Product && this.Handle) {
-      const response =  await Product.api().fetchByHandle(this.Handle)
-      console.error("loaded", response,this.Status, this.Handle)
+
+    if ( this.$props.selection_mode && SELECTION_MODE_OPTIONS[ this.$props.selection_mode ] ) {
+      console.error("selection mode", SELECTION_MODE_OPTIONS[ this.$props.selection_mode ] )
     }
   },
   methods: {
+    async doLoader(mode = this.$data._load_mode, handle = this.Handle) {
+      // if (!handle )return;
+      console.error("trying to load", mode, handle)
+
+      if (mode == 'LOAD_ALL') {
+        //load all
+        await Product.api().fetchAll();
+      } else if (mode == 'LOAD_HANDLE_ALWAYS') {
+        //load by handle
+        if (!handle) return;
+        await Product.api().fetchByHandle(handle)
+      } else if (mode == 'LOAD_HANDLE_NOT_IN_DATABASE') {
+        if (!handle) return;
+        if (!Product.getProductByHandle(handle)) await Product.api().fetchByHandle(handle)
+        //check first , thhen load by handle
+      } else if (mode == 'LOAD_NEVER') {
+        //do nothing? instance???
+      }
+    },
     getOption(index = false, index_prop = "id", getAll = false) {
       if (!this.$props.enableoptions) return false
       if (!this.Ready || !index) return
@@ -266,7 +319,7 @@ export default {
       }
     }),
     Handle: {
-      get: function () {   //variant_id
+      get: function () {
         if (this.$data._handle) return this.$data._handle;
         return this.$props.handle
       },
@@ -274,11 +327,11 @@ export default {
         this.$data._handle = value;
       }
     },
-        Ready: function () {
-      if ( this.Status == "LOADING" ) return
+    Ready: function () {
+      if (this.Status == "LOADING") return
       return (!this.isLoading && this.Product && this.Instance && this.SelectedVariant) ? true : false;
     },
-    Status:function(){
+    Status: function () {
       return Product.store().get('loader/getProductLoader')(this.Handle)
     },
     Instance: {
@@ -286,24 +339,21 @@ export default {
         return ProductInstanceBase.query().whereId(this.$data._refID).with("Variant|Group").first();
       },
       set: async function (value) {
-        if ( !value ) return;
+        if (!value) return;
 
-        if ( ( value && value.id && value.handle )  ) {
+        if ((value && value.id && value.handle)) {
           //hhas an id , not the same as refid.
 
-         if  (value.id !=  this.$data._refID ){
-         //  this.$data._refID = value.id;
-           this.$data._refID = value.id;
-           console.log("updatin no refffg!!", value)
-           await this.insertOrUpdateInstance(value);
-
-         }
-        }else if ( value && !value.id ){
-          await this.insertOrUpdateInstance({...value, id: this.$data._refID} )
+          if (value.id != this.$data._refID) {
+            this.$data._refID = value.id;
+            console.log("updatin no refffg!!", value)
+            await this.insertOrUpdateInstance(value);
+          }
+        } else if (value && !value.id) {
+          await this.insertOrUpdateInstance({...value, id: this.$data._refID})
         }
-        if (  value && value.handle )  this.Handle = value.handle;
-
-      //  console.log("tring to set instance!!!!!!!!!!!!!!!", this.insertOrUpdateInstance())
+        if (value && value.handle) this.Handle = value.handle;
+        //  console.log("tring to set instance!!!!!!!!!!!!!!!", this.insertOrUpdateInstance())
       }
     },
     SelectedVariant: {

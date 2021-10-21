@@ -108,6 +108,10 @@ export default class Product extends Model {
         if (_product && _product.id && isShopifyID(_product.id)) return toInteger(_product.id)
         return false;
     }
+
+    static getProductByHandle(handle) {
+        return Product.query().where("handle", handle).first();
+    }
 }
 
 /*INCOMING DATA: n*/ //TODO: shoud be switched to static method.

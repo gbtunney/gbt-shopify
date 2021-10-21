@@ -1,6 +1,6 @@
 import {Model} from '@vuex-orm/core'
 import  {Variant, Product, ProductInstanceGroup,Cart} from "./..";
-import {Editable_Defaults, ID_LENGTH} from "../settings";
+import {Editable_Defaults, ID_LENGTH, SELECTION_MODE_OPTIONS} from "../settings";
 import {isShopifyID} from "../scripts/shopify";
 import {getContainsLetter, getHasLetter, getRandomNumber, stringContainsUppercase, toInteger} from "../scripts/generic";
 
@@ -25,12 +25,13 @@ export class ProductInstanceBase extends Model {
             meta: this.string(null),
             url:this.string(null),
             //*** variant linked with instance ( ie could be not for sale variant with group etc.
-            handle: this.string(null),
+            handle: this.string(false).nullable(),
             group_id: this.number(null),
-            variant_id: this.number(null),
+            variant_id: this.number(1),
             Variant: this.hasOne(Variant, "id", "variant_id"),
 
             //*** preferences
+            selection_mode : this.string ("normal").nullable(),
             add_to_cart_enabled: this.boolean(Editable_Defaults["addToCart"]), /// this is bool to allow a add to cart button for TOTAL GROUP.
             quantity_editable: this.boolean(Editable_Defaults["quantity"]),
             variant_editable: this.boolean(Editable_Defaults["variant"]),
@@ -60,6 +61,9 @@ export class ProductInstanceBase extends Model {
     }*/
     static mutators() {
         return {
+            selection_mode(value) {
+                return (Object.keys(SELECTION_MODE_OPTIONS).indexOf(value) >= 0) ? value : false
+            },
             options_editable(value) {
                 if (R.is(Boolean, value)) return value;
                 else if (R.is(Array, value)) {     //expand to map

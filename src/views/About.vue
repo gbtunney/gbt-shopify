@@ -29,7 +29,7 @@
     <hr>
 
     <button @click="Testing">CLICK MEEEEEE</button>
-    <product-instance-provider2 v-bind="$data.testing" >
+    <product-instance-provider2 v-bind="$data.testing" :load_mode="'LOAD_ALL'"  :selection_mode="'extended'" >
       <!--ff
 //{ Loading,Variants,Images,Options,OptionValueList,
 // Product,ProductImage,SelectedVariant,SelectedVariantImage,SelectedOptionList,SelectedOption,

@@ -43,10 +43,12 @@ export default {
   methods: {
     RemoveLineItem(instance) {
       console.log("tryingto delete " , instance )
-      instance.$delete();
+
       if (instance && instance.id) {
         return {[instance.id]: 0}
       }
+      instance.$delete();
+      //TODO: service call here.
       return false;
     },
     UpdateLineItem(instance) { ///node thihs is also in the lineitem model????.
