@@ -11,3 +11,5 @@ export const Editable_Defaults = {
 export const MINIMUM_QUANTITY = 1;
 
 export const ID_LENGTH = 10000000000;
+
+export const USE_SERVER  = false;

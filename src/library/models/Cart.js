@@ -2,7 +2,8 @@ import { Model } from '@vuex-orm/core'
 import {ProductInstanceSingle,LineItem,  Variant} from './..'
 import {getRandomNumber} from "../scripts/generic";
 import {ID_LENGTH} from "../settings";
-
+import * as R from 'ramda'
+const {omit, pick} = R
 export class ProductGroupBase extends Model {
     static entity ="productgroupbase"
 
@@ -51,19 +52,59 @@ export class Cart extends ProductGroupBase {
      }
      static apiConfig = {
         actions: {
-            addItems(item_array) {
+            updateItems(item_array, useServer = true) {
                 let _items = item_array;
+                if (useServer) {
+                    Cart.commit((state) => {
+                        state.fetching = true
+                    })
+                    return this.post(`/cart/add.js`,
+                        {
+                            save: false,
+                            items: _items
+                        }
+                    )
+                } else {
+                    console.log("SERVER :: UPDATE ITEMS  ", _items)
+                }
+            },
+            addItems(item_array, useServer = true) {
+
+                let _items = item_array;
+
+                if (useServer) {
                 Cart.commit((state) => {
                     state.fetching = true
                 })
+                    let convertedItems =   _items.map(function (_item) {
+                        return _item.NewLineItem;
+                    })
                 return this.post(`/cart/add.js`,
                     {
                         save: false,
-                        items: _items
+                        items: convertedItems
                     }
-                )
+                )}else {
+                    ///TODO: THIS IS KIND OF BROKEN.
+                    console.log("SERVER :: ADD ITEMS  ", _items)
+                    let newArr =   _items.map(function (_item) {
+                       let cleaned  = _item.$toJson();
+
+                       if ( _item.requested_quantity ) cleaned =
+                           { ...cleaned ,'type':'LINE_ITEM',
+                               'quantity':  _item.requested_quantity,
+                               'group_id' :Cart.store().state.entities.cart.cart.id
+                           }
+                        return omit(['id','requested_quantity','properties'] ,cleaned)
+                       // return omit(['id','requested_quantity','properties'] ,cleaned)
+                    })
+                   console.log("THE NEW ARRAY IS ",newArr,newArr, Cart.store().state.entities.cart.cart );
+                    ///todo: PUSH NEW CHILD
+                    return newArr;
+                  //  LineItem.create({data: newArr[0]})
+                }
             },
-            fetchCart(data = {}) {
+            fetchCart(data = {}, useServer = true) {
                 Cart.commit((state) => {
                     state.fetching_cart = true
                 })
@@ -93,6 +134,9 @@ export class Cart extends ProductGroupBase {
              requires_shipping: this.boolean(false),
              cart_level_discount_applications: this.attr([])
          }
+     }
+     static GetCart(){
+        return Cart.store().state.entities.cart.cart;
      }
 }
 

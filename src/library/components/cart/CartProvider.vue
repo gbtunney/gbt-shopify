@@ -1,7 +1,10 @@
 <script>
 import {ProductInstanceSingle, ProductInstanceGroup, LineItem,Cart,ProductGroupBase} from "../..";
 import {getRandomNumber} from "../../scripts/generic";
+import {USE_SERVER} from "../../settings"
 import {mapState} from "vuex";
+import * as R from "ramda";
+const {omit} = R
 
 export default {
   name: "cart",
@@ -12,6 +15,14 @@ export default {
     }
   },
   props: {
+    useServer: {
+      type:Boolean,
+      default : USE_SERVER
+    },
+    debugMode: {
+      type:Boolean,
+      default : true
+    },
     instance: {
       type: [Object, Boolean],
       default: false,
@@ -22,20 +33,44 @@ export default {
     },
   },
   watch: {
-    instance(newValue) {
-      console.log("instance changed ", newValue)
-      this.init();
+    instance: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        this.init();
+      }
     }
   },
   methods: {
-    removeItem(item) {
-      // Shopify.removeItem(item)
+    RemoveLineItem(instance) {
+      console.log("tryingto delete " , instance )
+      instance.$delete();
+      if (instance && instance.id) {
+        return {[instance.id]: 0}
+      }
+      return false;
     },
-    updateItemQuantity(item, qty) {
-      console.log(item, qty)
-      //Shopify.updateItemQuantity(item, qty)
+    UpdateLineItem(instance) { ///node thihs is also in the lineitem model????.
+      var test;
+      if (instance && instance.id && instance.quantity) {
+        test = {[instance.id]: instance.quantity}
+      }
+      Cart.api().updateItems([test],this.$props.useServer)
+      return test;
     },
-    async addToCart() {
+    updateAll(instance){
+      var test = Object.fromEntries(this.Items.reduce((accumulator, currentValue, currentIndex, array) => {
+        if (currentValue && currentValue.id && currentValue.quantity) {
+          return  accumulator.set(currentValue.id,currentValue.quantity)
+        }
+      }, new Map()) )
+      if ( this.$props.useServer) {
+        console.warn("Update ALL LineItem::::::::", test)
+      }else{
+        ///SERVICE CALL HERE????
+      }
+      return test;
+    },
+    async addToCart2() {
       var junkitem = {
         id: 22589265510518,
         quantity: 2,
@@ -44,44 +79,11 @@ export default {
         }
       }
       var itemaddresponse = await Cart.api().addItems([this.Instance.LineItem, junkitem])
-
       var cartresponse = await Cart.api().fetchCart()
       console.log("reloaded cart", cartresponse, this.Instance.$toJson())
     },
-    async initializeInstanceGroup(dataObj) {
-      const _testData = {
-        message: "this is a test grtoup[ instance",
-        ProductInstances: [
-          {
-            variant_id: 22589282975862,
-            group_id: this.$data._refID,
-            message: "thhis is a test"
-          }
-        ]
-      }
-
-      ////this overrides.
-      const default_data = {
-        id: this.$data._refID,
-        message: this.$props.message
-      }
-
-      const _data = {..._testData, ...default_data};
-      const instance = await ProductInstanceGroup.insert({
-        data: _data
-      })
-    },
-    async registerChild(_child) {
-      await ProductInstanceSingle.update({
-        where: _child.id,
-        data: {
-          group_id: this.$data._refID
-        }
-      })
-      console.log("trying to register a child", this.Children, this.Instance)
-    },
     async init() {
-
+      if (!this.$props.instance) return
       let that = this
       //Cart HAS TO BE merged with an id with a number.
       if ( this.$props.instance ){
@@ -89,14 +91,12 @@ export default {
           data: { ...this.$props.instance, id: this.$data._refID}
         })
         if (this.Instance){
-
           await Cart.commit((state) => {
             state.checkoutId = that.Instance.token
             state.cart = that.Instance;//Cart.query().where("token", state.checkoutId).withAll().first();
-            //  if ( state.cart && state.cart.id) that.$data._refID  = state.cart.id;
           })
         }
-        console.log("response ", response)
+       // this.$store.commit('loader/addProductLoader', {handle:"test",status:"testingfggg"})
       }
       /*
       let that = this
@@ -137,7 +137,9 @@ export default {
           TotalPrice: () => (this.Instance) ? this.Instance.TotalPrice : false,
           ItemsAvailable: () => (this.Instance) ? this.Instance.IsAvailable : false,
           Children: this.Items,
-          LineItems: this.Items
+          LineItems: this.Items,
+          UpdateLineItem:this.UpdateLineItem,
+          RemoveLineItem: this.RemoveLineItem
         }
     )
   },

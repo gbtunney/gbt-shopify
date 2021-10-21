@@ -1,9 +1,11 @@
 import {Model} from '@vuex-orm/core'
 import  {Variant, Product, ProductInstanceGroup,Cart} from "./..";
-import * as R from "ramda";
 import {Editable_Defaults, ID_LENGTH} from "../settings";
 import {isShopifyID} from "../scripts/shopify";
 import {getContainsLetter, getHasLetter, getRandomNumber, stringContainsUppercase, toInteger} from "../scripts/generic";
+
+import * as R from "ramda";
+const { pick} = R
 
 export class ProductInstanceBase extends Model {
     static entity = 'productbase'
@@ -142,18 +144,10 @@ export class ProductInstanceSingle extends ProductInstanceBase {
     get IsAvailable() {
         return this.Variant.IsAvailable;
     }
-    get LineItem(){
-       let cartMeta ;
-        if ( this.message ){
-            cartMeta=  {
-              message: this.message
-            }
-        }
-        console.log("cart meta", cartMeta)
-       return { id :this.variant_id,
-            quantity: this.requested_quantity,
-            properties: cartMeta
-        }
+    get NewLineItem() {
+        const newObj = {...this.$toJson(), 'quantity': this.$toJson()['requested_quantity'],
+          'id' : this.variant_id };
+        return pick(['id', 'quantity', 'properties'], newObj)
     }
 }
 ProductInstanceSingle.prototype.get_option_editable = function (_key = false) {
@@ -165,6 +159,9 @@ ProductInstanceSingle.prototype.get_option_editable = function (_key = false) {
 export class LineItem extends ProductInstanceBase {
     static entity = 'lineitem'
     static baseEntity = 'productbase'
+    static afterCreate(model) {
+        console.log("!!!!!!!!!NEW LINE ITEM CREATEE!!!!!!",model, model.type)
+    }
     static fields() {
         return {
             ...super.fields(),
@@ -174,7 +171,7 @@ export class LineItem extends ProductInstanceBase {
 
             Group: this.belongsTo(Cart, "id"),
 
-            featured_image:this.attr(null), // TODO: this is an object, maybe convert to an image
+            featured_image: this.attr(null), // TODO: this is an object, maybe convert to an image
             title: this.string(null),
             price: this.number(null),
             original_price: this.number(null),

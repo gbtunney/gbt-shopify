@@ -2,9 +2,8 @@
 import {getRandomNumber} from "./../../scripts/generic"
 import {isShopifyID} from "./../../scripts/shopify"
 import * as R from "ramda";
-
 import {LoaderMixin} from './../../mixins/LoaderMixin'
-import {Editable_Defaults} from '../../settings'
+import {Editable_Defaults, USE_SERVER} from '../../settings'
 import {
   ProductInstanceSingle,
   Product,
@@ -30,6 +29,10 @@ export default {
     }
   },
   props: {
+    useServer: {
+      type:Boolean,
+      default : USE_SERVER
+    },
     id : {
       type: [Number],
       default: 666666666666
@@ -108,8 +111,8 @@ export default {
     this.Handle = this.$props.handle;
     this.insertOrUpdateInstance(this.$props);
     if (!this.Product && this.Handle) {
-      const response =  Product.api().fetchByHandle(this.Handle)
-      console.error("loaded", response)
+      const response =  await Product.api().fetchByHandle(this.Handle)
+      console.error("loaded", response,this.Status, this.Handle)
     }
   },
   methods: {
@@ -218,19 +221,18 @@ export default {
       }
     },
     async insertOrUpdateInstance(_data = this.mapValuesToInstance()) {
-      console.log("insertOrUpdateInstanceDATA ", _data)
-
       const response = await ProductInstanceBase.insertOrUpdate({
         data: _data
       })
-      console.log("insertOrUpdateInstance", response)
     },
-    async updateInstance(_data) {
-      console.log("trying to update instance", _data)
-      return await ProductInstanceSingle.update({
+    async updateInstance(_data, instance) {
+      console.log("trying to update instance", _data,instance)
+      const response =  await ProductInstanceSingle.update({
         where: this.$data._refID,
         data: _data
       })
+      this.$emit('changed', this.Instance,response)
+      return response
     },
     getMergedOptionArray(oldArray = [], replaceArray = []) {
       if (!this.Product) return;
@@ -247,20 +249,14 @@ export default {
         return accumulator.set(currentValue.option_id, currentValue)
       }, workingOptions).values())
     },
-    async addToCart() {
-      var itemaddresponse = await Cart.api().addItems([this.Instance.LineItem])
+    async addToCart(instance) {
+      console.log("SERVER TRYING TO ADD ITEM ",instance, [this.Instance.NewLineItem] )
+      var itemaddresponse = await Cart.api().addItems([this.Instance], this.$props.useServer)
 
-      var cartresponse = await Cart.api().fetchCart()
-      console.log("reloaded cart",cartresponse, this.Instance.$toJson())
+      //console.log("SERVER REFRESH CART",[this.Instance.NewLineItem] )
+      //var cartresponse = await Cart.api().fetchCart()
+     // console.log("reloaded cart",cartresponse, this.Instance.$toJson())
     },
-    async initTest(){
-
-      if (      this.Product){
-        console.log("testing product", this.Instance.options_editable);
-        console.log("after create ",  VariantOption.all())
-      }
-
-    }
   },
   computed: {
     ...mapState('entities/products', {   //cartLoading
@@ -279,7 +275,11 @@ export default {
       }
     },
         Ready: function () {
+      if ( this.Status == "LOADING" ) return
       return (!this.isLoading && this.Product && this.Instance && this.SelectedVariant) ? true : false;
+    },
+    Status:function(){
+      return Product.store().get('loader/getProductLoader')(this.Handle)
     },
     Instance: {
       get: function () {
@@ -393,7 +393,7 @@ export default {
           addToCartEnabled: this.$props.add_to_cart_enabled,
           testOptionMap: this.getOption,
           addToCart: this.addToCart,
-          initTest: this.initTest,
+          loadTest: this.Status,
           /*addToCart: (variant,qty) => Shopify.addItem( this.SelectedVariant, 2  )*/
         }
     )

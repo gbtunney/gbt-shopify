@@ -1,7 +1,7 @@
 import {Model} from '@vuex-orm/core'
 import {Variant, ProductImage, ProductOption, ProductOptionValue, VariantOption} from './..'
 import {SHOPIFY_BASE_URL,ID_LENGTH} from "./../settings";
-
+//import store from '../../store'
 import * as R from 'ramda'
 const {omit, pick} = R
 import {getRandomNumber, slugify, toInteger} from "./../scripts/generic";
@@ -21,14 +21,17 @@ export default class Product extends Model {
     static afterCreate(model) {
         ///make pivot table.
         model.createVariantOptionPivot()
+        Product.store().commit('loader/addProductLoader', {handle:model.handle,status:"NOT_LOADING"})
     }
 
     static apiConfig = {
         actions: {
             fetchByHandle(handle) {
-                Product.commit((state) => {
+               /* Product.commit((state) => {
                     state.fetching = true
-                })
+                })*/
+               Product.store().commit('loader/addProductLoader', {handle:handle,status:"LOADING"})
+                  // Product.store().get('loader/getProductLoader')(handle)
                 return this.get(`/products/${handle}.json`,
                     {
                         dataTransformer: (response) => {
