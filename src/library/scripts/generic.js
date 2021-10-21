@@ -34,6 +34,22 @@ export function getDigitCount(value) {
     return Math.log(toInteger(value)) * Math.LOG10E + 1 | 0;
 }
 
+/**
+ * Rename multiple keys of an object at once
+ * @constructor
+ * @param {object} keysMap - object with mapping keys | example {name: 'firstName', job: 'passion'}
+ * @param {object}  -obj - the object to remap. | example {name: 'Bobo', job: 'Front-End Master'}
+ * @return {object} - source : https://www.freecodecamp.org/news/30-seconds-of-code-rename-many-object-keys-in-javascript-268f279c7bfa/
+ */
+export const renameKeys = (keysMap = {}, obj = {}) =>
+    Object.keys(obj).reduce(
+        (acc, key) => ({
+            ...acc,
+            ...{[keysMap[key] || key]: obj[key]}
+        }),
+        {}
+    );
+
 export function slugify(value) {
     if (value == null
         || value == ""
