@@ -49,6 +49,40 @@ export const renameKeys = (keysMap = {}, obj = {}) =>
         }),
         {}
     );
+/**
+ * validateEnum
+ * @author=Gillian
+ * @constructor
+ * @param {*} value - Value to validate ( todo: add string )
+ * @param {object,array } _enum  - Enum string values
+ * @return {boolean} case_sensitive - invalidates if case doesnt match exactly.
+ */
+export function validateEnum(value = false, _enum = [], case_sensitive = false) {
+    if (!value || R.isEmpty(_enum)) return false
+    let _enumArray = _enum; //set the array value
+    if (R.is(Array, _enumArray)) return (_enumArray.indexOf((!case_sensitive) ? String(value).toLowerCase() : value) >= 0) ? true : false;
+    if (R.is(Object, _enum) && !R.is(Array, _enum)) _enumArray = Object.keys(_enum); ///for some reason ramda  and value = ["2","3" ] returns true for both Array && Object
+}
+
+//this is an enum values
+const CLONE_MODES = ["pick", "omit"]
+const CLONE_MODES_OBJ = {pick: "pick", omit: "omit"}
+
+/**
+ cloneObject
+ * @author=Gillian
+ * @constructor
+ * @param {object} value - Object with key/values
+ * @param {boolean, string(enum) } - false: clone all props. ['pick','omit ]- calls ramda func to white/black list
+ * @return {object} -
+ */
+export function cloneObject(value = {}, mode = false, id_list = [], mode_list = CLONE_MODES) {
+    let returnvalue = {...value};
+    if (mode && !R.isEmpty(value) && validateEnum(mode, mode_list, true)) {
+        returnvalue = R.call(R[String(mode).toLowerCase()], id_list, value)
+    }
+    return returnvalue;
+}
 
 export function slugify(value) {
     if (value == null

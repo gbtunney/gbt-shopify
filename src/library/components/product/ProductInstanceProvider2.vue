@@ -1,5 +1,5 @@
 <script>
-import {getRandomNumber, isInteger, toInteger} from "./../../scripts/generic"
+import {getRandomNumber, isInteger, toInteger,validateEnum} from "./../../scripts/generic"
 import {isShopifyID} from "./../../scripts/shopify"
 import * as R from "ramda";
 import {LoaderMixin} from './../../mixins/LoaderMixin'
@@ -25,10 +25,9 @@ export default {
   components: {},
   data: function () {
     return {
-      _refID: getRandomNumber(1000000),
+      _refID: false,
       _handle: false,
       _initialized:false,
-      _load_mode : 'LOAD_HANDLE_ALWAYS'
     }
   },
   props: {
@@ -84,17 +83,17 @@ export default {
       default: Editable_Defaults["addToCart"]
     },
     load_mode: {
-      type: [String, Boolean, Number],
-      default:'LOAD_HANDLE_NOT_IN_DATABASE',
+      type: [Boolean, String, Number],
+      default: "LOAD_HANDLE_NOT_IN_DATABASE",
+      //TODO CHANGE VALIDATOR TO MY FUNCTION
       validator: function (value) {
-        if (isInteger(value)) {
-          console.log("value is integer ", value, isInteger(value))
-
-          return (LOAD_MODE[toInteger(value)] && LOAD_MODE.length >= toInteger(value)) ? LOAD_MODE[toInteger(value)] : false
-        } else if (typeof value == "string") {
-          console.log("value is string ", value, LOAD_MODE.includes(value))
-          return (LOAD_MODE.includes(value) >= 0) ? true : false
-        }else return false
+        if (R.isEmpty(value)) return false;
+        if (R.is(String, value)) return LOAD_MODE.includes(value)
+        if (isInteger(value) && LOAD_MODE.length >= toInteger(value)) {
+          const index = toInteger(value);
+          return (LOAD_MODE[index]) ? true : false
+        }
+        return false
       }
     },
     enableoptions: {
@@ -107,53 +106,51 @@ export default {
     }
   },
   watch: {
-    load_mode: {
+    id: {
       immediate: true,
       handler(value, oldValue) {
-        if (isInteger(value)) {
-          this.$data._load_mode = (LOAD_MODE[toInteger(value)] && LOAD_MODE.length >= toInteger(value)) ? LOAD_MODE[toInteger(value)] : false
-        } else if (typeof value == "string") {
-          this.$data._load_mode = (LOAD_MODE.includes(value) >= 0) ? value : false
-        } else this.$data._load_mode = false
-        //TODO: PICK UP HEREE
-        const response = this.doLoader(this.$data._load_mode);//await Product.api().fetchByHandle(this.Handle)
+        if (value && (value != this.$data._refID)) this.$data._refID = value;
+        console.log("ID IS BEING CHANGED!!!!!!!!! new:", value, "old:", oldValue, "ref", this.$data._refID, "Instance", this.Instance)
       }
-    },
-    instance: function (value, old) {
-      console.log("instance changed.", value,old);
-    // this.Instance = value;
-    },
-    variant: function (value) {
-      console.log("variant changed.", value);
     },
     handle: {
       immediate: true,
-      handler(value) {
-        if (value) {
-          this.$data._refID = this.$props.id
+      handler(value, old) {
+        if (value != this.Handle) {
+          console.log("TRYING TO LOAD A NEW HANDLE! old:", this.Handle, "new", value, "loader mode ", this.LoaderMode);
           this.Handle = value;
-          this.insertOrUpdateInstance(this.$props, this.$data._load_mode);
-          console.log("handle changed!!.", value);
+          this.doLoader(this.LoaderMode)
         }
       }
     }
   },
   async mounted() {
-    console.log("propes" ,this.$props,defaultInstance)
-
+    console.log("mounted ::::  PROPS:", this.$props, "data::: ", this.$data)
     this.$data._refID = this.$props.id
-    this.Handle = this.$props.handle;
+    // await this.$store.dispatch('orm/initHooks')
+    //todo move this
     this.insertOrUpdateInstance(this.$props);
-
-    if ( this.$props.selection_mode && SELECTION_MODE_OPTIONS[ this.$props.selection_mode ] ) {
-      console.error("selection mode", SELECTION_MODE_OPTIONS[ this.$props.selection_mode ] )
+    ProductInstanceSingle.afterUpdate = function (model) {
+      console.log("UPDATE CALLED DDD DD D ", model)
     }
+    if (this.$props.selection_mode && SELECTION_MODE_OPTIONS[this.$props.selection_mode]) {
+      console.error("selection mode", SELECTION_MODE_OPTIONS[this.$props.selection_mode])
+    }
+/*
+DEMO
+    const respond =  await this.$store.dispatch('orm/updateModelInstance', {model_instance: this.Instance , values: {
+        meta: "meta test",
+        url: 'http://google.com'
+      }
+    })
+    console.log("updateModelInstance: result ", respond)
+
+*/
   },
   methods: {
     async doLoader(mode = this.$data._load_mode, handle = this.Handle) {
-      // if (!handle )return;
-      console.error("trying to load", mode, handle)
-
+      if (!handle) return;
+      console.log("doLoader :::::::::;", mode, handle)
       if (mode == 'LOAD_ALL') {
         //load all
         await Product.api().fetchAll();
@@ -163,8 +160,8 @@ export default {
         await Product.api().fetchByHandle(handle)
       } else if (mode == 'LOAD_HANDLE_NOT_IN_DATABASE') {
         if (!handle) return;
+        console.error("doLoader:  LOAD_HANDLE_NOT_IN_DATABASE:product", Product.getProductByHandle(handle))
         if (!Product.getProductByHandle(handle)) await Product.api().fetchByHandle(handle)
-        //check first , thhen load by handle
       } else if (mode == 'LOAD_NEVER') {
         //do nothing? instance???
       }
@@ -278,6 +275,7 @@ export default {
         data: _data
       })
     },
+    ///todo: replace
     async updateInstance(_data, instance) {
       console.log("trying to update instance", _data,instance)
       const response =  await ProductInstanceSingle.update({
@@ -287,6 +285,7 @@ export default {
       this.$emit('changed', this.Instance,response)
       return response
     },
+    //todo : move to variant or something
     getMergedOptionArray(oldArray = [], replaceArray = []) {
       if (!this.Product) return;
       ///make map of old array. this should be minimised someohw?
@@ -302,16 +301,30 @@ export default {
         return accumulator.set(currentValue.option_id, currentValue)
       }, workingOptions).values())
     },
+    //replace w clone...
     async addToCart(instance) {
       console.log("SERVER TRYING TO ADD ITEM ",instance, [this.Instance.NewLineItem] )
       var itemaddresponse = await Cart.api().addItems([this.Instance], this.$props.useServer)
-
-      //console.log("SERVER REFRESH CART",[this.Instance.NewLineItem] )
-      //var cartresponse = await Cart.api().fetchCart()
-     // console.log("reloaded cart",cartresponse, this.Instance.$toJson())
+    },
+    testFunction(){
+      const productquery =   Product.getProductByObject({ product_type:"Patterns" });
+      console.log("productquery ::: QUERY  ", Product.all(),productquery)
     },
   },
   computed: {
+    LoaderMode: function () {
+      const value = this.$props.load_mode;
+      if (R.isEmpty(value)) return false;
+
+      if (R.is(String, value) && LOAD_MODE.includes(value)) {
+        return value;
+      }
+      if (isInteger(value) && LOAD_MODE.length >= toInteger(value)) {
+        const index = toInteger(value);
+        return (LOAD_MODE[index]) ? LOAD_MODE[index] : false;
+      }
+      return false
+    },
     ...mapState('entities/products', {   //cartLoading
       isFetching:function (state){
        console.log("checking status", state.fetching)
@@ -320,8 +333,7 @@ export default {
     }),
     Handle: {
       get: function () {
-        if (this.$data._handle) return this.$data._handle;
-        return this.$props.handle
+        return this.$data._handle;
       },
       set: function (value) {
         this.$data._handle = value;
@@ -435,13 +447,11 @@ export default {
           //instance variables
           Instance: this.Instance,
           RequestedQuantity: this.RequestedQuantity,
-
           UpdateInstance: this.updateInstance, //these are all functions
           UpdateOption: this.updateOption,
           UpdateVariant: this.updateVariant,
-
           addToCartEnabled: this.$props.add_to_cart_enabled,
-          testOptionMap: this.getOption,
+          test: this.testFunction,
           addToCart: this.addToCart,
           loadTest: this.Status,
           /*addToCart: (variant,qty) => Shopify.addItem( this.SelectedVariant, 2  )*/

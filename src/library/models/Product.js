@@ -1,7 +1,6 @@
 import {Model} from '@vuex-orm/core'
 import {Variant, ProductImage, ProductOption, ProductOptionValue, VariantOption} from './..'
 import {SHOPIFY_BASE_URL,ID_LENGTH} from "./../settings";
-//import store from '../../store'
 import * as R from 'ramda'
 const {omit, pick} = R
 import {getRandomNumber, slugify, toInteger} from "./../scripts/generic";
@@ -65,7 +64,8 @@ export default class Product extends Model {
             id: this.number(getRandomNumber(ID_LENGTH)),
             handle: this.string(null), ///already a slug
             title: this.string(null),
-            subtitle: this.string("tihs is a test subtitle"), //from defaults
+            meta: this.string(null).nullable(),
+            subtitle: this.string(null).nullable(), //from defaults
             body_html: this.string(null), //maybe strip html eventually
             ///"published_scope": "global",   //maybe scrap what isnt the right user
             vendor: this.string(null),
@@ -112,6 +112,22 @@ export default class Product extends Model {
     static getProductByHandle(handle) {
         return Product.query().where("handle", handle).first();
     }
+    static getProductByObject(where={}) {
+        if (  R.isEmpty(where) ) return false;
+        const predWhere = R.whereEq(where);
+
+        const user = Product.query()
+            .where((_record, query) => {
+                return ( predWhere(_record) ) ? _record : false
+              // query.where('age', 20).orWhere('id', 1)
+            })
+            .get()
+        console.log("seatching " ,  user)
+
+        return user;
+      //  return Product.query().where("handle", handle).first();
+    }
+
 }
 
 /*INCOMING DATA: n*/ //TODO: shoud be switched to static method.

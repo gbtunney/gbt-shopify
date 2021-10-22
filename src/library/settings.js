@@ -1,3 +1,5 @@
+export const LOCAL_STORAGE_KEY = "owoolvuex"
+
 //for ajax api, no token needed.
 export const SHOPIFY_BASE_URL = 'https://o-wool-stage.myshopify.com';
 

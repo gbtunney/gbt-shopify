@@ -28,23 +28,24 @@
     </cart-provider>
     <hr>
 
+
     <button @click="Testing">CLICK MEEEEEE</button>
-    <product-instance-provider2 v-bind="$data.testing" :load_mode="'LOAD_ALL'"  :selection_mode="'extended'" >
-      <!--ff
+    <product-instance-provider2 v-bind="$data.testing"  :load_mode="'LOAD_ALL'"  :selection_mode="'extended'" >
+      <!--ff:load_mode="'LOAD_ALWAYS'"
 //{ Loading,Variants,Images,Options,OptionValueList,
 // Product,ProductImage,SelectedVariant,SelectedVariantImage,SelectedOptionList,SelectedOption,
 // RequestedQuantity , UpdateInstance , UpdateOption,UpdateVariant,addToCartEnabled,addToCart}
 -->
 
-      <div slot-scope="{Ready,Loading,Variants,Images,Options,OptionValueList,
+      <div slot-scope="{test,Ready,Loading,Variants,Images,Options,OptionValueList,
       Product,ProductImage,SelectedVariant,SelectedVariantImage,SelectedOptionList,SelectedOption,
       RequestedQuantity ,Instance, UpdateInstance , UpdateOption,UpdateVariant,addToCartEnabled,addToCart,loadTest
        }"
           id="shopify-section-product-template" class="shopify-section">
 
         <div v-if="Ready" style="border:2px solid red">Ready..Loading</div>
-        <button class="bg-accent-secondary" >
-        button:  {{ loadTest }} ||
+        <button @click="test" class="bg-accent-secondary" >
+        TEST PROODUCTS ||
         </button>
         <div v-if="Product"> LOADED PRODUCT : {{Product.title}}</div>
         <button @click="addToCart(Instance)">Add to Cart </button>
@@ -74,6 +75,7 @@ import ProductInstanceProvider2 from '@/library/components/product/ProductInstan
 import CartProvider from '@/library/components/cart/CartProvider.vue'; // @ is an alias to /src
 import {Product,LineItem} from '@/library'
 import { SfQuantitySelector} from "@storefront-ui/vue";
+import {renameKeys} from "../library/scripts/generic";
 
 
   export default {
@@ -87,14 +89,22 @@ import { SfQuantitySelector} from "@storefront-ui/vue";
 },
   props: {},
     async mounted(){
+
+      var keysMap = {name: 'firstName', job: 'passion'};
+      var obj = {name: 'Bobo', job: 'Front-End Master'};
+console.log("RENAME KEYS TEST@@@@@@@@@@@@@@",   renameKeys(keysMap, obj) )
+      this.$store.set('shopify/cart_token', CartData.token);
+
       this.$data.message=  CartData
 
      const response = await Product.new()
       console.log("THE PRODUCT ID IS!!!!!",response, LineItem.all())
     },
     methods:{
-    Testing(){
-      this.$data.testing={handle: 'local' , variant_id : 8, options_editable: ['color']}
+    async Testing(){
+
+      this.$data.testing={handle: 'balance' , id:444444444, variant_id : 8, options_editable: ['color']}
+
     }
     }
 }

@@ -2,9 +2,16 @@ import {Model} from '@vuex-orm/core'
 import  {Variant, Product, ProductInstanceGroup,Cart} from "./..";
 import {Editable_Defaults, ID_LENGTH, SELECTION_MODE_OPTIONS} from "../settings";
 import {isShopifyID} from "../scripts/shopify";
-import {getContainsLetter, getHasLetter, getRandomNumber, stringContainsUppercase, toInteger} from "../scripts/generic";
+import * as R from 'ramda'
+import {
+    cloneObject,
+    getContainsLetter,
+    getHasLetter,
+    getRandomNumber,
+    stringContainsUppercase,
+    toInteger
+} from "../scripts/generic";
 
-import * as R from "ramda";
 const { pick} = R
 
 export class ProductInstanceBase extends Model {
@@ -38,7 +45,31 @@ export class ProductInstanceBase extends Model {
             options_editable: this.attr(Editable_Defaults["options"]), //future pref dont know when implement
         }
     }
+    get Entity(){
+        return {entity : this.constructor.entity,baseEntity:  this.constructor.entity}
+    }
+    getClone(mode = false, idList = []) {
+        return cloneObject(this.$toJson(), mode, idList)
+    }
+    _updateWhere(where = {}, values = false) {
+        if (!values || R.isEmpty(where)) return false;
+        const predWhere = R.whereEq(where);
+        ProductInstanceBase.update({
+            where: (instance) => {
+                return predWhere(instance)
+            },
+            data: {active: true}
+        })
+    }
 
+    _updateByID(values, mode = false, idList = []) {
+        if (!values) return;
+        ProductInstanceBase.update({...values, id: this.id})
+        return;
+    }
+    _update(values,mode = false, idList = []) {
+      //  return cloneObject(this.$toJson(), mode, idList)
+    }
     get VariantID() {
         if (this.variant_id) {
             if (isShopifyID(this.variant_id)) return toInteger(this.variant_id)
@@ -139,6 +170,7 @@ export class ProductInstanceSingle extends ProductInstanceBase {
     prefix (prefix) {
         return `${prefix} ${this.variant_id}`
     }
+
     get LinePrice() {  //requested quantity * price.
         return (this.Variant) ? (this.requested_quantity * this.Variant.price) : "not set"
     }
