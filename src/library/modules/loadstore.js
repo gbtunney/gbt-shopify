@@ -13,6 +13,7 @@ const state = {
  */
 const getters = {
     getProductLoader: (state) => (handle) => {
+        if (! state.fetching_map ) console.log("NO ENTRY FOR HANDLE",typeof state.fetching_map)
         return state.fetching_map.get(handle)
     }
 }
@@ -22,12 +23,11 @@ const getters = {
  */
 const mutations = {
     addProductLoader(state, payload) {
-        console.log("AFDED PRODUCT LOADER", payload)
+        console.log("AFDED PRODUCT LOADER", payload, state.fetching_map )
         if (payload.handle) {
-            state.fetching_map = new Map(state.fetching_map).set(payload.handle, payload.status)
+          state.fetching_map = new Map(state.fetching_map).set(payload.handle, payload.status)
         }
-    },
-    ...defaultMutations(state)
+    }
 }
 /**
  * actions

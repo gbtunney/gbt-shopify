@@ -20,17 +20,13 @@ export default class Product extends Model {
     static afterCreate(model) {
         ///make pivot table.
         model.createVariantOptionPivot()
-        Product.store().commit('loader/addProductLoader', {handle:model.handle,status:"NOT_LOADING"})
+        Product.store().commit('entities/products/addProductLoader', {handle:model.handle,status:"NOT_LOADING"})
     }
 
     static apiConfig = {
         actions: {
             fetchByHandle(handle) {
-               /* Product.commit((state) => {
-                    state.fetching = true
-                })*/
-               Product.store().commit('loader/addProductLoader', {handle:handle,status:"LOADING"})
-                  // Product.store().get('loader/getProductLoader')(handle)
+               Product.store().commit('entities/products/addProductLoader', {handle:handle,status:"LOADING"})
                 return this.get(`/products/${handle}.json`,
                     {
                         dataTransformer: (response) => {
@@ -112,10 +108,10 @@ export default class Product extends Model {
     static getProductByHandle(handle) {
         return Product.query().where("handle", handle).first();
     }
+    //DEMO FUNCTION
     static getProductByObject(where={}) {
         if (  R.isEmpty(where) ) return false;
         const predWhere = R.whereEq(where);
-
         const user = Product.query()
             .where((_record, query) => {
                 return ( predWhere(_record) ) ? _record : false
@@ -123,9 +119,7 @@ export default class Product extends Model {
             })
             .get()
         console.log("seatching " ,  user)
-
         return user;
-      //  return Product.query().where("handle", handle).first();
     }
 
 }

@@ -4,7 +4,6 @@ import {database} from '@/library'
 import createEasyAccess from 'vuex-easy-access'
 import createPersistedState from "vuex-persistedstate";
 import {LOCAL_STORAGE_KEY} from '../library/settings'
-import loadstore from '../library/loadstore.js'
 import {ormmodule} from '../library/modules/ormmodule'
 import {shopifymodule} from '../library/modules/shopifymodule'
 
@@ -21,8 +20,7 @@ const VUEX_EASY_ACCESS = createEasyAccess()
 /** Vuex Local Storage Persistance */
 const dataState = createPersistedState({
   key: LOCAL_STORAGE_KEY,
-  paths: ['shopify', 'entities.products']
-
+  storage: window.sessionStorage
 })
 
 export const store = new Vuex.Store({
@@ -33,7 +31,7 @@ export const store = new Vuex.Store({
   actions: {
   },
   modules:  {
-    loader: loadstore,
+    /*loader: loadstore,*/
     orm: ormmodule,
     shopify: shopifymodule
   },
