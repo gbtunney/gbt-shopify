@@ -196,8 +196,12 @@ export default {
       let _option = false;
       if (R.is(String, option)) {
         _option = this.getOption(option, "handle")
-      } else if (R.is(Object, option) && R.propIs(String, 'id', option)) _option = option;
+      } else if (R.is(Object, option) ) _option = option;
       let _selectedOptions = this.SelectedOptionList
+
+      //GILLIAN TODOOOOOOOOO,  PLEASE fix this has to do w busted id
+
+console.log("TETEJTRKEJKKKJJ" ,this.SelectedVariant.getOptionValue('color') )
       let valueListForOption = ProductOptionValue
           .query()
           .where("product_id", this.Product.id)
@@ -205,8 +209,14 @@ export default {
           .orderBy('position')
           .with("Variants")
           .all();
+
+    //  console.log("THE OPTION ID@!!",ProductOptionValue.all(),_option, valueListForOption,typeof valueListForOption)
+
       return valueListForOption.map(function (_value) {
+       // console.log("valueeee!",_selectedOptions,_value,that.getMergedOptionArray(_selectedOptions, _value))
+
         let variantArr = that.getVariantsByOptionValues(that.getMergedOptionArray(_selectedOptions, _value));
+
         let isDisabled = false;
         if (variantArr && variantArr.length == 0) isDisabled = true;
         else if ((variantArr.length == 1 && variantArr[0].IsAvailable == false)) isDisabled = true;
@@ -218,13 +228,12 @@ export default {
       })
     },
     isOptionSelected(_value) {
-      if (!_value || !R.propIs(String, 'id', _value)) return false;
       if (_value.Option && this.SelectedOption(_value.Option)) return (_value.id == this.SelectedOption(_value.Option).id);
       return false;
     },
     SelectedOption: function (option) {
-      if (!this.Ready) return;
-      if (!option || !R.propIs(String, 'id', option)) return false;
+     // if (!this.Ready) return;
+      if (!option ) return false;
       return this.SelectedVariant.getOptionValue(option.id);
     },
     //these are good.  change to 'update selected'
@@ -282,9 +291,9 @@ export default {
       }, new Map());
       if (replaceArray && replaceArray.length == 0) return Array.from(workingOptions.values())
       let _replaceArray = replaceArray;
-
+   //   console.log("edsdsds",workingOptions,replaceArray)
       //if its a single value object push into array.
-      if (replaceArray && R.is(Object, replaceArray) && R.propIs(String, 'id', replaceArray)) _replaceArray = [replaceArray]
+      if (replaceArray && R.is(Object, replaceArray) ) _replaceArray = [replaceArray]
       return Array.from(_replaceArray.reduce((accumulator, currentValue, currentIndex, array) => {
         return accumulator.set(currentValue.option_id, currentValue)
       }, workingOptions).values())

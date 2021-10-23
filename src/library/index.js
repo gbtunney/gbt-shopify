@@ -10,8 +10,8 @@ import {ProductOptionBase, ProductOption, VariantOption, ProductOptionValue} fro
 import {ProductInstanceBase,ProductInstanceSingle, LineItem} from './models/ProductInstance'
 import {Cart,ProductInstanceGroup,ProductGroupBase} from './models/Cart'
 import {SHOPIFY_BASE_URL} from "./settings";
-
 import {moduleLoadStatus}from "./modules/moduleLoadStatus"
+
 const _database = new Database()
 export {
     Product,
@@ -67,7 +67,7 @@ _database.register(Product,tempProductLoadModule)
 _database.register(ProductImage)
 _database.register(Variant);
 _database.register(VariantOption);
-
+//console.error("ttttt",ModuleShopify)
 _database.register(Cart)
 _database.register(LineItem)
 VuexORM.use(VuexORMAxios, {axios,
