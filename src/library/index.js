@@ -1,6 +1,5 @@
 //model list.
 //import {Product, Variant, ProductImage, ProductOptionBase, ProductOption, VariantOption, ProductOptionValue, ProductInstanceSingle, ProductInstanceGroup} from './../database'
-
 import VuexORM, {Database} from '@vuex-orm/core'
 import axios from 'axios'
 import VuexORMAxios from '@vuex-orm/plugin-axios'
@@ -12,6 +11,7 @@ import {ProductInstanceBase,ProductInstanceSingle, LineItem} from './models/Prod
 import {Cart,ProductInstanceGroup,ProductGroupBase} from './models/Cart'
 import {SHOPIFY_BASE_URL} from "./settings";
 
+import {moduleLoadStatus}from "./modules/moduleLoadStatus"
 const _database = new Database()
 export {
     Product,
@@ -30,7 +30,7 @@ export {
 }
 _database.register(ProductGroupBase);
 
-_database.register(ProductInstanceBase)
+_database.register(ProductInstanceBase, moduleLoadStatus)
 _database.register(ProductInstanceSingle)
 _database.register(ProductInstanceGroup)
 
@@ -38,7 +38,32 @@ _database.register(ProductOptionBase)
 _database.register(ProductOption)
 _database.register(ProductOptionValue)
 
-_database.register(Product)
+
+const tempProductLoadModule = {
+    state: {
+        count: 15,
+        fetching_map: [],
+    },
+    getters : {
+        getProductLoader: (state) => (handle) => {
+            if (!handle) return new Map(state.fetching_map);
+            return new Map(state.fetching_map).get(handle) ? new Map(state.fetching_map).get(handle) : false
+        }
+    },
+    mutations: {
+        add (state, count) {
+            state.count = state.count + count
+        },
+        addProductLoader(state, payload) {
+            if (payload.handle) {
+               // console.log( "log",Array.from(new Map(state.fetching_map)))
+                state.fetching_map = Array.from(new Map(state.fetching_map).set(payload.handle, payload.status));
+            }
+        }
+    }
+}
+
+_database.register(Product,tempProductLoadModule)
 _database.register(ProductImage)
 _database.register(Variant);
 _database.register(VariantOption);

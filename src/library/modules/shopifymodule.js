@@ -1,6 +1,3 @@
-import {defaultMutations} from 'vuex-easy-access'
-import {store} from '../../store'
-import {Query} from '@vuex-orm/core'
 import {
     cloneObject
 } from "../scripts/generic";
@@ -29,7 +26,9 @@ const getters = {
 
 
 const mutations = {
+/*
     ...defaultMutations(state)
+*/
 }
 /**
  * actions
@@ -40,7 +39,6 @@ const actions = {}
  * export
  */
 export const shopifymodule = {
-    namespaced: true,
     state,
     getters,
     mutations,

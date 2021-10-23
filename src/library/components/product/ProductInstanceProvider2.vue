@@ -117,51 +117,39 @@ export default {
       immediate: true,
       handler(value, old) {
         if (value != this.Handle) {
-          console.log("TRYING TO LOAD A NEW HANDLE! old:", this.Handle, "new", value, "loader mode ", this.LoaderMode);
           this.Handle = value;
           this.doLoader(this.LoaderMode)
         }
       }
     }
   },
-  async mounted() {
+  mounted() {
     console.log("mounted ::::  PROPS:", this.$props, "data::: ", this.$data)
     this.$data._refID = this.$props.id
-    // await this.$store.dispatch('orm/initHooks')
-    //todo move this
+    this.Handle = this.$props.handle
     this.insertOrUpdateInstance(this.$props);
-    ProductInstanceSingle.afterUpdate = function (model) {
+    /*ProductInstanceSingle.afterUpdate = function (model) {
       console.log("UPDATE CALLED DDD DD D ", model)
-    }
+    }*/
     if (this.$props.selection_mode && SELECTION_MODE_OPTIONS[this.$props.selection_mode]) {
       console.error("selection mode", SELECTION_MODE_OPTIONS[this.$props.selection_mode])
     }
-/*
-DEMO
-    const respond =  await this.$store.dispatch('orm/updateModelInstance', {model_instance: this.Instance , values: {
-        meta: "meta test",
-        url: 'http://google.com'
-      }
-    })
-    console.log("updateModelInstance: result ", respond)
-
-*/
   },
   methods: {
-    async doLoader(mode = this.$data._load_mode, handle = this.Handle) {
+    doLoader(mode = this.$data._load_mode, handle = this.Handle) {
       if (!handle) return;
       console.log("doLoader :::::::::;", mode, handle)
       if (mode == 'LOAD_ALL') {
         //load all
-        await Product.api().fetchAll();
+         Product.api().fetchAll();
       } else if (mode == 'LOAD_HANDLE_ALWAYS') {
         //load by handle
         if (!handle) return;
-        await Product.api().fetchByHandle(handle)
+         Product.api().fetchByHandle(handle)
       } else if (mode == 'LOAD_HANDLE_NOT_IN_DATABASE') {
         if (!handle) return;
-        console.error("doLoader:  LOAD_HANDLE_NOT_IN_DATABASE:product", Product.getProductByHandle(handle))
-        if (!Product.getProductByHandle(handle)) await Product.api().fetchByHandle(handle)
+        console.error("doLoader:  LOAD_HANDLE_NOT_IN_DATABASE:product",this.Status, this.Product,Product.getProductByHandle(handle))
+        if (!Product.getProductByHandle(handle)) Product.api().fetchByHandle(handle)
       } else if (mode == 'LOAD_NEVER') {
         //do nothing? instance???
       }
@@ -270,8 +258,8 @@ DEMO
         }
       }
     },
-    async insertOrUpdateInstance(_data = this.mapValuesToInstance()) {
-      const response = await ProductInstanceBase.insertOrUpdate({
+    insertOrUpdateInstance(_data = this.mapValuesToInstance()) {
+      const response = ProductInstanceBase.insertOrUpdate({
         data: _data
       })
     },
@@ -344,28 +332,25 @@ DEMO
       return (!this.isLoading && this.Product && this.Instance && this.SelectedVariant) ? true : false;
     },
     Status: function () {
-      return Product.store().get('loader/getProductLoader')(this.Handle)
+      return  this.$store.getters['entities/products/getProductLoader'](this.Handle)
     },
     Instance: {
       get: function () {
         return ProductInstanceBase.query().whereId(this.$data._refID).with("Variant|Group").first();
       },
-      set: async function (value) {
+      set: function (value) {
         if (!value) return;
-
         if ((value && value.id && value.handle)) {
           //hhas an id , not the same as refid.
 
           if (value.id != this.$data._refID) {
             this.$data._refID = value.id;
-            console.log("updatin no refffg!!", value)
-            await this.insertOrUpdateInstance(value);
+            this.insertOrUpdateInstance(value);
           }
         } else if (value && !value.id) {
-          await this.insertOrUpdateInstance({...value, id: this.$data._refID})
+          this.insertOrUpdateInstance({...value, id: this.$data._refID})
         }
         if (value && value.handle) this.Handle = value.handle;
-        //  console.log("tring to set instance!!!!!!!!!!!!!!!", this.insertOrUpdateInstance())
       }
     },
     SelectedVariant: {

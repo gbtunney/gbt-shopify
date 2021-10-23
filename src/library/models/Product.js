@@ -19,8 +19,9 @@ export default class Product extends Model {
 
     static afterCreate(model) {
         ///make pivot table.
-        model.createVariantOptionPivot()
+        console.log("PRODUCT ::afterCreate ",model)
         Product.store().commit('entities/products/addProductLoader', {handle:model.handle,status:"NOT_LOADING"})
+        model.createVariantOptionPivot()
     }
 
     static apiConfig = {
@@ -156,12 +157,12 @@ Product.prototype.APITransformProductData = function (_product) {
     return {..._product, ...{options: option_arr}};
 }
 
-Product.prototype.createVariantOptionPivot = async function () {
+Product.prototype.createVariantOptionPivot = function () {
     let _product_id = this.id;
     if (_product_id) {
-        const _variants = await Variant.query().where("product_id", _product_id).with('options').all();
+        const _variants = Variant.query().where("product_id", _product_id).with('options').all();
         if (_variants && _variants.length > 0) {
-            await _variants.forEach(function (_variant) {
+            _variants.forEach(function (_variant) {
                 let variant = _variant;
                 if (_variant.options && _variant.options.length > 0) {
                     _variant.options.forEach(function (option_value) {
@@ -169,7 +170,7 @@ Product.prototype.createVariantOptionPivot = async function () {
                             data: {
                                 variant_id: variant.id,
                                 option_value_id: option_value.id,
-                                thumbnail_id: (variant.Image) ? variant.Image.id : false
+                                /*thumbnail_id: (variant.Image) ? variant.Image.id : false*/
                             }
                         })
                     })

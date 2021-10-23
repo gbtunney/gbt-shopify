@@ -84,21 +84,20 @@ export default {
       var cartresponse = await Cart.api().fetchCart()
       console.log("reloaded cart", cartresponse, this.Instance.$toJson())
     },
-    async init() {
+     init() {
       if (!this.$props.instance) return
       let that = this
       //Cart HAS TO BE merged with an id with a number.
       if ( this.$props.instance ){
-        const response = await Cart.insert({
+        const response =  Cart.insert({
           data: { ...this.$props.instance, id: this.$data._refID}
         })
         if (this.Instance){
-          await Cart.commit((state) => {
+           Cart.commit((state) => {
             state.checkoutId = that.Instance.token
             state.cart = that.Instance;//Cart.query().where("token", state.checkoutId).withAll().first();
           })
         }
-       // this.$store.commit('loader/addProductLoader', {handle:"test",status:"testingfggg"})
       }
       /*
       let that = this
@@ -128,7 +127,7 @@ export default {
       return LineItem.query().where("group_id", this.$data._refID).withAll().all();
     },
   },
-  async mounted() {
+  mounted() {
     this.init();
   },
   render() {

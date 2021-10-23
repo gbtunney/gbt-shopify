@@ -22,6 +22,18 @@ export class ProductInstanceBase extends Model {
             LINE_ITEM: LineItem
         }
     }
+    static afterUpdate (model) {
+        console.log("ProductInstanceBase:::::::::::::; afterUpdate" ,model);
+        //increment
+        ProductInstanceBase.store().commit('entities/productbase/increment', 1)
+    }
+     static afterCreate (model) {
+        console.log("ProductInstanceBase afterCreate" ,model);
+
+        //increment
+         ProductInstanceBase.store().commit('entities/productbase/counter_reset', 5)
+
+    }
 
     static fields() {
         return {
@@ -88,8 +100,7 @@ export class ProductInstanceBase extends Model {
         }
         return false;
     }
-   /* static beforeCreate (model) {
-    }*/
+
     static mutators() {
         return {
             selection_mode(value) {
