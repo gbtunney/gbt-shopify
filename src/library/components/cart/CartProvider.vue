@@ -2,7 +2,7 @@
 import {ProductInstanceSingle, ProductInstanceGroup, LineItem,Cart,ProductGroupBase} from "../..";
 import {getRandomNumber} from "../../scripts/generic";
 import {USE_SERVER} from "../../settings"
-import {mapState} from "vuex";
+import {mapState,mapActions,mapGetters} from "vuex";
 import * as R from "ramda";
 const {omit} = R
 
@@ -41,6 +41,7 @@ export default {
     }
   },
   methods: {
+
     RemoveLineItem(instance) {
       console.log("tryingto delete " , instance )
 
@@ -116,6 +117,9 @@ export default {
     },
   },
   computed: {
+     ...mapGetters('shopify',[
+      'getCart'
+    ]),
     ...mapState('entities/cart', {   //cartLoading
       isCartLoading: (state) => state.fetching,
       cart: (state) => state.cart
@@ -127,12 +131,13 @@ export default {
       return LineItem.query().where("group_id", this.$data._refID).withAll().all();
     },
   },
-  mounted() {
+ async mounted() {
     this.init();
   },
-  render() {
+   render() {
     return this.$scopedSlots.default(
         {
+          Testing: this.getCart,
           Cart: this.Instance,
           isCartLoading: this.isCartLoading,
           TotalPrice: () => (this.Instance) ? this.Instance.TotalPrice : false,

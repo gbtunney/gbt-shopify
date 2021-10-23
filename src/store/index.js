@@ -5,6 +5,7 @@ import createEasyAccess from 'vuex-easy-access'
 import createPersistedState from "vuex-persistedstate";
 import {LOCAL_STORAGE_KEY} from '../library/settings'
 import {ormmodule} from '../library/modules/ormmodule'
+import {moduleShopify}from "../library/modules/moduleShopify"
 
 const plugins ={
   VUEX_LOCAL_STORAGE: true
@@ -32,9 +33,9 @@ export const store = new Vuex.Store({
   modules:  {
     /*loader: loadstore,*/
     orm: ormmodule,
-/*
-    shopify: shopifymodule
-*/
+
+    shopify: moduleShopify
+
   },
   plugins: [
     database, VUEX_EASY_ACCESS, dataState/*VUEX_LOCAL_STORAGE.plugin*/

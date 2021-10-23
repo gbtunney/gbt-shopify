@@ -4,7 +4,8 @@
 
 
     <cart-provider :instance="message">
-      <div slot-scope="{Cart,isCartLoading , LineItems,UpdateLineItem,RemoveLineItem}">
+      <div slot-scope="{Cart,isCartLoading , LineItems,UpdateLineItem,RemoveLineItem,Testing}">
+        TESTING!!!!!!!!! {{Testing}}
         <div v-if="!isCartLoading">
           <div v-for="lineitem in LineItems" v-bind:key="lineitem.id">
             <hr>
