@@ -19,9 +19,10 @@ export default class Product extends Model {
 
     static afterCreate(model) {
         ///make pivot table.
+        model.createVariantOptionPivot()
         console.log("PRODUCT ::afterCreate ",model)
         Product.store().commit('entities/products/addProductLoader', {handle:model.handle,status:"NOT_LOADING"})
-        model.createVariantOptionPivot()
+
     }
 
     static apiConfig = {
@@ -58,7 +59,7 @@ export default class Product extends Model {
 
     static fields() {
         return {
-            id: this.number(getRandomNumber(ID_LENGTH)),
+            id: this.uid(() =>getRandomNumber(ID_LENGTH)),
             handle: this.string(null), ///already a slug
             title: this.string(null),
             meta: this.string(null).nullable(),

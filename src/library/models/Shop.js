@@ -1,10 +1,12 @@
 import { Model } from '@vuex-orm/core'
+import {getRandomNumber} from "../scripts/generic";
+import {ID_LENGTH} from "../settings";
 
 export default class Shop extends Model {
     static entity = 'shop'
     static fields() {
         return {
-            id: this.uid(),
+            id: this.uid(() =>getRandomNumber(ID_LENGTH)),
             description:this.string(),
             name:this.string(),
         }

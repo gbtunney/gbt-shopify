@@ -3,7 +3,7 @@
     <h1>This is an about page</h1>
 
 
-    <cart-provider :instance="message">
+    <cart-provider v-bind="message">
       <div slot-scope="{Cart,isCartLoading , LineItems,UpdateLineItem,RemoveLineItem,Testing}">
         TESTING!!!!!!!!! {{Testing}}
         <div v-if="!isCartLoading">
@@ -12,12 +12,11 @@
             <product-instance-provider2 @changed="UpdateLineItem" v-bind="lineitem.$toJson()">
               <div slot-scope="{Ready, loadTest,Product,SelectedVariant,RequestedQuantity,UpdateInstance,Instance}">
                 <div style="border:2px solid red">Ready..Loading {{loadTest}}</div>
-
                 <div class="flex" v-if="Ready">
                   <SfQuantitySelector :qty="RequestedQuantity"  :min="0"
                       :max="SelectedVariant.inventory_quantity"
                       @input="UpdateInstance({ quantity: $event},Instance)" />
-                  <button class="bg-accent-secondary" @click="RemoveLineItem(Instance)">REMOVE ME</button>
+                  <button class="bg-accent-secondary" @click="UpdateInstance({ quantity: 0},Instance)">REMOVE ME</button>
                   {{RequestedQuantity}} - {{ Product.title }} :: {{ SelectedVariant.title }}
                 </div>
 
@@ -90,10 +89,10 @@ import {renameKeys} from "../library/scripts/generic";
 },
   props: {},
     async mounted(){
-
       var keysMap = {name: 'firstName', job: 'passion'};
       var obj = {name: 'Bobo', job: 'Front-End Master'};
 console.log("RENAME KEYS TEST@@@@@@@@@@@@@@",   renameKeys(keysMap, obj) )
+
       this.$store.set('shopify/cart_token', CartData.token);
 
       this.$data.message=  CartData

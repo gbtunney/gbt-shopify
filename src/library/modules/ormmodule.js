@@ -4,6 +4,8 @@ import {Query} from '@vuex-orm/core'
 import {
     cloneObject
 } from "../scripts/generic";
+import {upperCase} from "../scripts/stringUtils";
+import {ProductInstanceBase} from "../models/ProductInstance";
 /**
  * state
  */
@@ -17,7 +19,7 @@ const state = {
 const getters = {
     getEntity:  (state) => (instance) => {
         if ( instance && instance.constructor ){
-            return {entity : instance.constructor.entity,baseEntity:  instance.constructor.entity}
+            return {entity : instance.constructor.entity,baseEntity:  instance.constructor.baseEntity}
         }
         return false
     },
@@ -34,6 +36,17 @@ const mutations = {
  * actions
  */
 const actions = {
+    /* FORMAT for dispatch */
+    //ProductInstanceBase.store()
+    // .dispatch('orm/logOrmEvent',
+    // ['gillian',model,["testi stringggg ",{ttttttt:"!!!!!!!!!!!!!!"}],'blue','orange' ])
+        //array with :[ "event string", model
+    async logOrmEvent({state}, [event = "no event to log", model, additional = [], ...args]) {
+        const type = await ProductInstanceBase.store().dispatch('orm/getEntity', model);
+        const message = `EVENT:: ${event} \n  TYPE:: ${(type && type.baseEntity) ? upperCase(type.baseEntity) : ""} \n`;
+        console.important(message, [" MODEL::", model, type, ...additional], ...args)
+        return;
+    },
     getEntity({context, getters, commit}, instance) {
         if (instance && getters['getEntity']) return getters['getEntity'](instance)
         return

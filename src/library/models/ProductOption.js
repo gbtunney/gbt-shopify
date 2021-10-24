@@ -17,7 +17,7 @@ export class ProductOptionBase extends Model {
 
     static fields() {
         return {
-            id: this.number(getRandomNumber(ID_LENGTH)),
+            id: this.uid(() => getRandomNumber(ID_LENGTH)),
             type: this.attr('VALUE'), // Exposing the discriminator field.
 
             handle: this.string(null, value => slugify(value)),

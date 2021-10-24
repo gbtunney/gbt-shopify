@@ -14,7 +14,7 @@ export default class Variant extends Model {
   }
   static fields() {
     return {
-      id: this.number(getRandomNumber(ID_LENGTH)),
+      id: this.uid(() =>getRandomNumber(ID_LENGTH)),
       // handle: maybe generate a slug from options??
       title: this.string(null),
       position: this.number(null), //the index  ///set this to increment?

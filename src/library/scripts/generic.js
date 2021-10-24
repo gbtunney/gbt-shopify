@@ -1,5 +1,5 @@
 import * as R from 'ramda'
-
+window.R = R;
 export function getRandomNumber(_multiplier = 100, _digits = 3) {
     //TODO: make actuall functionx
     return Math.floor(Math.random() * _multiplier)
@@ -102,4 +102,13 @@ export function slugify(value) {
         .replace(/^-+/, '')             // Trim - from start of text
         .replace(/-+$/, '')             // Trim - from end of text
         .replace(/[\s_-]+/g, '-');
+}
+//todo:document
+export const importantConsoleLog = function (message = "",
+                                             additional = [],
+                                             backgroundCOLOR = "rgba(101,9,13,0.66)",
+                                             borderCOLOR = "#323232") {
+    console.log(`%c ${message} `,
+        `background:${backgroundCOLOR}; border: 1px solid ${borderCOLOR};`,
+        ...additional);
 }

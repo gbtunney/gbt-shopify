@@ -25,11 +25,5 @@ export const LoaderMixin = {
       }
     }
   },
-  created: function () {
-    // this.hello()
-  },
-  methods: {
-    hello: function () {
-    }
-  }
+
 }

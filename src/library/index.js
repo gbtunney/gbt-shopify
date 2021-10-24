@@ -11,6 +11,7 @@ import {ProductInstanceBase,ProductInstanceSingle, LineItem} from './models/Prod
 import {Cart,ProductInstanceGroup,ProductGroupBase} from './models/Cart'
 import {SHOPIFY_BASE_URL} from "./settings";
 import {moduleLoadStatus}from "./modules/moduleLoadStatus"
+import {importantConsoleLog} from "./scripts/generic";
 
 const _database = new Database()
 export {
@@ -37,7 +38,6 @@ _database.register(ProductInstanceGroup)
 _database.register(ProductOptionBase)
 _database.register(ProductOption)
 _database.register(ProductOptionValue)
-
 
 const tempProductLoadModule = {
     state: {
@@ -67,15 +67,17 @@ _database.register(Product,tempProductLoadModule)
 _database.register(ProductImage)
 _database.register(Variant);
 _database.register(VariantOption);
-//console.error("ttttt",ModuleShopify)
+
 _database.register(Cart)
 _database.register(LineItem)
+
 VuexORM.use(VuexORMAxios, {axios,
     headers: {
         'Content-Type': 'application/json',
     },
     baseURL: SHOPIFY_BASE_URL
 })
+console.important = importantConsoleLog;
 export const database = VuexORM.install(_database)
 
 export default database

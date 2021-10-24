@@ -7,10 +7,11 @@ import {
     cloneObject,
     getContainsLetter,
     getHasLetter,
-    getRandomNumber,
+    getRandomNumber, isInteger,
     stringContainsUppercase,
     toInteger
 } from "../scripts/generic";
+import {upperCase} from "../scripts/stringUtils";
 
 const { pick} = R
 
@@ -22,22 +23,18 @@ export class ProductInstanceBase extends Model {
             LINE_ITEM: LineItem
         }
     }
-    static afterUpdate (model) {
-        console.log("ProductInstanceBase:::::::::::::; afterUpdate" ,model);
-        //increment
+    static  afterUpdate (model) {
+        ProductInstanceBase.store().dispatch('orm/logOrmEvent',['afterUpdate',model ])
         ProductInstanceBase.store().commit('entities/productbase/increment', 1)
     }
      static afterCreate (model) {
-        console.log("ProductInstanceBase afterCreate" ,model);
-
-        //increment
-         ProductInstanceBase.store().commit('entities/productbase/counter_reset', 5)
-
+         ProductInstanceBase.store().dispatch('orm/logOrmEvent', ['afterCreate',model, [], 'red'])
+         //ProductInstanceBase.store().commit('entities/productbase/counter_reset', 5)
     }
 
     static fields() {
         return {
-            id: this.number(getRandomNumber(ID_LENGTH)),
+            id: this.uid(() =>getRandomNumber(ID_LENGTH)),
             type: this.attr('INSTANCE'),
            /* timestamp: this.number(0, value => Date.now()),*/
             properties: this.attr({message:false}),
@@ -100,7 +97,6 @@ export class ProductInstanceBase extends Model {
         }
         return false;
     }
-
     static mutators() {
         return {
             selection_mode(value) {
@@ -164,6 +160,7 @@ export class ProductInstanceSingle extends ProductInstanceBase {
                 }
                 return
             },*/
+
             options_editable(value) {
                 if (R.is(Boolean, value)) return value;
                 else if (R.is(Array, value)) {     //expand to map
@@ -206,9 +203,7 @@ ProductInstanceSingle.prototype.get_option_editable = function (_key = false) {
 export class LineItem extends ProductInstanceBase {
     static entity = 'lineitem'
     static baseEntity = 'productbase'
-    static afterCreate(model) {
-        console.log("!!!!!!!!!NEW LINE ITEM CREATEE!!!!!!",model, model.type)
-    }
+
     static fields() {
         return {
             ...super.fields(),

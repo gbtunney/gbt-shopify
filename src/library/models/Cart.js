@@ -1,22 +1,34 @@
 import { Model } from '@vuex-orm/core'
 import {ProductInstanceSingle,LineItem,  Variant} from './..'
-import {getRandomNumber} from "../scripts/generic";
+import {getRandomNumber, isInteger, toInteger} from "../scripts/generic";
 import {ID_LENGTH} from "../settings";
 import * as R from 'ramda'
+import {isDevMode} from "../scripts/vuehelpers";
+import MockAdapter from "axios-mock-adapter";
+import axios from "axios";
 const {omit, pick} = R
+import CartData from "@/assets/cart.json"
+
+console.log("DEVMODE ",isDevMode() )
+
+
 export class ProductGroupBase extends Model {
     static entity ="productgroupbase"
-
     static types () {
         return {
             GROUP: ProductInstanceGroup,
             CART: Cart
         }
     }
-
+    static afterUpdate (model) {
+        ProductGroupBase.store().dispatch('orm/logOrmEvent', ['afterUpdate',model])
+    }
+    static afterCreate (model) {
+        ProductGroupBase.store().dispatch('orm/logOrmEvent', ['afterCreate',model, [], 'red'])
+    }
     static fields() {
         return {
-            id: this.number(getRandomNumber(ID_LENGTH)),
+            id: this.uid(() =>getRandomNumber(ID_LENGTH)),
             timestamp: this.number(0, value => Date.now()),
             type: this.attr('GROUP'),
 
@@ -36,20 +48,26 @@ export class ProductGroupBase extends Model {
             currency: this.string("USD"),
         }
     }
+}
 
+const mockaxios = function (
+    req = '/cart',
+    data = {},
+    _restore = false,
+    _timeout = false,
+    _error = false) {
+    const mock = new MockAdapter(axios);
+    mock.onGet(req).reply(200, data);
+    if (_timeout) mock.onGet(req).timeout();
+    if (_error) mock.onGet(req).networkError();
+    if (_restore) mock.restore();
+    return
 }
 
 export class Cart extends ProductGroupBase {
     static entity ="cart"
      static baseEntity = 'productgroupbase' /// TODO: extend instance instead?
 
-     static state ()  {
-         return {
-             cart: false,
-             checkoutId:false,
-             fetching: false,
-         }
-     }
      static apiConfig = {
         actions: {
             updateItems(item_array, useServer = true) {
@@ -104,25 +122,27 @@ export class Cart extends ProductGroupBase {
                   //  LineItem.create({data: newArr[0]})
                 }
             },
-            fetchCart(data = {}, useServer = true) {
-                Cart.commit((state) => {
-                    state.fetching_cart = true
-                })
-                return this.get(`/cart.js`, {
-                        dataTransformer: (response) => {
-                            const _cart = response.data
-                            if (_cart && _cart.token) {
-                                Cart.commit((state) => {
-                                    state.fetching_cart = false
-                                    state.checkoutId = _cart.token;
-                                })
-                                //return _cart;
-                            }
+          async  fetchCart(mock = isDevMode() , useServer = true) {
+                if ( mock ){
+                    mockaxios("/cart",CartData)
+                  return this.get("/cart").then(function (response) {
+                        console.log("MOCK CART " ,response);
 
-                           return {..._cart, id: getRandomNumber(10000)}
+                    }).catch(function (error) {
+                        console.error("error ob" ,error);
+                    })
+                }else{
+                    return this.get(`/cart.js`,{
+                        validateStatus: function (status) {
+                            console.log("validating status" ,status)
+                            return status < 500; // Resolve only if the status code is less than 500
                         }
-                    }
-                )
+                    })
+                        .catch(function (error) {
+                            console.log("error ob" ,error.toJSON());
+                        });
+                }
+
             },
         }
     }
@@ -181,63 +201,4 @@ export class ProductInstanceGroup extends ProductGroupBase {
         //if one is unavailable the rest are false.
     }
 }
-
-
 export default Cart
-/*
-1	jQuery.post('/cart/update.js', {updates: {794864053: 5}});
-
-            {"id": 22589283041398,
-            "properties": {},
-            "quantity": 100,
-            "variant_id": 22589283041398,
-            "key": "22589283041398:caf6a8e681b33b85ea2f0005964eee12",
-            "title": "Local (worsted) - Red Squirrel \/ Skein",
-            "price": 2025,
-            "original_price": 2025,
-            "discounted_price": 1013,
-            "line_price": 101250,
-            "original_line_price": 202500,
-            "total_discount": 101250,
-            "discounts": [{"amount": 101250, "title": "Test Discount"}],
-            "sku": "Local:LRedSquirrel",
-            "grams": 127,
-            "vendor": "O-Wool",
-            "taxable": true,
-            "product_id": 2651981938806,
-            "product_has_only_default_variant": false,
-            "gift_card": false,
-            "final_price": 1013,
-            "final_line_price": 101250,
-            "url": "\/products\/local?variant=22589283041398",
-            "featured_image": {
-                "aspect_ratio": 0.667,
-                "alt": "Red Squirrel",
-                "height": 2048,
-                "url": "https:\/\/cdn.shopify.com\/s\/files\/1\/0084\/4044\/7094\/products\/LRedSquirrel_9bf93c6f-91f6-4618-ba14-e10a09a936ae.jpg?v=1570355350",
-                "width": 1366
-            },
-            "image": "https:\/\/cdn.shopify.com\/s\/files\/1\/0084\/4044\/7094\/products\/LRedSquirrel_9bf93c6f-91f6-4618-ba14-e10a09a936ae.jpg?v=1570355350",
-            "handle": "local",
-            "requires_shipping": true,
-            "product_type": "Yarns",
-            "product_title": "Local (worsted)",
-            "product_description": "Worsted WeightFiber Content:50% alpaca from local farms in NJ \u0026 PA50% certified organic merinoPut-up: 3.5 oz \/ 100gYardage: 240 yds \/ 219mGauge: 18 - 20 sts = 4\u201d \/ 10cm Needle: 7 - 9 US \/ 4.5 - 5.5mm\u00a0How about Local dyed with Natural Dyes!?\nClick here for patterns in Local\nWant to see all of the colors in person before ordering? Order a Shade Card.\n\nWant your yarn wound into balls?\u00a0Look here.\nAfter one adventurous drive in a minivan brimming with alpaca fiber, O-Wool Local was born. Since then, I've visited farms all around the Philadelphia area collecting fiber. Local is processed in the Northeastern USA. It is squishy and soft, and still has that alpaca smell and some lanolin left in the fiber. It is a truly rustic, minimally processed yarn - if that's your thing, you're going to love this yarn.\nHand wash in cold water with gentle detergent. Lay flat to dry.\n\u00a0",
-            "variant_title": "Red Squirrel \/ Skein",
-            "variant_options": ["Red Squirrel", "Skein"],
-            "options_with_values": [{"name": "Color", "value": "Red Squirrel"}, {"name": "Size", "value": "Skein"}],
-            "line_level_discount_allocations": [{
-                "amount": 101250,
-                "discount_application": {
-                    "type": "automatic",
-                    "key": "294b84ae-3829-477d-a869-0bc207f33a8f",
-                    "title": "Test Discount",
-                    "description": "",
-                    "value": "50.0",
-                    "created_at": "2021-10-03T21:29:55.907Z",
-                    "value_type": "percentage",
-                    "allocation_method": "across",
-                    "target_selection": "entitled",
-                    "target_type": "line_item",
-                    "total_allocated_amount": 131625
-           }*/
