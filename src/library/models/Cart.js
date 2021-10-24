@@ -1,34 +1,40 @@
-import { Model } from '@vuex-orm/core'
-import {ProductInstanceSingle,LineItem,  Variant} from './..'
+import {Model} from '@vuex-orm/core'
+import {ProductInstanceSingle, LineItem, Variant} from './..'
 import {getRandomNumber, isInteger, toInteger} from "../scripts/generic";
 import {ID_LENGTH} from "../settings";
-import * as R from 'ramda'
+const R = window.R;
+
 import {isDevMode} from "../scripts/vuehelpers";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
-const {omit, pick} = R
 import CartData from "@/assets/cart.json"
 
-console.log("DEVMODE ",isDevMode() )
+const BASE_ENTITY = 'productgroupbase'
 
+//TODO: refactor to bbetter name.
+console.log("DEVMODE ", isDevMode())
 
 export class ProductGroupBase extends Model {
-    static entity ="productgroupbase"
-    static types () {
+    static entity = BASE_ENTITY
+
+    static types() {
         return {
             GROUP: ProductInstanceGroup,
             CART: Cart
         }
     }
-    static afterUpdate (model) {
-        ProductGroupBase.store().dispatch('orm/logOrmEvent', ['afterUpdate',model])
+
+    static afterUpdate(model) {
+        ProductGroupBase.store().dispatch('orm/logOrmEvent', ['afterUpdate', model])
     }
-    static afterCreate (model) {
-        ProductGroupBase.store().dispatch('orm/logOrmEvent', ['afterCreate',model, [], 'red'])
+
+    static afterCreate(model) {
+        ProductGroupBase.store().dispatch('orm/logOrmEvent', ['afterCreate', model, [], 'red'])
     }
+
     static fields() {
         return {
-            id: this.uid(() =>getRandomNumber(ID_LENGTH)),
+            id: this.uid(() => getRandomNumber(ID_LENGTH)),
             timestamp: this.number(0, value => Date.now()),
             type: this.attr('GROUP'),
 
@@ -49,7 +55,7 @@ export class ProductGroupBase extends Model {
         }
     }
 }
-
+//todo .... move
 const mockaxios = function (
     req = '/cart',
     data = {},
@@ -65,10 +71,10 @@ const mockaxios = function (
 }
 
 export class Cart extends ProductGroupBase {
-    static entity ="cart"
-     static baseEntity = 'productgroupbase' /// TODO: extend instance instead?
+    static entity = "cart"
+    static baseEntity = BASE_ENTITY /// TODO: extend instance instead?
 
-     static apiConfig = {
+    static apiConfig = {
         actions: {
             updateItems(item_array, useServer = true) {
                 let _items = item_array;
@@ -91,86 +97,88 @@ export class Cart extends ProductGroupBase {
                 let _items = item_array;
 
                 if (useServer) {
-                Cart.commit((state) => {
-                    state.fetching = true
-                })
-                    let convertedItems =   _items.map(function (_item) {
+                    Cart.commit((state) => {
+                        state.fetching = true
+                    })
+                    let convertedItems = _items.map(function (_item) {
                         return _item.NewLineItem;
                     })
-                return this.post(`/cart/add.js`,
-                    {
-                        save: false,
-                        items: convertedItems
-                    }
-                )}else {
+                    return this.post(`/cart/add.js`,
+                        {
+                            save: false,
+                            items: convertedItems
+                        }
+                    )
+                } else {
                     ///TODO: THIS IS KIND OF BROKEN.
                     console.log("SERVER :: ADD ITEMS  ", _items)
-                    let newArr =   _items.map(function (_item) {
-                       let cleaned  = _item.$toJson();
+                    let newArr = _items.map(function (_item) {
+                        let cleaned = _item.$toJson();
 
-                       if ( _item.requested_quantity ) cleaned =
-                           { ...cleaned ,'type':'LINE_ITEM',
-                               'quantity':  _item.requested_quantity,
-                               'group_id' :Cart.store().state.entities.cart.cart.id
-                           }
-                        return omit(['id','requested_quantity','properties'] ,cleaned)
-                       // return omit(['id','requested_quantity','properties'] ,cleaned)
+                        if (_item.quantity) cleaned =
+                            {
+                                ...cleaned, 'type': 'LINE_ITEM',
+                                'quantity': _item.quantity,
+                                'group_id': Cart.store().state.entities.cart.cart.id
+                            }
+                        return R.omit(['id', 'requested_quantity', 'properties'], cleaned)
                     })
-                   console.log("THE NEW ARRAY IS ",newArr,newArr, Cart.store().state.entities.cart.cart );
+                    console.log("THE NEW ARRAY IS ", newArr, newArr, Cart.store().state.entities.cart.cart);
                     ///todo: PUSH NEW CHILD
                     return newArr;
-                  //  LineItem.create({data: newArr[0]})
+                    //  LineItem.create({data: newArr[0]})
                 }
             },
-          async  fetchCart(mock = isDevMode() , useServer = true) {
-                if ( mock ){
-                    mockaxios("/cart",CartData)
-                  return this.get("/cart").then(function (response) {
-                        console.log("MOCK CART " ,response);
+            async fetchCart(mock = isDevMode(), useServer = true) {
+                if (mock) {
+                    mockaxios("/cart", CartData)
+                    return this.get("/cart").then(function (response) {
+                        console.log("MOCK CART ", response);
 
                     }).catch(function (error) {
-                        console.error("error ob" ,error);
+                        console.error("error ob", error);
                     })
-                }else{
-                    return this.get(`/cart.js`,{
+                } else {
+                    return this.get(`/cart.js`, {
                         validateStatus: function (status) {
-                            console.log("validating status" ,status)
+                            console.log("validating status", status)
                             return status < 500; // Resolve only if the status code is less than 500
                         }
                     })
                         .catch(function (error) {
-                            console.log("error ob" ,error.toJSON());
+                            console.log("error ob", error.toJSON());
                         });
                 }
 
             },
         }
     }
-     static fields() {
-         return {
-             ...super.fields(),
-             items: this.hasMany(LineItem, "group_id"),
-             total_weight: this.number(null),
-             requires_shipping: this.boolean(false),
-             cart_level_discount_applications: this.attr([])
-         }
-     }
-     static GetCart(){
+
+    static fields() {
+        return {
+            ...super.fields(),
+            items: this.hasMany(LineItem, "group_id"),
+            total_weight: this.number(null),
+            requires_shipping: this.boolean(false),
+            cart_level_discount_applications: this.attr([])
+        }
+    }
+
+    static GetCart() {
         return Cart.store().state.entities.cart.cart;
-     }
+    }
 }
 
 export class ProductInstanceGroup extends ProductGroupBase {
     static entity = 'productgroup'
-   static baseEntity = 'productgroupbase'
+    static baseEntity = BASE_ENTITY
+
     static fields() { //this used ti be inherited but it was a pain in the ass
         return {
             ...super.fields(),
-
             //*** variant linked with instance ( ie could be not for sale variant with group etc.
-           // variant_id: this.number(null),
-           // Variant: this.hasOne(Variant, "id", "variant_id"),
-
+            // variant_id: this.number(null),
+            // Variant: this.hasOne(Variant, "id", "variant_id"),
             //*** preferences
             add_to_cart_enabled: this.boolean(false), /// this is bool to allow a add to cart button for TOTAL GROUP.
 
@@ -179,7 +187,7 @@ export class ProductInstanceGroup extends ProductGroupBase {
             max_children: this.number(1), //the max instanxes per group
         }
     }
-
+    //REMOVE???? //GILLIAN??
     get TotalPrice() {
         let accumulator = 0;
         if (this.ProductInstances) {
@@ -192,7 +200,7 @@ export class ProductInstanceGroup extends ProductGroupBase {
         return accumulator;
         //add the array of item prices.
     }
-
+    //REMOVE???? //GILLIAN??
     get IsAvailable() {
         return this.ProductInstances.reduce(function (item, bool) {
             if (!item.IsAvailable) return false;

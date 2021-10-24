@@ -10,7 +10,7 @@ export default class ProductImage extends Model {
 
     static fields() {
         return {
-            id: this.number(getRandomNumber(ID_LENGTH)),
+            id: this.uid(() => getRandomNumber(ID_LENGTH)),
             position: this.number(null),
             alt: this.string(null),
             width: this.number(500),
@@ -43,11 +43,11 @@ export default class ProductImage extends Model {
             "alt": this.alt
         }
     }
-}
-//note: must be called with ()
-ProductImage.prototype.getSrc = function (_width = false, _height = false) {
-    //console.log("getting hheight", _height, ShopifyMediaURL(this.src, _width, _height))
-    return ShopifyMediaURL(this.src, _width, _height);
+
+    /** Static  Methods  */
+    getSrc (_width = false, _height = false) {
+        return ShopifyMediaURL(this.src, _width, _height);
+    }
 }
 /* SRC SET!!!!!!!!!
     [

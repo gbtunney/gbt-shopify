@@ -2,7 +2,6 @@ import {Model} from '@vuex-orm/core'
 import  {Variant, Product, ProductInstanceGroup,Cart} from "./..";
 import {Editable_Defaults, ID_LENGTH, SELECTION_MODE_OPTIONS} from "../settings";
 import {isShopifyID} from "../scripts/shopify";
-import * as R from 'ramda'
 import {
     cloneObject,
     getContainsLetter,
@@ -12,31 +11,27 @@ import {
     toInteger
 } from "../scripts/generic";
 import {upperCase} from "../scripts/stringUtils";
+const R = window.R;
 
-const { pick} = R
+
+const BASE_ENTITY = 'productbase' //todo: change name
+
 
 export class ProductInstanceBase extends Model {
-    static entity = 'productbase'
+    static entity = BASE_ENTITY
+
     static types () {
         return {
             INSTANCE: ProductInstanceSingle,
             LINE_ITEM: LineItem
         }
     }
-    static  afterUpdate (model) {
-        ProductInstanceBase.store().dispatch('orm/logOrmEvent',['afterUpdate',model ])
-        ProductInstanceBase.store().commit('entities/productbase/increment', 1)
-    }
-     static afterCreate (model) {
-         ProductInstanceBase.store().dispatch('orm/logOrmEvent', ['afterCreate',model, [], 'red'])
-         //ProductInstanceBase.store().commit('entities/productbase/counter_reset', 5)
-    }
 
     static fields() {
         return {
             id: this.uid(() =>getRandomNumber(ID_LENGTH)),
             type: this.attr('INSTANCE'),
-           /* timestamp: this.number(0, value => Date.now()),*/
+            /* timestamp: this.number(0, value => Date.now()),*/
             properties: this.attr({message:false}),
             meta: this.string(null),
             url:this.string(null),
@@ -54,12 +49,27 @@ export class ProductInstanceBase extends Model {
             options_editable: this.attr(Editable_Defaults["options"]), //future pref dont know when implement
         }
     }
-    get Entity(){
-        return {entity : this.constructor.entity,baseEntity:  this.constructor.entity}
+    static  afterUpdate (model) {
+        ProductInstanceBase.store().dispatch('orm/logOrmEvent',['afterUpdate',model ])
+        ProductInstanceBase.store().commit('entities/productbase/increment', 1)
     }
+     static afterCreate (model) {
+         ProductInstanceBase.store().dispatch('orm/logOrmEvent', ['afterCreate',model, [], 'red'])
+         //ProductInstanceBase.store().commit('entities/productbase/counter_reset', 5)
+    }
+    //REMOVE ???
+    ///** STATIC METHHIDS KEEP!!!!!! */  ////MOVE IDK ????
     getClone(mode = false, idList = []) {
         return cloneObject(this.$toJson(), mode, idList)
     }
+
+    //todo :
+    //REMOVE ???
+    get Entity(){
+        return {entity : this.constructor.entity,baseEntity:  this.constructor.entity}
+    }
+    ///DEMO FUNCTION
+    //REMOVE OR MOVE???????????
     _updateWhere(where = {}, values = false) {
         if (!values || R.isEmpty(where)) return false;
         const predWhere = R.whereEq(where);
@@ -70,7 +80,8 @@ export class ProductInstanceBase extends Model {
             data: {active: true}
         })
     }
-
+////TODO::
+    ///REMOVE????????????
     _updateByID(values, mode = false, idList = []) {
         if (!values) return;
         ProductInstanceBase.update({...values, id: this.id})
@@ -117,12 +128,12 @@ export class ProductInstanceBase extends Model {
 
 export class ProductInstanceSingle extends ProductInstanceBase {
     static entity = 'productsingle'
-    static baseEntity = 'productbase'
+    static baseEntity = BASE_ENTITY
 
     static fields() {
         return {
             ...super.fields(),
-            requested_quantity: this.number(1),
+            quantity: this.number(1),
           //  group_id: this.number(null),
             Group: this.belongsTo(ProductInstanceGroup, "group_id"),
 
@@ -130,37 +141,6 @@ export class ProductInstanceSingle extends ProductInstanceBase {
     }
     static mutators() {
         return {
-           /* variant_id (value) {
-                if (!value) return value
-                //console.log("trying to set id",value);
-                if ( isShopifyID(value) ) return toInteger(value)
-                if (R.is(String, value) && getContainsLetter(value)){
-                    if (stringContainsUppercase(value)) { ///if contains an uppercase, its not a handle
-                        let _variant = Variant.query().where("sku", value).first();
-                        console.log("searching for sku", _variant);
-                        if (_variant && _variant.id) return _variant.id
-                    }
-                    let search_handle = value;
-                    let search_position = 1;
-                    if (value.contains("|")) {
-                        console.log("contains pipe char, checking for handle and integer")
-                        let arr = value.split('|');
-                        if (arr && arr.length >= 2) {
-                            search_handle = arr[0];
-                            search_position = toInteger(arr[1], 1);
-                        }
-                    }
-                    let _product = Product.query().where("handle", search_handle).first();
-                    console.log(" ifffffs prodduct handle", search_handle, search_position, _product);
-                    if (_product && _product.id) {
-                        let foundVariant = Variant.query().where("product_id", _product.id).where("position", search_position).first()
-                        console.log(" foundVariante", foundVariant);
-                        if (foundVariant && foundVariant.id) return foundVariant.id
-                    }
-                }
-                return
-            },*/
-
             options_editable(value) {
                 if (R.is(Boolean, value)) return value;
                 else if (R.is(Array, value)) {     //expand to map
@@ -180,20 +160,26 @@ export class ProductInstanceSingle extends ProductInstanceBase {
     }
 
     get LinePrice() {  //requested quantity * price.
-        return (this.Variant) ? (this.requested_quantity * this.Variant.price) : "not set"
+        return (this.Variant) ? (this.quantity * this.Variant.price) : "not set"
     }
     get TotalPrice() {
-        return (this.Variant) ? (this.requested_quantity * this.Variant.price) : "not set"
+        return (this.Variant) ? (this.quantity * this.Variant.price) : "not set"
     }
     get IsAvailable() {
         return this.Variant.IsAvailable;
     }
+    ///REMOVE???/
+    //TODO???
     get NewLineItem() {
-        const newObj = {...this.$toJson(), 'quantity': this.$toJson()['requested_quantity'],
+        const newObj = {...this.$toJson(), 'quantity': this.$toJson()['quantity'],
           'id' : this.variant_id };
-        return pick(['id', 'quantity', 'properties'], newObj)
+        return R.pick(['id', 'quantity', 'properties'], newObj)
     }
 }
+
+
+///TODO
+//REMOVE   *****
 ProductInstanceSingle.prototype.get_option_editable = function (_key = false) {
     if (R.is(Boolean, this.options_editable)) return this.options_editable;
     const _map = new Map(this.options_editable);
@@ -202,7 +188,7 @@ ProductInstanceSingle.prototype.get_option_editable = function (_key = false) {
 
 export class LineItem extends ProductInstanceBase {
     static entity = 'lineitem'
-    static baseEntity = 'productbase'
+    static baseEntity = BASE_ENTITY
 
     static fields() {
         return {
@@ -210,9 +196,7 @@ export class LineItem extends ProductInstanceBase {
             //*********** The Child value instances
             key: this.string(null),
             quantity: this.number(1),
-
             Group: this.belongsTo(Cart, "id"),
-
             featured_image: this.attr(null), // TODO: this is an object, maybe convert to an image
             title: this.string(null),
             price: this.number(null),

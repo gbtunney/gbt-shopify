@@ -1,11 +1,10 @@
 import {Model} from '@vuex-orm/core'
-import {Variant, ProductImage, ProductOption, ProductOptionValue, VariantOption} from './..'
-import {SHOPIFY_BASE_URL,ID_LENGTH} from "./../settings";
-import * as R from 'ramda'
-const {omit, pick} = R
-import {getRandomNumber, slugify, toInteger} from "./../scripts/generic";
-import {isShopifyID} from "../scripts/shopify";
 
+import {Variant, ProductImage, ProductOption, ProductOptionValue, VariantOption} from './..'
+import {ID_LENGTH} from "./../settings";
+import {getRandomNumber, isInteger, slugify, toInteger} from "./../scripts/generic";
+import {isShopifyID} from "../scripts/shopify";
+const R = window.R
 //todo: get this from settings
 export default class Product extends Model {
     static entity = 'products';
@@ -59,7 +58,7 @@ export default class Product extends Model {
 
     static fields() {
         return {
-            id: this.uid(() =>getRandomNumber(ID_LENGTH)),
+            id: this.uid(() => getRandomNumber(ID_LENGTH)),
             handle: this.string(null), ///already a slug
             title: this.string(null),
             meta: this.string(null).nullable(),
@@ -92,7 +91,7 @@ export default class Product extends Model {
     get Images() {
         return this.images;
     }
-
+//    //REMOVE?  needs to be moee specific/????
     get Variants() {
         return this.variants;
     }
@@ -100,17 +99,48 @@ export default class Product extends Model {
     get Options(){
         return this.options
     }
+    /** INSTANCE METHODS> NEWW GILLIAN GILLIAN */
+    getOptionIDByProp(key = false, prop = "handle") {   //default is "handle"
+        if (!key) return
+        const query =
+            ProductOption
+                .query()
+                .where("product_id", this.id)
+                .where(prop, key).first();
+        return (query && query.id) ? query.id : false
+    }
 
+    getOptionValueList(value = false, relations = '*') {
+        if (!value || R.isEmpty(value)) return
+        let id = (isInteger(value)) ? isInteger(value) : false;
+        if (R.is(String, value)) {
+            /*assume it is a hhandle*/
+            const tempval = this.getOptionIDByProp(value);
+            id = (isInteger(tempval)) ? toInteger(tempval) : false
+            if (!id) return false;
+        }
+        return ProductOptionValue
+            .query()
+            .where("product_id", this.id)
+            .where("option_id", id).with(relations).all();
+    }
+    /** END NEW INSTANCE METHODS> NEWW GILLIAN GILLIAN */
+
+    /** Any product handle to ID  */
+    //TODO : Keep
     static handleToID(handle) {
         var _product = Product.query().where("handle", handle).first();
         if (_product && _product.id && isShopifyID(_product.id)) return toInteger(_product.id)
         return false;
     }
-
-    static getProductByHandle(handle) {
+    /** Get any product by handle  */
+    //TODO : Keep
+    static getProductByHandle(handle) {  //todo: withs????
         return Product.query().where("handle", handle).first();
     }
+
     //DEMO FUNCTION
+    //REMOVE?
     static getProductByObject(where={}) {
         if (  R.isEmpty(where) ) return false;
         const predWhere = R.whereEq(where);
@@ -124,8 +154,14 @@ export default class Product extends Model {
         return user;
     }
 
-}
+    ///TODO:?????
+    //REMOVE?
+    static getProductOptions(handle) {
+        return Product.query().where("handle", handle).first();
+    }
 
+}
+//REMOVE?
 /*INCOMING DATA: n*/ //TODO: shoud be switched to static method.
 Product.prototype.APITransformProductData = function (_product) {
     //make id public
@@ -152,7 +188,7 @@ Product.prototype.APITransformProductData = function (_product) {
                 values: expandedValues
             }
             //remove id and merge options. parent option
-            return {...omit(["id"], _option), ...newOptionProps}
+            return {...R.omit(["id"], _option), ...newOptionProps}
         })
     }
     return {..._product, ...{options: option_arr}};

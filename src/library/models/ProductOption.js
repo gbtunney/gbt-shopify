@@ -3,9 +3,11 @@ import {getRandomNumber, slugify} from "./../scripts/generic";
 import {Product, Variant, ProductImage} from "./..";
 import {ID_LENGTH} from "../settings";
 
+const BASE_ENTITY = 'productoptionbase'
+
 // Base entity.
 export class ProductOptionBase extends Model {
-    static entity = 'productoptionbase'
+    static entity = BASE_ENTITY
 
     static types() {
         return {
@@ -19,7 +21,6 @@ export class ProductOptionBase extends Model {
         return {
             id: this.uid(() => getRandomNumber(ID_LENGTH)),
             type: this.attr('VALUE'), // Exposing the discriminator field.
-
             handle: this.string(null, value => slugify(value)),
             sid: this.number(null),  ////thhihs is the origonal ID, it should have been converted to sid.
             title: this.string(null),
@@ -34,7 +35,7 @@ export class ProductOptionBase extends Model {
 export class ProductOptionValue extends ProductOptionBase {
 
     static entity = 'productoptionvalue'
-    static baseEntity = 'productoptionbase'
+    static baseEntity = BASE_ENTITY
     static primaryKey = ['product_id', 'handle']
 
     static fields() {
@@ -71,7 +72,7 @@ export class ProductOptionValue extends ProductOptionBase {
 export class ProductOption extends ProductOptionBase {
 
     static entity = 'productoptions'
-    static baseEntity = 'productoptionbase'
+    static baseEntity = BASE_ENTITY
 
     static fields() {
         return {
