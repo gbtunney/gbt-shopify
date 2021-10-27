@@ -1,23 +1,15 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
+
+import {gVueUtils} from "./library";
+
+//Vue.use(gVueUtils);
+
+
 import store from './store'
 import './assets/tailwind.css'
 
-//todo:RELOCATE!!!!!!!!!
-Vue.filter('toCurrency', function (value) {
-  if (typeof value !== "number") {
-    return value;
-  }
-  const formatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0
-  });
-  return formatter.format(value);
-});
-import VTooltip from 'v-tooltip'
-Vue.use(VTooltip)
 Vue.config.productionTip = false
 
 new Vue({

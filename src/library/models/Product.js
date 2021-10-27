@@ -1,15 +1,21 @@
-import {Model} from '@vuex-orm/core'
+/** Product **
+ * @model Product
+ * @entity - products */
 
-import {Variant, ProductImage, ProductOption, ProductOptionValue, VariantOption} from './..'
-import {ID_LENGTH} from "./../settings";
+import {Model} from '@vuex-orm/core'
+import {Variant, ProductImage, ProductOption, ProductOptionValue, VariantOption} from './index'
 import {getRandomNumber, isInteger, slugify, toInteger} from "./../scripts/generic";
 import {isShopifyID} from "../scripts/shopify";
+
 const R = window.R
+console.log("ALERT TESTI", Variant)
 //todo: get this from settings
-export default class Product extends Model {
+import {ID_LENGTH} from "./../settings";
+
+export class Product extends Model {
     static entity = 'products';
 
-    static state ()  {
+    static state() {
         return {
             fetching: false,
             ready: false,
@@ -19,15 +25,15 @@ export default class Product extends Model {
     static afterCreate(model) {
         ///make pivot table.
         model.createVariantOptionPivot()
-        console.log("PRODUCT ::afterCreate ",model)
-        Product.store().commit('entities/products/addProductLoader', {handle:model.handle,status:"NOT_LOADING"})
+        console.log("PRODUCT ::afterCreate ", model)
+        Product.store().commit('entities/products/addProductLoader', {handle: model.handle, status: "NOT_LOADING"})
 
     }
 
     static apiConfig = {
         actions: {
             fetchByHandle(handle) {
-               Product.store().commit('entities/products/addProductLoader', {handle:handle,status:"LOADING"})
+                Product.store().commit('entities/products/addProductLoader', {handle: handle, status: "LOADING"})
                 return this.get(`/products/${handle}.json`,
                     {
                         dataTransformer: (response) => {
@@ -91,14 +97,16 @@ export default class Product extends Model {
     get Images() {
         return this.images;
     }
+
 //    //REMOVE?  needs to be moee specific/????
     get Variants() {
         return this.variants;
     }
 
-    get Options(){
+    get Options() {
         return this.options
     }
+
     /** INSTANCE METHODS> NEWW GILLIAN GILLIAN */
     getOptionIDByProp(key = false, prop = "handle") {   //default is "handle"
         if (!key) return
@@ -124,6 +132,7 @@ export default class Product extends Model {
             .where("product_id", this.id)
             .where("option_id", id).with(relations).all();
     }
+
     /** END NEW INSTANCE METHODS> NEWW GILLIAN GILLIAN */
 
     /** Any product handle to ID  */
@@ -133,6 +142,7 @@ export default class Product extends Model {
         if (_product && _product.id && isShopifyID(_product.id)) return toInteger(_product.id)
         return false;
     }
+
     /** Get any product by handle  */
     //TODO : Keep
     static getProductByHandle(handle) {  //todo: withs????
@@ -141,16 +151,16 @@ export default class Product extends Model {
 
     //DEMO FUNCTION
     //REMOVE?
-    static getProductByObject(where={}) {
-        if (  R.isEmpty(where) ) return false;
+    static getProductByObject(where = {}) {
+        if (R.isEmpty(where)) return false;
         const predWhere = R.whereEq(where);
         const user = Product.query()
             .where((_record, query) => {
-                return ( predWhere(_record) ) ? _record : false
-              // query.where('age', 20).orWhere('id', 1)
+                return (predWhere(_record)) ? _record : false
+                // query.where('age', 20).orWhere('id', 1)
             })
             .get()
-        console.log("seatching " ,  user)
+        console.log("seatching ", user)
         return user;
     }
 
@@ -161,6 +171,7 @@ export default class Product extends Model {
     }
 
 }
+
 //REMOVE?
 /*INCOMING DATA: n*/ //TODO: shoud be switched to static method.
 Product.prototype.APITransformProductData = function (_product) {
@@ -216,3 +227,4 @@ Product.prototype.createVariantOptionPivot = function () {
         }
     }
 }
+export default Product

@@ -1,7 +1,7 @@
 import {defaultMutations} from "vuex-easy-access";
 import {Query} from "@vuex-orm/core";
 import {cloneObject} from "../scripts/generic";
-import {Cart as CartModel} from "../../library";
+import {Cart as CartModel} from "../../library/models";
 /**
  * state
  */

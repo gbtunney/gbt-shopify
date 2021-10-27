@@ -1,19 +1,37 @@
+/* * exports { ProductGroupBase,ProductInstanceGroup,Cart }*/
+/** ProductGroup
+ * @baseentity ProductGroupBase - productgroupbase
+ * @entity ProductInstanceGroup - productgroup
+ * @entity Cart - cart */
+
+//**************  ProductGroupBase *****************//
+/* * @model ProductGroupBase
+* @entity productgroupbase */
+
+/** @model  - ProductInstanceGroup
+ * @entity  - productgroup
+ * @baseentity  - productgroupbase */
+
+/** @model  - Cart
+ * @entity  - cart
+ * * @baseentity  - productgroupbase */
+
 import {Model} from '@vuex-orm/core'
-import {ProductInstanceSingle, LineItem, Variant} from './..'
+import {ProductInstanceSingle, LineItem, Variant} from './'
 import {getRandomNumber, isInteger, toInteger} from "../scripts/generic";
 import {ID_LENGTH} from "../settings";
+
 const R = window.R;
 
 import {isDevMode} from "../scripts/vuehelpers";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import CartData from "@/assets/cart.json"
+//************** End imports *****************//
 
 const BASE_ENTITY = 'productgroupbase'
 
-//TODO: refactor to bbetter name.
-console.log("DEVMODE ", isDevMode())
-
+//************** ProductGroupBase *****************//
 export class ProductGroupBase extends Model {
     static entity = BASE_ENTITY
 
@@ -55,6 +73,7 @@ export class ProductGroupBase extends Model {
         }
     }
 }
+
 //todo .... move
 const mockaxios = function (
     req = '/cart',
@@ -187,6 +206,7 @@ export class ProductInstanceGroup extends ProductGroupBase {
             max_children: this.number(1), //the max instanxes per group
         }
     }
+
     //REMOVE???? //GILLIAN??
     get TotalPrice() {
         let accumulator = 0;
@@ -200,6 +220,7 @@ export class ProductInstanceGroup extends ProductGroupBase {
         return accumulator;
         //add the array of item prices.
     }
+
     //REMOVE???? //GILLIAN??
     get IsAvailable() {
         return this.ProductInstances.reduce(function (item, bool) {
@@ -209,4 +230,5 @@ export class ProductInstanceGroup extends ProductGroupBase {
         //if one is unavailable the rest are false.
     }
 }
-export default Cart
+
+export default ProductInstanceGroup

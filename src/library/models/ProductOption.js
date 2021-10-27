@@ -1,11 +1,35 @@
+/* * ProductOptionBase *
+* @model {class} - ProductOptionBase
+* @entity  - productoptionbase */
+
+/* * ProductOptionValue *
+* @model {class}- ProductOptionValue
+* @extends - ProductOptionBase
+* @entity {string}-productoptionvalue
+* @baseentity {string}- productoptionbase */
+
+/* * ProductOption *
+* @model {class}- ProductOption
+* @extends {boolean}- ProductOptionBase
+* @entity {string}- productoptionvalue
+* @baseentity {string}- productoptionbase  */
+
+/* * VariantOption [PIVOT] *
+* @model {class}- VariantOption
+* @key -['variant_id', 'option_value_id']
+* @entity {string}- variantOption
+* */
+
+//todo: import {ID_LENGTH} from "../settings";
 import {Model} from '@vuex-orm/core'
+import {Product, Variant, ProductImage} from "./";
+
 import {getRandomNumber, slugify} from "./../scripts/generic";
-import {Product, Variant, ProductImage} from "./..";
 import {ID_LENGTH} from "../settings";
+//************** End Imports *****************//
 
 const BASE_ENTITY = 'productoptionbase'
 
-// Base entity.
 export class ProductOptionBase extends Model {
     static entity = BASE_ENTITY
 
@@ -97,4 +121,5 @@ export class VariantOption extends Model {
     }
 }
 
+//export {ProductOptionBase, ProductOptionValue, ProductOption, VariantOption}
 export default ProductOption

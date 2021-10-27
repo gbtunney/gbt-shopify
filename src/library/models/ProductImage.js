@@ -1,11 +1,17 @@
-/* eslint-disable */
+/* * ProductImage *
+* @model  - ProductImage
+* @entity  - productimages */
+
 import {Model} from '@vuex-orm/core'
-import {Product, Variant} from './..'
+import {Product, Variant} from './'
 import {ShopifyMediaURL} from "./../scripts/shopify";
 import {getRandomNumber} from "../scripts/generic";
+
+//TODO::::REMOVE
 import {ID_LENGTH} from "../settings";
 
-export default class ProductImage extends Model {
+
+export class ProductImage extends Model {
     static entity = 'productimages'
 
     static fields() {
@@ -45,10 +51,11 @@ export default class ProductImage extends Model {
     }
 
     /** Static  Methods  */
-    getSrc (_width = false, _height = false) {
+    getSrc(_width = false, _height = false) {
         return ShopifyMediaURL(this.src, _width, _height);
     }
 }
+export default ProductImage
 /* SRC SET!!!!!!!!!
     [
       {

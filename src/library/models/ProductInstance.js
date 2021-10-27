@@ -1,5 +1,23 @@
+/*export {ProductInstanceBase,ProductInstanceSingle, LineItem} */
+
+/* * ProductInstanceBase *
+* @model - ProductInstanceBase
+* @entity {string}- productbase */
+
+/* * ProductInstanceSingle *
+* @model ProductInstanceSingle
+* @extends {class}- ProductInstanceBase
+* @entity {string}- productsingle
+* @baseentity {string}- ..productbase */
+
+/* * LineItem *
+* @module LineItem
+* @extends {class}- ProductInstanceBase
+* @entity {string}- lineitem
+* @baseentity {string}- productbase */
+
 import {Model} from '@vuex-orm/core'
-import  {Variant, Product, ProductInstanceGroup,Cart} from "./..";
+import {Variant, Product, ProductInstanceGroup, Cart} from "./";
 import {Editable_Defaults, ID_LENGTH, SELECTION_MODE_OPTIONS} from "../settings";
 import {isShopifyID} from "../scripts/shopify";
 import {
@@ -11,16 +29,16 @@ import {
     toInteger
 } from "../scripts/generic";
 import {upperCase} from "../scripts/stringUtils";
-const R = window.R;
 
+const R = window.R;
+//************** End Imports *****************//
 
 const BASE_ENTITY = 'productbase' //todo: change name
-
 
 export class ProductInstanceBase extends Model {
     static entity = BASE_ENTITY
 
-    static types () {
+    static types() {
         return {
             INSTANCE: ProductInstanceSingle,
             LINE_ITEM: LineItem
@@ -29,12 +47,12 @@ export class ProductInstanceBase extends Model {
 
     static fields() {
         return {
-            id: this.uid(() =>getRandomNumber(ID_LENGTH)),
+            id: this.uid(() => getRandomNumber(ID_LENGTH)),
             type: this.attr('INSTANCE'),
             /* timestamp: this.number(0, value => Date.now()),*/
-            properties: this.attr({message:false}),
+            properties: this.attr({message: false}),
             meta: this.string(null),
-            url:this.string(null),
+            url: this.string(null),
             //*** variant linked with instance ( ie could be not for sale variant with group etc.
             handle: this.string(false).nullable(),
             group_id: this.number(null),
@@ -42,44 +60,30 @@ export class ProductInstanceBase extends Model {
             Variant: this.hasOne(Variant, "id", "variant_id"),
 
             //*** preferences
-            selection_mode : this.string ("normal").nullable(),
+            selection_mode: this.string("normal").nullable(),
             add_to_cart_enabled: this.boolean(Editable_Defaults["addToCart"]), /// this is bool to allow a add to cart button for TOTAL GROUP.
             quantity_editable: this.boolean(Editable_Defaults["quantity"]),
             variant_editable: this.boolean(Editable_Defaults["variant"]),
             options_editable: this.attr(Editable_Defaults["options"]), //future pref dont know when implement
         }
     }
-    static  afterUpdate (model) {
-        ProductInstanceBase.store().dispatch('orm/logOrmEvent',['afterUpdate',model ])
+
+    static afterUpdate(model) {
+        ProductInstanceBase.store().dispatch('orm/logOrmEvent', ['afterUpdate', model])
         ProductInstanceBase.store().commit('entities/productbase/increment', 1)
     }
-     static afterCreate (model) {
-         ProductInstanceBase.store().dispatch('orm/logOrmEvent', ['afterCreate',model, [], 'red'])
-         //ProductInstanceBase.store().commit('entities/productbase/counter_reset', 5)
+
+    static afterCreate(model) {
+        ProductInstanceBase.store().dispatch('orm/logOrmEvent', ['afterCreate', model, [], 'red'])
+        //ProductInstanceBase.store().commit('entities/productbase/counter_reset', 5)
     }
+
     //REMOVE ???
     ///** STATIC METHHIDS KEEP!!!!!! */  ////MOVE IDK ????
     getClone(mode = false, idList = []) {
         return cloneObject(this.$toJson(), mode, idList)
     }
 
-    //todo :
-    //REMOVE ???
-    get Entity(){
-        return {entity : this.constructor.entity,baseEntity:  this.constructor.entity}
-    }
-    ///DEMO FUNCTION
-    //REMOVE OR MOVE???????????
-    _updateWhere(where = {}, values = false) {
-        if (!values || R.isEmpty(where)) return false;
-        const predWhere = R.whereEq(where);
-        ProductInstanceBase.update({
-            where: (instance) => {
-                return predWhere(instance)
-            },
-            data: {active: true}
-        })
-    }
 ////TODO::
     ///REMOVE????????????
     _updateByID(values, mode = false, idList = []) {
@@ -87,9 +91,7 @@ export class ProductInstanceBase extends Model {
         ProductInstanceBase.update({...values, id: this.id})
         return;
     }
-    _update(values,mode = false, idList = []) {
-      //  return cloneObject(this.$toJson(), mode, idList)
-    }
+
     get VariantID() {
         if (this.variant_id) {
             if (isShopifyID(this.variant_id)) return toInteger(this.variant_id)
@@ -108,6 +110,7 @@ export class ProductInstanceBase extends Model {
         }
         return false;
     }
+
     static mutators() {
         return {
             selection_mode(value) {
@@ -134,11 +137,12 @@ export class ProductInstanceSingle extends ProductInstanceBase {
         return {
             ...super.fields(),
             quantity: this.number(1),
-          //  group_id: this.number(null),
+            //  group_id: this.number(null),
             Group: this.belongsTo(ProductInstanceGroup, "group_id"),
 
-                }
+        }
     }
+
     static mutators() {
         return {
             options_editable(value) {
@@ -152,34 +156,37 @@ export class ProductInstanceSingle extends ProductInstanceBase {
             }
         }
     }
+
     /**
      * Add given prefix to the user's full name.
      */
-    prefix (prefix) {
+    prefix(prefix) {
         return `${prefix} ${this.variant_id}`
     }
 
     get LinePrice() {  //requested quantity * price.
         return (this.Variant) ? (this.quantity * this.Variant.price) : "not set"
     }
+
     get TotalPrice() {
         return (this.Variant) ? (this.quantity * this.Variant.price) : "not set"
     }
+
     get IsAvailable() {
         return this.Variant.IsAvailable;
     }
+
     ///REMOVE???/
     //TODO???
     get NewLineItem() {
-        const newObj = {...this.$toJson(), 'quantity': this.$toJson()['quantity'],
-          'id' : this.variant_id };
+        const newObj = {
+            ...this.$toJson(), 'quantity': this.$toJson()['quantity'],
+            'id': this.variant_id
+        };
         return R.pick(['id', 'quantity', 'properties'], newObj)
     }
 }
-
-
-///TODO
-//REMOVE   *****
+//TODO::::REMOVE
 ProductInstanceSingle.prototype.get_option_editable = function (_key = false) {
     if (R.is(Boolean, this.options_editable)) return this.options_editable;
     const _map = new Map(this.options_editable);
@@ -208,9 +215,11 @@ export class LineItem extends ProductInstanceBase {
             final_price: this.number(null),
             final_line_price: this.number(null),
             product_has_only_default_variant: this.boolean(false),
-          //etc etc/
+            //etc etc/
         }
     }
+
+    //todo:remove
     static apiConfig = {
         actions: {
             updateItem(line_item) {
@@ -219,7 +228,7 @@ export class LineItem extends ProductInstanceBase {
                     {
                         save: false,
                         updates: {
-                            [_line_item.id] : _line_item.quantity
+                            [_line_item.id]: _line_item.quantity
                         }
                     }
                 )
@@ -227,4 +236,13 @@ export class LineItem extends ProductInstanceBase {
         }
     }
 }
+/*
+
+export {
+    ProductInstanceBase,
+    ProductInstanceSingle,
+    LineItem
+}
+*/
+
 export default ProductInstanceSingle

@@ -4,7 +4,7 @@ import {getRandomNumber} from "../scripts/generic";
 import {ID_LENGTH} from "../settings";
 
 export default class ProductMetaAttr extends Model {
-
+    static entity = 'productmetaattrs'
     static fields() {
         return {
             id: this.uid(() =>getRandomNumber(ID_LENGTH)),
@@ -15,7 +15,7 @@ export default class ProductMetaAttr extends Model {
     }
 }
 
-ProductMetaAttr.entity = 'productmetaattrs';
+
 
 /*  PRODUCT META LOOKUP???
 

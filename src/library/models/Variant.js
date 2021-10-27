@@ -1,8 +1,15 @@
+/* * Variant *
+* @model  - Variant
+* @entity  - variants */
+
 import {Model} from '@vuex-orm/core'
 import {getRandomNumber, slugify} from "./../scripts/generic"
-import {Product, ProductImage,ProductOptionValue,VariantOption} from "./..";
+import {Product, ProductImage,ProductOptionValue,VariantOption} from "./";
 import {ID_LENGTH, MINIMUM_QUANTITY} from './../settings'
-export default class Variant extends Model {
+const R = window.R
+//************** End Imports *****************//
+
+export class Variant extends Model {
   static entity = 'variants';
 
   static beforeCreate(model) {
@@ -87,9 +94,13 @@ Variant.prototype.getOptionValue = function (index = false, index_by = "id") {
 }
 
 Variant.prototype.getOptionValueMap = function (optionArray = [], index_by = "id", _map = new Map()) {
+//  const list = [{id: 'xyz', title: 'A'}, {id: 'abc', title: 'B'}];
+ // R.indexBy(R.prop('id'), list);
+
   return optionArray.reduce((accumulator, currentValue, currentIndex, array) => {
     if (currentValue.Option && currentValue.Option[index_by]) {
       return accumulator.set(currentValue.Option[index_by], currentValue)
     }
   }, _map);
 }
+export default Variant

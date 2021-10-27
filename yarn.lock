@@ -1660,6 +1660,18 @@
   dependencies:
     axios "^0.21.1"
 
+"@vuex-orm/plugin-change-flags@^1.2.3":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@vuex-orm/plugin-change-flags/-/plugin-change-flags-1.2.3.tgz#1e6082da205419d18be3e05ea7180c3a2fc323e7"
+  integrity sha512-Zd2ndi4ceDvmb4O/kU7sFjJ7ZtupQgO+Ggvx7o3Q2VFylZ1Zv6lSLKyNPWKYDxSvcrUPJmhliiWbLUaVmyC3hw==
+
+"@vuex-orm/plugin-search@^0.24.1":
+  version "0.24.1"
+  resolved "https://registry.yarnpkg.com/@vuex-orm/plugin-search/-/plugin-search-0.24.1.tgz#6107b94ec393fde55a40eb4685d4bbe2e65f7e79"
+  integrity sha512-YabmgyM1FZiQckTiI5+Iw4FhXT7eC5D1hZnrR8x1Bxeih/qgSjv6YJOZQWWp14WRLMUBCHtMNAcpGvQQhmNGJQ==
+  dependencies:
+    fuse.js "^3.4.6"
+
 "@webassemblyjs/ast@1.9.0":
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.9.0.tgz#bd850604b4042459a5a41cd7d338cbed695ed964"
@@ -4546,6 +4558,11 @@ functional-red-black-tree@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
+
+fuse.js@^3.4.6:
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/fuse.js/-/fuse.js-3.6.1.tgz#7de85fdd6e1b3377c23ce010892656385fd9b10c"
+  integrity sha512-hT9yh/tiinkmirKrlv4KWOjztdoZo1mx9Qh4KvWqC7isoXwdUY3PNWUxceF4/qO9R6riA2C29jdTOeQOIROjgw==
 
 gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"
