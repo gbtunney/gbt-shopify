@@ -8,6 +8,9 @@ import VuexORMAxios from '@vuex-orm/plugin-axios'
 import VuexORMisDirtyPlugin from '@vuex-orm/plugin-change-flags';
 import VuexORMSearch from "@vuex-orm/plugin-search"
 
+import VTooltip from 'v-tooltip'
+
+
 import {installORM} from "../library/orm/database";
 import {Models} from "../library/models";
 //************** End ORM *****************//
@@ -17,46 +20,17 @@ import {LOCAL_STORAGE_KEY, SHOPIFY_BASE_URL} from '../library/settings'
 //************** End VUEX plugins *****************//
 import createPersistedState from "vuex-persistedstate";
 import createEasyAccess from "vuex-easy-access";
-import {getVuexPlugins,registerUse} from "../library/scripts/vuehelpers";
+import {getVuexPlugins,  registerConfig} from "../library/scripts/vuehelpers";
+import {enable} from "core-js/internals/internal-metadata";
 
 //import {ormmodule} from '../library/modules/ormmodule'
 //import {moduleShopify}from "../library/modules/moduleShopify"
 
 Vue.use(Vuex)
 
-const dataState = createPersistedState({
-  key: LOCAL_STORAGE_KEY,
-  storage: window.sessionStorage
-})
 
-const use = {
-  register: VuexORM, /// class like Vuex, VuexORM , Vue,
-  enabled: true,
-  plugins: {   ///plugins that 'use'
-    "@vuex-orm/plugin-axios": {
-      enabled: true,
-      plugin: VuexORMAxios,
-      options: {
-        axios,
-        baseURL: SHOPIFY_BASE_URL
-      }
-    },
-    "@vuex-orm/plugin-search": {
-      enabled: true,
-      plugin: VuexORMSearch,
-      options: {
-        caseSensitive: true,
-        threshold: 0
-      }
-    },
-    "@vuex-orm/plugin-change-flags": {
-      enabled: true,
-      plugin: VuexORMisDirtyPlugin
-    }
-  },
-}
+//registerConfig(config)
 
-registerUse([use])
 
 const vuex_plugins = {
   "vuex-easy-access": {

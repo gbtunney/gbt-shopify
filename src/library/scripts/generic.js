@@ -33,6 +33,16 @@ export function isInteger(value) {
 export function getDigitCount(value) {
     return Math.log(toInteger(value)) * Math.LOG10E + 1 | 0;
 }
+export function isFunction(value =false){
+    if (value && (typeof value === "function") ) return true
+    return
+}
+
+export function toArray(value) {
+    if (!R.is(Array, value) && R.is(Object, value)) return [value]
+    if (R.is(Array, value)) return value
+    return false;
+}
 
 /**
  * Rename multiple keys of an object at once

@@ -4,9 +4,6 @@ import router from './router'
 
 import {gVueUtils} from "./library";
 
-//Vue.use(gVueUtils);
-
-
 import store from './store'
 import './assets/tailwind.css'
 
