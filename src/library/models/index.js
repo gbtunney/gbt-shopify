@@ -6,6 +6,7 @@ import {ProductInstanceBase, ProductInstanceSingle, LineItem} from './ProductIns
 import {Cart, ProductInstanceGroup, ProductGroupBase} from './Group'
 ///import {Shop} from './Shop'
 import {ProductMetaAttr} from './ProductMetaAttr'
+import {moduleLoadStatus} from '../modules/moduleLoadStatus'
 
 const ALL_MODELS = [
     ProductInstanceBase,
@@ -15,7 +16,7 @@ const ALL_MODELS = [
     ProductOptionBase,
     ProductOption,
     ProductOptionValue,
-    Product,
+    [Product,moduleLoadStatus],
     ProductImage,
     Variant,
     VariantOption,

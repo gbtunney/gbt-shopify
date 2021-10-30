@@ -20,55 +20,72 @@ import {LOCAL_STORAGE_KEY, SHOPIFY_BASE_URL} from '../library/settings'
 //************** End VUEX plugins *****************//
 import createPersistedState from "vuex-persistedstate";
 import createEasyAccess from "vuex-easy-access";
-import {getVuexPlugins,  registerConfig} from "../library/scripts/vuehelpers";
+import {getVuexPlugins,  getVuexModules} from "../library/scripts/vuehelpers";
 import {enable} from "core-js/internals/internal-metadata";
 
-//import {ormmodule} from '../library/modules/ormmodule'
+import {moduleLoadStatus} from '../library/modules/moduleLoadStatus'
+import {ormmodule2} from "../library/modules/ormmodule";
+import {moduleShopify} from "../library/modules/moduleShopify";
+import {toArray} from "../library/scripts/generic";
 //import {moduleShopify}from "../library/modules/moduleShopify"
 
 Vue.use(Vuex)
-
-
-//registerConfig(config)
-
-
-const vuex_plugins = {
-  "vuex-easy-access": {
-    enabled: true,
-    plugin: createEasyAccess,
-  },
-  "vuex-orm-custom": {
-    enabled: true,
-    plugin: installORM,
-    options: {
-      models: Models,
-    }
-  },
-  "vuex-persistedstate": {
-    enabled: true,
-    plugin: createPersistedState,
-    options: {
-      key: LOCAL_STORAGE_KEY,
-      storage: window.sessionStorage
-    },
-  },
-}
 //todo: move
 /*
-import {ormmodule} from "../modules/ormmodule";
-import {moduleShopify} from "../modules/moduleShopify";
-import {registerUse} from "../scripts/vuehelpers";
-   /*loader: loadstore,*/
-    /*   orm: ormmodule,
-     shopify: moduleShopify*/
+const myvuexconfig = {
+  modules: [
+    {
+      enabled: true,
+      module: {loader: moduleLoadStatus}
+    },
+    {
+      enabled: true,
+      module: {shopify: moduleShopify}
+    }
+  ],
+  plugins: {
+    "vuex-easy-access": {
+      enabled: true,
+      plugin: createEasyAccess,
+    },
+    "vuex-orm-custom": {
+      enabled: true,
+      plugin: installORM,
+      options: {
+        models: Models,
+      }
+    },
+    "vuex-persistedstate": {
+      enabled: false,
+      plugin: createPersistedState,
+      options: {
+        key: LOCAL_STORAGE_KEY,
+        storage: window.sessionStorage
+      },
+    },
+  }
+}*/
+export const store =function(config={}){
+ return new Vuex.Store({
+    state: {
+      test: "hello",
+    },
+    mutations: {},
+    actions: {},
+    modules: getVuexModules(config),
+    plugins: getVuexPlugins(config)
+  })
+}
 
-export const store = new Vuex.Store({
+
+
+/*export const store = new Vuex.Store({
   state: {
     test: "hello",
   },
   mutations: {},
   actions: {},
-  modules: {},
-  plugins: getVuexPlugins(vuex_plugins)
-})
+  modules: getVuexModules(myvuexconfig),
+  plugins: getVuexPlugins(myvuexconfig)
+})*/
 export default store;

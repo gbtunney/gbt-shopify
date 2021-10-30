@@ -1,9 +1,11 @@
 export const moduleLoadStatus = {
     state: {
+        testvariable: "hhere it is",
         update_counter: 0,
         count: 0,
         status_map: [],
-    },
+    },namespaced: true,
+
     getters: {
         getCounter: (state) => (key = 'count') => {
             if (!key) return new Map(state.status_map);
