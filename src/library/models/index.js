@@ -8,15 +8,40 @@ import {Cart, ProductInstanceGroup, ProductGroupBase} from './Group'
 import {ProductMetaAttr} from './ProductMetaAttr'
 import {moduleLoadStatus} from '../modules/moduleLoadStatus'
 
+const tempProductLoadModule = {
+    state: {
+        count: 15,
+        fetching_map: [],
+    },
+    getters : {
+        getProductLoader: (state) => (handle) => {
+            if (!handle) return new Map(state.fetching_map);
+            return new Map(state.fetching_map).get(handle) ? new Map(state.fetching_map).get(handle) : false
+        }
+    },
+    mutations: {
+        add (state, count) {
+            state.count = state.count + count
+        },
+        addProductLoader(state, payload) {
+            if (payload.handle) {
+                // console.log( "log",Array.from(new Map(state.fetching_map)))
+                state.fetching_map = Array.from(new Map(state.fetching_map).set(payload.handle, payload.status));
+            }
+        }
+    }
+}
+
+
 const ALL_MODELS = [
-    ProductInstanceBase,
+   [ ProductInstanceBase,moduleLoadStatus],
     ProductInstanceSingle,
     ProductGroupBase,
     ProductInstanceGroup,
     ProductOptionBase,
     ProductOption,
     ProductOptionValue,
-    [Product,moduleLoadStatus],
+    [Product,tempProductLoadModule],
     ProductImage,
     Variant,
     VariantOption,
