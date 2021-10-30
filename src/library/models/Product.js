@@ -109,20 +109,13 @@ export class Product extends Model {
         return this.options
     }
 
-    get pivotArr(){
-        const product_pivot = this.Variants.reduce((accumulator, currentValue, currentIndex, array) => {
-           //console.log("test::: REDUCE :::: TOTAL:",accumulator ," currentValue:", currentValue)
-            return [ ...accumulator, ...currentValue.pivots]
-        }, []);
-       // console.log("test::: REDUCE :::: after:",this.variants,product_pivot )
-        return product_pivot;
-    }
-   async createVariantOptionPivot(){
-        const product_pivot = this.Variants.reduce((accumulator, currentValue, currentIndex, array) => {
+    async createVariantOptionPivot() {
+        const _variants = Variant.query().where("product_id", this.id).all()
+        const product_pivot = _variants.reduce((accumulator, currentValue, currentIndex, array) => {
             //console.log("test::: REDUCE :::: TOTAL:",accumulator ," currentValue:", currentValue)
-            return [ ...accumulator, ...currentValue.pivots]
+            return [...accumulator, ...currentValue.pivots]
         }, []);
-      return  await VariantOption.insert({
+        return await VariantOption.insert({
             data: product_pivot
         })
     }
