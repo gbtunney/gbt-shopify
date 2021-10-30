@@ -67,6 +67,7 @@ export class ProductOptionValue extends ProductOptionBase {
             ...super.fields(),
             alt: this.string(),
             option_id: this.number(null),//the parent option,
+            parent_handle: this.string(null, value => slugify(value)),
             thumbnail_id: this.number(null),
             option: this.belongsTo(ProductOption, "option_id"),
             Variants: this.belongsToMany(Variant, VariantOption, "option_value_id", "variant_id"),
@@ -97,7 +98,7 @@ export class ProductOption extends ProductOptionBase {
 
     static entity = 'productoptions'
     static baseEntity = BASE_ENTITY
-
+    static primaryKey =  ['product_id', 'handle']
     static fields() {
         return {
             ...super.fields(),

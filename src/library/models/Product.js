@@ -37,6 +37,7 @@ export class Product extends Model {
                 return this.get(`/products/${handle}.json`,
                     {
                         dataTransformer: (response) => {
+
                             return Product.prototype.APITransformProductData(response.data.product)
                         }
                     }
@@ -100,13 +101,31 @@ export class Product extends Model {
 
 //    //REMOVE?  needs to be moee specific/????
     get Variants() {
-        return this.variants;
+        return Variant.query().where("product_id" , this.id).withAll().all()
+        //return this.variants;
     }
 
     get Options() {
         return this.options
     }
 
+    get pivotArr(){
+        const product_pivot = this.Variants.reduce((accumulator, currentValue, currentIndex, array) => {
+           //console.log("test::: REDUCE :::: TOTAL:",accumulator ," currentValue:", currentValue)
+            return [ ...accumulator, ...currentValue.pivots]
+        }, []);
+       // console.log("test::: REDUCE :::: after:",this.variants,product_pivot )
+        return product_pivot;
+    }
+   async createVariantOptionPivot(){
+        const product_pivot = this.Variants.reduce((accumulator, currentValue, currentIndex, array) => {
+            //console.log("test::: REDUCE :::: TOTAL:",accumulator ," currentValue:", currentValue)
+            return [ ...accumulator, ...currentValue.pivots]
+        }, []);
+      return  await VariantOption.insert({
+            data: product_pivot
+        })
+    }
     /** INSTANCE METHODS> NEWW GILLIAN GILLIAN */
     getOptionIDByProp(key = false, prop = "handle") {   //default is "handle"
         if (!key) return
@@ -123,14 +142,21 @@ export class Product extends Model {
         let id = (isInteger(value)) ? isInteger(value) : false;
         if (R.is(String, value)) {
             /*assume it is a hhandle*/
+            return ProductOptionValue
+                .query()
+                .where("product_id", this.id)
+                .where("parent_handle", value).withAll().all();
+
+            /*
             const tempval = this.getOptionIDByProp(value);
+            console.log("tempval ",tempval )
             id = (isInteger(tempval)) ? toInteger(tempval) : false
-            if (!id) return false;
+            if (!id) return false;*/
         }
         return ProductOptionValue
             .query()
             .where("product_id", this.id)
-            .where("option_id", id).with(relations).all();
+            .where("option_id", id).withAll().all();
     }
 
     /** END NEW INSTANCE METHODS> NEWW GILLIAN GILLIAN */
@@ -187,6 +213,7 @@ Product.prototype.APITransformProductData = function (_product) {
                     product_id: product_ID, ///from parent
                     sid: parent.id, //hthhihs shhould probs  be an option id
                     handle: slugify(value),
+                    parent_handle : slugify(_option.name),
                     title: value,
                     position: (index + 1),
                 }
@@ -194,7 +221,7 @@ Product.prototype.APITransformProductData = function (_product) {
             //new parent option props
             let newOptionProps = {
                 sid: _option.id,
-                handle: _option.name,
+                handle: slugify(_option.name),
                 title: _option.name,
                 values: expandedValues
             }
@@ -205,26 +232,4 @@ Product.prototype.APITransformProductData = function (_product) {
     return {..._product, ...{options: option_arr}};
 }
 
-Product.prototype.createVariantOptionPivot = function () {
-    let _product_id = this.id;
-    if (_product_id) {
-        const _variants = Variant.query().where("product_id", _product_id).with('options').all();
-        if (_variants && _variants.length > 0) {
-            _variants.forEach(function (_variant) {
-                let variant = _variant;
-                if (_variant.options && _variant.options.length > 0) {
-                    _variant.options.forEach(function (option_value) {
-                        VariantOption.insert({
-                            data: {
-                                variant_id: variant.id,
-                                option_value_id: option_value.id,
-                                /*thumbnail_id: (variant.Image) ? variant.Image.id : false*/
-                            }
-                        })
-                    })
-                }
-            })
-        }
-    }
-}
 export default Product

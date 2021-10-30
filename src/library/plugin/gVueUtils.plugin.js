@@ -228,7 +228,7 @@ export const  getAppVuexPlugins = function(flags={},_settings=BASE_CONFIG){
     },
     }
 }
-    _plugins = getVuexPlugins(_plugins),
+    _plugins = getVuexPlugins(_plugins)
     return _plugins
 }
 export default gVueUtils;

@@ -44,9 +44,16 @@ export class Variant extends Model {
       image: this.hasOne(ProductImage, 'id', "image_id"),
     }
   }
-  get TestHandle() {
-    return this.$query().all();
-   // return (this.price <= 0) ? "free" : `$${this.price}`
+  //TODO: GILLIAN NOTES this.$query().all();
+  get pivots() {
+    const variant_id = this.id
+    return this.options.map(function (option_value) {
+      return {
+        variant_id,
+        option_value_id: option_value.id,
+        /*thumbnail_id: (variant.Image) ? variant.Image.id : false*/
+      }
+    })
   }
 
   get Price() {
@@ -79,28 +86,14 @@ export class Variant extends Model {
     else if (this.inventory_quantity >= MINIMUM_QUANTITY) return true;
     return false;
   }
-  get Options() { ///returns an array of handles.....
-    return this.options;
+  getOptionValue(value, index_by = "parent_handle") {
+    const map = this.options.reduce((accumulator, currentValue, currentIndex, array) => {
+      if (currentValue && currentValue[index_by]) {
+        return accumulator.set(currentValue[index_by], currentValue)
+      }
+    }, new Map());
+    return (map.get(value)) ? map.get(value) : false;
   }
-  get OptionValues() { ///returns an array of handles.....
-    return this.options;
-  }
-}
-//could be id, handle or objject.
-Variant.prototype.getOptionValue = function (index = false, index_by = "id") {
-  if (!index) return
-  const _map = this.getOptionValueMap(this.options, index_by) // this.getOptionMap(option_value_array,"handle");
-  return (_map.get(index)) ? _map.get(index) : false;
 }
 
-Variant.prototype.getOptionValueMap = function (optionArray = [], index_by = "id", _map = new Map()) {
-//  const list = [{id: 'xyz', title: 'A'}, {id: 'abc', title: 'B'}];
- // R.indexBy(R.prop('id'), list);
-
-  return optionArray.reduce((accumulator, currentValue, currentIndex, array) => {
-    if (currentValue.Option && currentValue.Option[index_by]) {
-      return accumulator.set(currentValue.Option[index_by], currentValue)
-    }
-  }, _map);
-}
 export default Variant

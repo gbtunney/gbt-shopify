@@ -29,22 +29,16 @@ export default {
     }
   },
   props: {},
-  mounted(){
 
-    console.log("settings!!!!!!!!!!!!!!!!!!", this.$gbtconfig)
-  //  store.registerModule(['entities', 'products'], moduleLoadStatus)
-
-  }
-/*  async mounted() {
-    const response19 = await Product.insert({
-      data: {
-        handle: "test"
-      }
-    })
-    const response26 = await Product.api().fetchByHandle("local")
-    console.log("ORM Response: Product ::query() :: ", response26)
-    console.log("ORM Response: Product ::insert :: ", response19)
-
-  }*/
+ async mounted() {
+  // const response26 = await Product.api().fetchByHandle("local")
+   const response26 = await Product.api().fetchAll()
+   console.log("ORM Response: Product ::query() :: ", response26)
+   var product = Product.getProductByHandle("local");
+var variant = product.Variants[0];
+  const resp = await product.createVariantOptionPivot()
+ //  console.log(" variant new functions " ,resp,VariantOption.all())
+   console.log(" chhecking new functions " ,product.getOptionValueList("color") )
+ }
 }
 </script>
