@@ -112,7 +112,6 @@ export class Product extends Model {
     async createVariantOptionPivot() {
         const _variants = Variant.query().where("product_id", this.id).all()
         const product_pivot = _variants.reduce((accumulator, currentValue, currentIndex, array) => {
-            //console.log("test::: REDUCE :::: TOTAL:",accumulator ," currentValue:", currentValue)
             return [...accumulator, ...currentValue.pivots]
         }, []);
         return await VariantOption.insert({
@@ -130,26 +129,27 @@ export class Product extends Model {
         return (query && query.id) ? query.id : false
     }
 
-    getOptionValueList(value = false, relations = '*') {
+    getOptionValueList(value = false, relations = true) {
         if (!value || R.isEmpty(value)) return
-        let id = (isInteger(value)) ? isInteger(value) : false;
+        var _optionParentHandle = false
+        var _query ;
+       // let id = (isInteger(value)) ? isInteger(value) : false;
+        if (R.is(Object , value) &&  value['handle']) {
+            _optionParentHandle = value['handle']
+        }
         if (R.is(String, value)) {
             /*assume it is a hhandle*/
-            return ProductOptionValue
+            _optionParentHandle = value
+            _query=  ProductOptionValue
                 .query()
                 .where("product_id", this.id)
-                .where("parent_handle", value).withAll().all();
+                .where("parent_handle", _optionParentHandle)
 
-            /*
-            const tempval = this.getOptionIDByProp(value);
-            console.log("tempval ",tempval )
-            id = (isInteger(tempval)) ? toInteger(tempval) : false
-            if (!id) return false;*/
+            if ( relations == true )return _query.withAll().all();
+            if ( relations == false )return _query.all();
+            if (R.is(String, relations)) return _query.with(relations).all();
         }
-        return ProductOptionValue
-            .query()
-            .where("product_id", this.id)
-            .where("option_id", id).withAll().all();
+        return false
     }
 
     /** END NEW INSTANCE METHODS> NEWW GILLIAN GILLIAN */
@@ -182,13 +182,6 @@ export class Product extends Model {
         console.log("seatching ", user)
         return user;
     }
-
-    ///TODO:?????
-    //REMOVE?
-    static getProductOptions(handle) {
-        return Product.query().where("handle", handle).first();
-    }
-
 }
 
 //REMOVE?
