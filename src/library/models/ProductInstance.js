@@ -96,7 +96,7 @@ export class ProductInstanceBase extends Model {
         if (this.variant_id) {
             if (isShopifyID(this.variant_id)) return toInteger(this.variant_id)
             if (this.handle) {
-                const _product_id = Product.handleToID(this.handle);
+                const _product_id = Product.productHandleToID(this.handle);
                 const position_index = (toInteger(this.variant_id) > 0) ? toInteger(this.variant_id) : 1;
                 const _variant = Variant.query()
                     .where("product_id", _product_id)

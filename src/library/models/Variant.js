@@ -86,12 +86,13 @@ export class Variant extends Model {
     else if (this.inventory_quantity >= MINIMUM_QUANTITY) return true;
     return false;
   }
+
+  getOptionValueIndexedBy(index_by = "parent_handle") {
+    return R.indexBy(R.prop(index_by), this.options);
+  }
+
   getOptionValue(value, index_by = "parent_handle") {
-    const map = this.options.reduce((accumulator, currentValue, currentIndex, array) => {
-      if (currentValue && currentValue[index_by]) {
-        return accumulator.set(currentValue[index_by], currentValue)
-      }
-    }, new Map());
+    const map = new Map(Object.entries(this.getOptionValueIndexedBy(index_by)))
     return (map.get(value)) ? map.get(value) : false;
   }
 }

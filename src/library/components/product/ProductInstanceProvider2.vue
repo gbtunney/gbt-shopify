@@ -162,12 +162,6 @@ export default {
       else if (getAll) return ProductOption.query().where(index_prop, index).orderBy('position').withAll().all()
       return ProductOption.query().where(index_prop, index).orderBy('position').withAll().first()
     },
-    //TODO, please get this to take multiple querys? so all can be routed?
-    getVariant(index = false, index_prop = "product_id", getAll = false) {   //get all returns an array
-      if (index == true) return Variant.query().where(index_prop, this.Product.id).orderBy('position').withAll().all()    ////this defaults to thhe product id
-      else if (getAll) return Variant.query().where(index_prop, index).orderBy('position').withAll().all()
-      return Variant.query().where(index_prop, index).orderBy('position').withAll().first()
-    },
     //reduces the variant list by relevant options.
     getVariantsByOptionValues(option_value_array, boolRequireAll = true) {
       if (!option_value_array || option_value_array.length == 0) return false;
@@ -309,6 +303,12 @@ console.log("TETEJTRKEJKKKJJ" ,this.SelectedVariant.getOptionValue('color') )
     },
   },
   computed: {
+    ...mapState('entities/products', {   //cartLoading
+      isFetching:function (state){
+        console.log("checking status", state.fetching)
+        return false//state.fetching
+      }
+    }),
     LoaderMode: function () {
       const value = this.$props.load_mode;
       if (R.isEmpty(value)) return false;
@@ -322,12 +322,6 @@ console.log("TETEJTRKEJKKKJJ" ,this.SelectedVariant.getOptionValue('color') )
       }
       return false
     },
-    ...mapState('entities/products', {   //cartLoading
-      isFetching:function (state){
-       console.log("checking status", state.fetching)
-        return false//state.fetching
-      }
-    }),
     Handle: {
       get: function () {
         return this.$data._handle;
@@ -343,33 +337,17 @@ console.log("TETEJTRKEJKKKJJ" ,this.SelectedVariant.getOptionValue('color') )
     Status: function () {
       return  this.$store.getters['entities/products/getProductLoader'](this.Handle)
     },
-    Instance: {
-      get: function () {
-        return ProductInstanceBase.query().whereId(this.$data._refID).with("Variant|Group").first();
-      },
-      set: function (value) {
-        if (!value) return;
-        if ((value && value.id && value.handle)) {
-          //hhas an id , not the same as refid.
-
-          if (value.id != this.$data._refID) {
-            this.$data._refID = value.id;
-            this.insertOrUpdateInstance(value);
-          }
-        } else if (value && !value.id) {
-          this.insertOrUpdateInstance({...value, id: this.$data._refID})
-        }
-        if (value && value.handle) this.Handle = value.handle;
-      }
+    Instance: function () {
+      return ProductInstanceBase.query().whereId(this.$data._refID).with("Variant|Group").first();
     },
     SelectedVariant: {
       get: function () {
         if (!this.Instance || !this.Instance.VariantID || !this.Product) return;
-        return Variant.query().whereId(this.Instance.VariantID).withAll().first()
+        return Variant.query().whereId(this.Instance.VariantID).with('options.Variants|*').first()
       },
       set: function (value) {
-        if (!this.Instance || !this.Instance.variant_id || !this.Product) return;
-        if ((value && !this.Instance.variant_id) || (value && value.id != this.Instance.variant_id)) {
+        if (!this.Instance || !this.Instance.VariantID || !this.Product) return;
+        if ((value && !this.Instance.VariantID) || (value && value.id != this.Instance.VariantID)) {
           //NOTE: We are resetting the quantity here.
           this.updateInstance({variant_id: value.id, requested_quantity: 1})
           console.log("variant after ", this.SelectedVariant);
@@ -382,39 +360,39 @@ console.log("TETEJTRKEJKKKJJ" ,this.SelectedVariant.getOptionValue('color') )
       return this.SelectedVariant.Image
     },
     SelectedOptionList: function () {
-      if (!this.Ready || !this.Instance.variant_id) return
+      if (!this.Ready || !this.Instance.variant_id || this.SelectedVariant ) return
+      return false;
+      //todo: see withh
+      /*
       let query = Variant.query().whereId(this.Instance.variant_id).with('options.Variants').first();
       if (!query || !R.propIs(Array, 'options', query)) return false;
-      return query["options"]
+      return query["options"]*/
     },
     RequestedQuantity: function () {
       if (!this.Ready) return;
-      if ( this.Instance.type == "LINE_ITEM"){
         return this.Instance.quantity;
-      }
-      return (this.Ready && this.Instance.requested_quantity) ? this.Instance.requested_quantity : false
     },
-    Product:   function () {
-      if ( !this.Handle )return;
-      return Product.query().where("handle", this.Handle).withAll().first();
+    Product: function () {
+      if (!this.Handle) return;
+      return Product.getProductByHandle(this.Handle)
     },
     ProductImage: function () {
       if (!this.Product || !this.Ready) return;
       //pick image in position 1
+      /// this.Product.Image  TODO: < idk why i cant use thihs????
       return ProductImage.query().where("product_id", this.Product.id).where("position", 1).orderBy('position').withAll().first()
     },
     Variants: function () {
       if (!this.Product || !this.Ready) return;
-      return this.getVariant(true)
+      return this.Product.Variants;
     },
     Options: function () {
       if (!this.$props.enableoptions || !this.Ready) return false
-      return this.getOption(this.Product.id, "product_id", true)
+      return this.Product.Options;
     },
     Images: function () {
-      if (!this.Product) return;
-      if (!this.Variants) return;
-      return ProductImage.query().where("product_id", this.Product.id).orderBy('position').with('Variants.options.Variants').all()
+      if (!this.Product || !this.Variants) return; //todo: use  ready?
+      return this.Product.Images;
     },
   },
   render() {

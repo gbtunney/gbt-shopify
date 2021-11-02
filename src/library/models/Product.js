@@ -94,19 +94,60 @@ export class Product extends Model {
              download: this.hasOne()(ProductMetaAttr,  id) */
         }
     }
-
+    //************** GETTERS  *****************//
     get Images() {
-        return this.images;
+        return ProductImage.query().where("product_id", this.id).orderBy('position').with('Variants.options.Variants').all()
     }
 
-//    //REMOVE?  needs to be moee specific/????
     get Variants() {
-        return Variant.query().where("product_id" , this.id).withAll().all()
-        //return this.variants;
+        return Variant.query().where("product_id", this.id).orderBy('position').with('options.Variants').all()
     }
 
     get Options() {
-        return this.options
+        return ProductOption.query().where("product_id", this.id).orderBy('position').withAll().all()
+    }
+
+    //************** INSTANCE METHODS  *****************//
+    ///get the parent options
+    getOption(value = false) {
+        if (!value || R.isEmpty(value)) return
+        var _optionHandle = false
+
+        if (R.is(Object, value) && value['handle']) {
+            _optionHandle = value['handle']
+        }
+        if (R.is(String, value)) {
+            /*assume it is a hhandle*/
+            _optionHandle = value
+        }
+        return ProductOption
+            .query()
+            .where("product_id", this.id)
+            .where("handle", _optionHandle)
+            .withAll().first();
+    }
+
+    getOptionValueList(value = false, relations = true) {
+        if (!value || R.isEmpty(value)) return
+        var _optionParentHandle = false
+        var _query;
+        if (R.is(Object, value) && value['handle']) {
+            _optionParentHandle = value['handle']
+        }
+        if (R.is(String, value)) {
+            /*assume it is a hhandle*/
+            _optionParentHandle = value
+        }
+        _query = ProductOptionValue
+            .query()
+            .where("product_id", this.id)
+            .where("parent_handle", _optionParentHandle)
+            .orderBy('position')
+
+        if (relations == true) return _query.withAll().all();
+        if (relations == false) return _query.all();
+        if (R.is(String, relations)) return _query.with(relations).all();
+        return false
     }
 
     async createVariantOptionPivot() {
@@ -118,45 +159,10 @@ export class Product extends Model {
             data: product_pivot
         })
     }
-    /** INSTANCE METHODS> NEWW GILLIAN GILLIAN */
-    getOptionIDByProp(key = false, prop = "handle") {   //default is "handle"
-        if (!key) return
-        const query =
-            ProductOption
-                .query()
-                .where("product_id", this.id)
-                .where(prop, key).first();
-        return (query && query.id) ? query.id : false
-    }
 
-    getOptionValueList(value = false, relations = true) {
-        if (!value || R.isEmpty(value)) return
-        var _optionParentHandle = false
-        var _query ;
-       // let id = (isInteger(value)) ? isInteger(value) : false;
-        if (R.is(Object , value) &&  value['handle']) {
-            _optionParentHandle = value['handle']
-        }
-        if (R.is(String, value)) {
-            /*assume it is a hhandle*/
-            _optionParentHandle = value
-            _query=  ProductOptionValue
-                .query()
-                .where("product_id", this.id)
-                .where("parent_handle", _optionParentHandle)
-
-            if ( relations == true )return _query.withAll().all();
-            if ( relations == false )return _query.all();
-            if (R.is(String, relations)) return _query.with(relations).all();
-        }
-        return false
-    }
-
-    /** END NEW INSTANCE METHODS> NEWW GILLIAN GILLIAN */
-
+    //************** STATIC METHODS  *****************//
     /** Any product handle to ID  */
-    //TODO : Keep
-    static handleToID(handle) {
+    static productHandleToID(handle) {
         var _product = Product.query().where("handle", handle).first();
         if (_product && _product.id && isShopifyID(_product.id)) return toInteger(_product.id)
         return false;
@@ -164,23 +170,11 @@ export class Product extends Model {
 
     /** Get any product by handle  */
     //TODO : Keep
-    static getProductByHandle(handle) {  //todo: withs????
-        return Product.query().where("handle", handle).first();
-    }
-
-    //DEMO FUNCTION
-    //REMOVE?
-    static getProductByObject(where = {}) {
-        if (R.isEmpty(where)) return false;
-        const predWhere = R.whereEq(where);
-        const user = Product.query()
-            .where((_record, query) => {
-                return (predWhere(_record)) ? _record : false
-                // query.where('age', 20).orWhere('id', 1)
-            })
-            .get()
-        console.log("seatching ", user)
-        return user;
+    static getProductByHandle(handle, relations = true) {  //todo: withs????
+        const _query = Product.query().where("handle", handle)
+        if (relations == true) return _query.withAll().first();
+        if (relations == false) return _query.first();
+        if (R.is(String, relations)) return _query.with(relations).first();
     }
 }
 
@@ -198,7 +192,7 @@ Product.prototype.APITransformProductData = function (_product) {
                 return {
                     product_id: product_ID, ///from parent
                     sid: parent.id, //hthhihs shhould probs  be an option id
-                    handle: slugify(value),
+                    handle: slugify(value), //for some reason this doesnt property apply mutation for handle.
                     parent_handle : slugify(_option.name),
                     title: value,
                     position: (index + 1),

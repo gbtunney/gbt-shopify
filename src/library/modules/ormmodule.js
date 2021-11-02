@@ -79,7 +79,7 @@ const actions = {
 /**
  * export
  */
-export const ormmodule ={
+export const ormmodule2 ={
     namespaced: true,
     state,
     getters,
@@ -146,6 +146,21 @@ export function getModel(instance = false, store_ref = false, key = "entity") { 
     return
 }
 
+//DEMO FUNCTION get multiple where
+//REMOVE?
+static getProductByObject(where = {}) {
+    if (R.isEmpty(where)) return false;
+    const predWhere = R.whereEq(where);
+    const user = Product.query()
+        .where((_record, query) => {
+            return (predWhere(_record)) ? _record : false
+            // query.where('age', 20).orWhere('id', 1)
+        })
+        .get()
+    console.log("seatching ", user)
+    return user;
+}
+
 
 //this.$store.$db().model('products').query().withAll().first()
 
@@ -154,4 +169,4 @@ const list = [{id: 'xyz', title: 'A'}, {id: 'abc', title: 'B'}];
 R.indexBy(R.prop('id'), list);
 //=> {abc: {id: 'abc', title: 'B'}, xyz: {id: 'xyz', title: 'A'}}
 
-export default ormmodule
+export default ormmodule2
