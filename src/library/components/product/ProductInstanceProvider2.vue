@@ -1,7 +1,7 @@
 <script>
 import {getRandomNumber, isInteger, toInteger,validateEnum} from "./../../scripts/generic"
 import {isShopifyID} from "./../../scripts/shopify"
-import * as R from "ramda";
+const R = window.R
 import {LoaderMixin} from './../../mixins/LoaderMixin'
 import {Editable_Defaults, LOAD_MODE, SELECTION_MODE_OPTIONS, USE_SERVER} from '../../settings'
 import {
@@ -14,7 +14,7 @@ import {
   VariantOption,
   Cart,
   LineItem, ProductInstanceBase
-} from '../..'
+} from '../../models'
 import {mapState} from "vuex";
 
 const defaultInstance = ProductInstanceSingle.fields();
@@ -31,25 +31,17 @@ export default {
     }
   },
   props: {
-    useServer: {
-      type:Boolean,
-      default : USE_SERVER
-    },
     id : {
       type: [Number],
       default: getRandomNumber(1000000),
     },
-    instance: {
-      type: [Object, Boolean],
-      default: false,
+    handle: {
+      type: [Boolean,String],  /* ID OR SID */
+      default:  defaultInstance.handle.value,
     },
     variant_id: {
       type: Number,  /* ID OR SID */
       default: defaultInstance.variant_id.value,
-    },
-    handle: {
-      type: [Boolean,String],  /* ID OR SID */
-      default:  defaultInstance.handle.value,
     },
     type:{
       type: String,
@@ -108,14 +100,19 @@ export default {
   watch: {
     id: {
       immediate: true,
-      handler(value, oldValue) {
-        if (value && (value != this.$data._refID)) this.$data._refID = value;
-        console.log("ID IS BEING CHANGED!!!!!!!!! new:", value, "old:", oldValue, "ref", this.$data._refID, "Instance", this.Instance)
+      async handler(value, oldValue) {
+        if (value && (value != this.$data._refID)) {
+          this.$data._refID = value;
+          if (!this.Instance) {
+            const response = await this.insertOrUpdateInstance(this.$props);
+            console.log("TRDPOSNdsds", response)
+          }
+        }
       }
     },
     handle: {
       immediate: true,
-      handler(value, old) {
+      async handler(value, old) {
         if (value != this.Handle) {
           this.Handle = value;
           this.doLoader(this.LoaderMode)
@@ -123,11 +120,13 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
     console.log("mounted ::::  PROPS:", this.$props, "data::: ", this.$data)
     this.$data._refID = this.$props.id
     this.Handle = this.$props.handle
-    this.insertOrUpdateInstance(this.$props);
+    //this.doLoader(this.LoaderMode)
+   // const response = await this.insertOrUpdateInstance(this.$props);
+    //console.log("TRDPOSNdsds", response)
     /*ProductInstanceSingle.afterUpdate = function (model) {
       console.log("UPDATE CALLED DDD DD D ", model)
     }*/
@@ -154,13 +153,20 @@ export default {
         //do nothing? instance???
       }
     },
-    getOption(index = false, index_prop = "id", getAll = false) {
-      if (!this.$props.enableoptions) return false
-      if (!this.Ready || !index) return
-      /////query all options.!!
-      if (index == true) return ProductOption.query().where("product_id", this.Product.id).orderBy('position').withAll().all()
-      else if (getAll) return ProductOption.query().where(index_prop, index).orderBy('position').withAll().all()
-      return ProductOption.query().where(index_prop, index).orderBy('position').withAll().first()
+    async insertOrUpdateInstance(_data = {}) {
+      return await ProductInstanceBase.insertOrUpdate({
+        data: _data
+      })
+    },
+    ///todo: replace
+    async updateInstance(_data, instance) {
+      console.log("trying to update instance", _data,instance)
+      const response =  await ProductInstanceSingle.update({
+        where: this.$data._refID,
+        data: _data
+      })
+      this.$emit('changed', this.Instance,response)
+      return response
     },
     //reduces the variant list by relevant options.
     getVariantsByOptionValues(option_value_array, boolRequireAll = true) {
@@ -187,22 +193,13 @@ export default {
     OptionValueList: function (option) {
       if (!this.Ready || !option) return false;
       let that = this;
-      let _option = false;
-      if (R.is(String, option)) {
-        _option = this.getOption(option, "handle")
-      } else if (R.is(Object, option) ) _option = option;
+      let _option = this.Product.getOption(option)
+
       let _selectedOptions = this.SelectedOptionList
 
       //GILLIAN TODOOOOOOOOO,  PLEASE fix this has to do w busted id
 
-console.log("TETEJTRKEJKKKJJ" ,this.SelectedVariant.getOptionValue('color') )
-      let valueListForOption = ProductOptionValue
-          .query()
-          .where("product_id", this.Product.id)
-          .where("option_id", _option.id)
-          .orderBy('position')
-          .with("Variants")
-          .all();
+      let valueListForOption = this.Product.getOptionValueList(option,"Variants")
 
     //  console.log("THE OPTION ID@!!",ProductOptionValue.all(),_option, valueListForOption,typeof valueListForOption)
 
@@ -217,15 +214,15 @@ console.log("TETEJTRKEJKKKJJ" ,this.SelectedVariant.getOptionValue('color') )
         return {
           ..._value,
           $isDisabled: isDisabled,
-          isSelected: that.isOptionSelected(_value),
+          isSelected: that.isOptionValueSelected(_value),
         }
       })
     },
-    isOptionSelected(_value) {
-      if (_value.Option && this.SelectedOption(_value.Option)) return (_value.id == this.SelectedOption(_value.Option).id);
+    isOptionValueSelected(_value) {
+      if ( _value && _value.parent_handle &&  this.SelectedOption(_value.parent_handle) ) return (_value.id == this.SelectedOption(_value.parent_handle).id);
       return false;
     },
-    SelectedOption: function (option) {
+    SelectedOptionValue: function (option) {
      // if (!this.Ready) return;
       if (!option ) return false;
       return this.SelectedVariant.getOptionValue(option.id);
@@ -246,36 +243,7 @@ console.log("TETEJTRKEJKKKJJ" ,this.SelectedVariant.getOptionValue('color') )
       if (this.$props.ignoreInventory) this.SelectedVariant = variant; //doesnt do anythinggggg. override availability
       else if (variant.IsAvailable) this.SelectedVariant = variant;
     },
-    mapValuesToInstance() {
-      if (!this.Instance) {
-        const {message, quantity_editable, variant_editable, options_editable, add_to_cart_enabled} = this.$props;
-        //map props to instance. //this is only if it is un init.
-        return {
-          id: this.$data._refID,
 
-          message: "gillian t",
-          quantity_editable: quantity_editable,
-          variant_editable: variant_editable,
-          options_editable: options_editable, //future pref dont know when implement
-          add_to_cart_enabled: add_to_cart_enabled,
-        }
-      }
-    },
-    insertOrUpdateInstance(_data = this.mapValuesToInstance()) {
-      const response = ProductInstanceBase.insertOrUpdate({
-        data: _data
-      })
-    },
-    ///todo: replace
-    async updateInstance(_data, instance) {
-      console.log("trying to update instance", _data,instance)
-      const response =  await ProductInstanceSingle.update({
-        where: this.$data._refID,
-        data: _data
-      })
-      this.$emit('changed', this.Instance,response)
-      return response
-    },
     //todo : move to variant or something
     getMergedOptionArray(oldArray = [], replaceArray = []) {
       if (!this.Product) return;
@@ -338,7 +306,10 @@ console.log("TETEJTRKEJKKKJJ" ,this.SelectedVariant.getOptionValue('color') )
       return  this.$store.getters['entities/products/getProductLoader'](this.Handle)
     },
     Instance: function () {
-      return ProductInstanceBase.query().whereId(this.$data._refID).with("Variant|Group").first();
+      if (this.$data._refID) {
+        return ProductInstanceBase.query().whereId(this.$data._refID).with("Variant|Group").first();
+      }
+      return false;
     },
     SelectedVariant: {
       get: function () {
@@ -414,7 +385,7 @@ console.log("TETEJTRKEJKKKJJ" ,this.SelectedVariant.getOptionValue('color') )
           SelectedVariantImage: this.SelectedVariantImage,
           SelectedOptionList: this.SelectedOptionList, //  returns an array
           /** function that returns a optionvalue for a given option */
-          SelectedOption: this.SelectedOption,//FUNCTION single optionvalues by option
+          SelectedOptionValue: this.SelectedOptionValue,//FUNCTION single optionvalues by option
 
           //instance variables
           Instance: this.Instance,

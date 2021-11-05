@@ -58,7 +58,7 @@ export class ProductGroupBase extends Model {
 
             token: this.string(null),
             item_count: this.number(0),
-            note: this.string(null), ///CART
+            note: this.string(null).nullable(), ///CART
             attributes: this.attr(null),
 
             /* pricing stuff */
@@ -86,7 +86,7 @@ const mockaxios = function (
     if (_timeout) mock.onGet(req).timeout();
     if (_error) mock.onGet(req).networkError();
     if (_restore) mock.restore();
-    return
+    return mock
 }
 
 export class Cart extends ProductGroupBase {
@@ -150,10 +150,10 @@ export class Cart extends ProductGroupBase {
             },
             async fetchCart(mock = isDevMode(), useServer = true) {
                 if (mock) {
-                    mockaxios("/cart", CartData)
+                   const myaxios =  mockaxios("/cart", CartData)
                     return this.get("/cart").then(function (response) {
                         console.log("MOCK CART ", response);
-
+                        myaxios.restore();
                     }).catch(function (error) {
                         console.error("error ob", error);
                     })

@@ -55,10 +55,10 @@ export class ProductInstanceBase extends Model {
             url: this.string(null),
             //*** variant linked with instance ( ie could be not for sale variant with group etc.
             handle: this.string(false).nullable(),
-            group_id: this.number(null),
+            group_id: this.number(null).nullable(),
             variant_id: this.number(1),
             Variant: this.hasOne(Variant, "id", "variant_id"),
-
+            quantity: this.number(1),
             //*** preferences
             selection_mode: this.string("normal").nullable(),
             add_to_cart_enabled: this.boolean(Editable_Defaults["addToCart"]), /// this is bool to allow a add to cart button for TOTAL GROUP.
@@ -137,7 +137,7 @@ export class ProductInstanceSingle extends ProductInstanceBase {
         return {
             ...super.fields(),
             quantity: this.number(1),
-            //  group_id: this.number(null),
+             group_id: this.number(null),
             Group: this.belongsTo(ProductInstanceGroup, "group_id"),
 
         }
@@ -202,7 +202,6 @@ export class LineItem extends ProductInstanceBase {
             ...super.fields(),
             //*********** The Child value instances
             key: this.string(null),
-            quantity: this.number(1),
             Group: this.belongsTo(Cart, "id"),
             featured_image: this.attr(null), // TODO: this is an object, maybe convert to an image
             title: this.string(null),
