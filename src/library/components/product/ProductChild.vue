@@ -20,7 +20,7 @@ import {mapState} from "vuex";
 const defaultInstance = ProductInstanceSingle.fields();
 
 export default {
-  name: "ProductInstanceProvider",
+  name: "ProductChild",
   mixins: [LoaderMixin],
   components: {},
   data: function () {
@@ -100,42 +100,39 @@ export default {
   watch: {
     id: {
       immediate: true,
-      async handler(value, oldValue) {
+      handler(value, oldValue) {
         if (value && (value != this.$data._refID)) {
-          this.$data._refID = value;
-          if (!this.Instance) {
-            const response = await this.insertOrUpdateInstance(this.$props);
-            console.log("TRDPOSNdsds", response)
-          }
+          // this.$data._refID = value;
+          //    if (!this.Instance) {
+          // const response = await this.insertOrUpdateInstance(this.$props);
+          //console.log("TRDPOSNdsds", response)
+          // }
         }
       }
     },
     handle: {
       immediate: true,
-      async handler(value, old) {
+      handler(value, old) {
         if (value != this.Handle) {
           this.Handle = value;
-          this.doLoader(this.LoaderMode)
+          // this.doLoader(this.LoaderMode)
         }
       }
     }
   },
-  async mounted() {
-    console.log("mounted ::::  PROPS:", this.$props, "data::: ", this.$data)
+  mounted() {
     this.$data._refID = this.$props.id
-    this.Handle = this.$props.handle
-    //this.doLoader(this.LoaderMode)
-   // const response = await this.insertOrUpdateInstance(this.$props);
-    //console.log("TRDPOSNdsds", response)
-    /*ProductInstanceSingle.afterUpdate = function (model) {
-      console.log("UPDATE CALLED DDD DD D ", model)
-    }*/
+    if (this.Instance) {
+      this.Handle = this.Instance.handle
+    } else {
+      this.Handle = this.$props.handle
+    }
     if (this.$props.selection_mode && SELECTION_MODE_OPTIONS[this.$props.selection_mode]) {
-      console.error("selection mode", SELECTION_MODE_OPTIONS[this.$props.selection_mode])
+      //console.error("selection mode", SELECTION_MODE_OPTIONS[this.$props.selection_mode])
     }
   },
   methods: {
-    async doLoader(mode = this.$data._load_mode, handle = this.Handle) {
+    doLoader(mode = this.$data._load_mode, handle = this.Handle) {
       if (!handle) return;
       console.log("doLoader :::::::::;", mode, handle)
       if (mode == 'LOAD_ALL') {
@@ -147,16 +144,8 @@ export default {
          Product.api().fetchByHandle(handle)
       } else if (mode == 'LOAD_HANDLE_NOT_IN_DATABASE') {
         if (!handle) return;
-        console.log("doLoader:  LOAD_HANDLE_NOT_IN_DATABASE:product",this.Status, this.Product,Product.getProductByHandle(handle))
-      //  if (!Product.getProductByHandle(handle)){
-         var response= await Product.api().fetchByHandle(handle)
-        console.warn("timeout complete !!!!!!!!!!!!",response);
-
-        //  console.log("the promise !!",response)
-         // response
-     //   }
-
-
+        console.error("doLoader:  LOAD_HANDLE_NOT_IN_DATABASE:product",this.Status, this.Product,Product.getProductByHandle(handle))
+        if (!Product.getProductByHandle(handle)) Product.api().fetchByHandle(handle)
       } else if (mode == 'LOAD_NEVER') {
         //do nothing? instance???
       }
@@ -312,7 +301,7 @@ export default {
     },
     Status: function () {
       return "LOADING"
-    //  return  this.$store.getters['entities/products/getProductLoader'](this.Handle)
+      //return  this.$store.getters['entities/products/getProductLoader'](this.Handle)
     },
     Instance: function () {
       if (this.$data._refID) {
@@ -323,7 +312,8 @@ export default {
     SelectedVariant: {
       get: function () {
         if (!this.Instance || !this.Instance.VariantID || !this.Product) return;
-        return Variant.query().whereId(this.Instance.VariantID).with('options.Variants|*').first()
+        console.log("Variant ID!!", this.Instance.VariantID)
+        return Variant.query().whereId(this.Instance.VariantID).with('options.Variants').first()
       },
       set: function (value) {
         if (!this.Instance || !this.Instance.VariantID || !this.Product) return;

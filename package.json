@@ -43,6 +43,7 @@
     "axios-mock-adapter": "^1.20.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "ramda-adjunct": "^2.35.0",
     "swiper": "^5.2.0",
     "tailwind-css-variables": "^3.0.1",
     "tailwindcss-export-config": "^2.3.0",

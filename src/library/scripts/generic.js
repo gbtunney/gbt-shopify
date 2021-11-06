@@ -1,5 +1,34 @@
 import * as R from 'ramda'
+import * as RA from 'ramda-adjunct'
+
 window.R = R;
+window.RA = RA
+
+export function axios_wait(ms, value) {
+    //console.log("!!!!!!!axios wait ", ms, value);
+    return new Promise(resolve => setTimeout(resolve, ms, value));
+}
+
+export function setKeyMapImmutable(key, value, array = []) {
+    return Array.from(new Map([...array]).set(key, value));
+}
+
+export function deleteKeyMapImmutable(key, array = []) {
+    const _map = new Map([...array])
+    if (_map.has(key)) _map.delete(key)
+    return Array.from(_map)
+}
+
+export function getMapImmutable(array = [], key = false) {
+    let _map = new Map(array);
+    if (R.is(Boolean, key)) return _map;
+    return _map.get(key) ? _map.get(key) : false
+}
+
+export function randomInt(min = 0, max = 100) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
 export function getRandomNumber(_multiplier = 100, _digits = 3) {
     //TODO: make actuall functionx
     return Math.floor(Math.random() * _multiplier)
@@ -37,7 +66,11 @@ export function isFunction(value =false){
     if (value && (typeof value === "function") ) return true
     return
 }
-
+export function isArray(value) {
+    if (!R.is(Array, value) && R.is(Object, value)) return false//return [value]
+    if (R.is(Array, value)) return true
+    return false;
+}
 export function toArray(value) {
     if (!R.is(Array, value) && R.is(Object, value)) return [value]
     if (R.is(Array, value)) return value

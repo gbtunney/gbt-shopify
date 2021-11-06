@@ -1,6 +1,6 @@
 <script>
 import {Editable_Defaults, LOAD_MODE, SELECTION_MODE_OPTIONS, USE_SERVER} from "../../settings";
-import {getRandomNumber, isInteger, toInteger} from "../../scripts/generic";
+import {axios_wait, getRandomNumber, isInteger, toInteger} from "../../scripts/generic";
 const R = window.R
 import {
   Product,
@@ -122,37 +122,33 @@ export default {
   watch:{
     id: {
       immediate: true,
-    async  handler(value, oldValue) {
+      handler(value, oldValue) {
+        this.$store.dispatch('productloader/deleteAll')
         if (value && (value != this.$data._refID)) this.$data._refID = value;
-        console.log("counts" ,  ProductInstanceSingle.all(), ProductInstanceBase.all(),ProductInstanceGroup.all())
-        console.log("ID IS BEING CHANGED!!!!!!!!! new:", value, "old:", oldValue, "ref",
+        console.log("GROUP : ID IS BEING CHANGED!!!!!!!!! new:", value, "old:", oldValue, "ref",
             this.$data._refID, "Instance", this.Instance,
-       "props!!", this.$props )
-        const response = await this.insertOrUpdateInstance(this.$props);
+            "props!!", this.$props)
+        const list = this.$props.items;
+        const that = this
+        this.$store.dispatch("productloader/load_items", list) //.then(value => console.log("done!!!!!!!!!!!!!",that.Items  ))
+        const response = this.insertOrUpdateInstance(this.$props);
 
-
-        console.log("TRDPOSNdsds", response)
       }
     },
   },
-/*  async mounted(){
-
-  },*/
   computed:{
+    Status: function(){
+      return Array.from(this.$store.get('productloader/current_loading_map').values()).toString()
+    },
     Instance: function () {
       //return this.getCart
       return ProductInstanceBase.query().where("group_id", this.$data._refID).withAll().all();
 
     },
-    Items: function () { const that = this;
-      const items = ProductInstanceBase.query().where("group_id", this.$data._refID).withAll().all();
-     return items;
-      /*const merged = items.map(function(item){
-      return item.$toJson();
-        //return R.omit(["$isDirty", "$isNew"],item.$toJson())//{...item.$toJson(),...that.$props.childprops}
-      })
-      console.log("merged!!!!!!",merged)
-      return merged*/
+
+    Items: function () {
+        const items = ProductInstanceBase.query().where("group_id", this.$data._refID).withAll().all();
+        return items;
     },
     ItemProps:function(){
       return {
@@ -164,8 +160,11 @@ export default {
     }
   },
   methods:{
+   /* Status: function (_handle) {
+      return "LOADING"
+      //return  this.$store.getters['entities/products/getProductLoader'](_handle)
+    },*/
     async insertOrUpdateInstance(_data = {}) {
-      console.log("insserting " , _data)
       return await ProductInstanceGroup.insertOrUpdate({
         data: _data
       })
@@ -181,7 +180,7 @@ export default {
           Items: this.Items,
           ID: this.$data._refID,
           note: this.$props.note,
-          ItemProps: this.ItemProps
+          Status: this.Status
           /*Cart:this.getCart,
           isCartLoading: false,
           TotalPrice: () => (this.Instance) ? this.Instance.TotalPrice : false,

@@ -1,5 +1,3 @@
-import {defaultMutations} from 'vuex-easy-access'
-import {store } from '../../store'
 import {Query} from '@vuex-orm/core'
 import {
     cloneObject
@@ -7,61 +5,61 @@ import {
 import {upperCase} from "../scripts/stringUtils";
 import {ProductInstanceBase} from "../models";
 import {getEntity} from "../orm/functions";
-const R =window.R
+
+const R = window.R
+import {Product} from "../models"
 
 /**
  * state
  */
-const state = {
-  testing: 'gillian variable'
-
-};
+const state = {};
 
 /**
  * getters
  */
-const getters = {
-    getEntity:  (state) => (instance) => {
-        if ( instance && instance.constructor ){
-            return {entity : instance.constructor.entity,baseEntity:  instance.constructor.baseEntity}
-        }
-        return false
-    },
-}
+const getters = {}
+
 /**
-* mutations
-*/
-
-
+ * mutations
+ */
 const mutations = {
-    ...defaultMutations(state)
+    /* FORMAT for dispatch */
+    ///{state,store,dispatch}
+    //dispatch("initHooks") local module
+    //ProductInstanceBase.store()
+    // .dispatch('orm/logOrmEvent',
+    // ['gillian',model,["testi stringggg ",{ttttttt:"!!!!!!!!!!!!!!"}],'blue','orange' ])
+    //array with :[ "event string", model
+    logOrmEvent(state, [event = "no event to log", model, additional = [], ...args]) {
+        const type = getEntity(model);
+        const message = `EVENT:: ${event} \n  TYPE:: ${(type && type.baseEntity) ? upperCase(type.baseEntity) : ""} \n`;
+        console.important(message, [" MODEL::", model, type, ...additional], ...args)
+    }
 }
 /**
  * actions
  */
 const actions = {
-    /* FORMAT for dispatch */
-    //ProductInstanceBase.store()
-    // .dispatch('orm/logOrmEvent',
-    // ['gillian',model,["testi stringggg ",{ttttttt:"!!!!!!!!!!!!!!"}],'blue','orange' ])
-        //array with :[ "event string", model
-     logOrmEvent({state}, [event = "no event to log", model, additional = [], ...args]) {
-        const type = getEntity(model);
-        const message = `EVENT:: ${event} \n  TYPE:: ${(type && type.baseEntity) ? upperCase(type.baseEntity) : ""} \n`;
-        console.important(message, [" MODEL::", model, type, ...additional], ...args)
+    logOrmEvent({state, store, commit, dispatch, getters}, payload) {
+        commit("logOrmEvent", payload)
         return;
     },
-    initHooks({commit}, hook = 'afterUpdate', entity = false) {
-        Query.on(hook, (records, entity) => {
-            console.log("entity ", entity, records)
-            return records
-        })
+    initModelHooks({commit, getters}, {hook = 'afterUpdate', test = "not set", model = false}) {
+        if (model) {
+            model["afterUpdate"] = function () {
+                console.log("!!!!!!!!!!entity", model.entity, test, "hook", hook)
+            }
+        }
+        /*  Product.on(hook, (records, entity) => {
+              console.log("model",test,"hook",hook,"entity ", getters.getEntity(records),"records", records)
+              return records
+          })*/
     },
     ////idk?????????
     updateModelInstance({getters}, {model_instance = false, values, mode = false, idList = [], entityType = 'entity'}) {
         const {id: model_id} = model_instance;
         const values_clone = cloneObject(values, mode, idList) //todo might need ti clean id??
-        const entityFunc = (model_instance && getEntity(model_instance) ) ? getEntity(model_instance) : () => false;
+        const entityFunc = (model_instance && getEntity(model_instance)) ? getEntity(model_instance) : () => false;
         const payload = {
             entity: (entityFunc(model_instance) && entityFunc(model_instance)[entityType])
                 ? entityFunc(model_instance)[entityType]
@@ -69,13 +67,12 @@ const actions = {
             where: model_id,
             data: values_clone
         }
-        console.log("updateModelInstance payload ", payload);
-        return store.dispatch('entities/update', payload)
+        return this.dispatch('entities/update', payload)
     },
     updateEntityByID({commit}, {entity, id, values, mode = false, idList = []}) {
         var updateObj = {...values, id: id}
         var dispatchStr = `entities/${entity}/update`;
-        return store.dispatch(`entities/${entity}/update`, updateObj)
+        return this.dispatch(`entities/${entity}/update`, updateObj)
     }
 }
 

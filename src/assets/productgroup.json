@@ -10,6 +10,40 @@
       "meta": "null",
       "url": "null",
       "handle": "balance",
+      "variant_id": 6,
+      "Variant": null,
+      "selection_mode": "extended",
+      "add_to_cart_enabled": false,
+      "quantity_editable": true,
+      "variant_editable": true,
+      "options_editable": true,
+      "quantity": 1
+    },
+    {
+      "type": "INSTANCE",
+      "properties": {
+        "message": "item 2"
+      },
+      "meta": "null",
+      "url": "null",
+      "handle": "balance",
+      "variant_id": 8,
+      "Variant": null,
+      "selection_mode": "extended",
+      "add_to_cart_enabled": false,
+      "quantity_editable": true,
+      "variant_editable": true,
+      "options_editable": true,
+      "quantity": 1
+    },
+    {
+      "type": "INSTANCE",
+      "properties": {
+        "message": "item 2"
+      },
+      "meta": "null",
+      "url": "null",
+      "handle": "balance",
       "variant_id": 22589290119286,
       "Variant": null,
       "selection_mode": "extended",
@@ -27,7 +61,7 @@
       "meta": "null",
       "url": "null",
       "handle": "local",
-      "variant_id": 2,
+      "variant_id": 4,
       "Variant": null,
       "selection_mode": "extended",
       "add_to_cart_enabled": false,

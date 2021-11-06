@@ -8,10 +8,10 @@ import Vue from 'vue'
 
 import {installORM} from "../orm/database";
 import {Models} from "../models";
-
-import {moduleLoadStatus} from '../modules/moduleLoadStatus'
-//import {ormmodule2} from "../modules/ormmodule";
-import {moduleShopify} from "../modules/moduleShopify";
+import moduleProductLoader from '../modules/moduleProductLoader'
+//import {moduleLoadStatus} from '../modules/moduleLoadStatus'
+import ormmodule from "../modules/ormmodule";
+//import {moduleShopify} from "../modules/moduleShopify";
 import {importantConsoleLog, toArray} from "./../scripts/generic";
 import {getVuexModules, getVuexPlugins,registerConfig} from "../scripts/vuehelpers";
 import createEasyAccess from "vuex-easy-access";
@@ -135,15 +135,19 @@ const vuexConfigModules  =
 {
     modules: [
         {
-            enabled: false,
-            module: {loader: moduleLoadStatus}
+            enabled: true,
+            module: {
+                productloader: moduleProductLoader
+            }
         },
         {
             enabled: true,
-            module: {shopify: moduleShopify}
-        }
-    ],
+            module: {
+                orm: ormmodule
 
+            }
+        },
+    ],
 }
 
 

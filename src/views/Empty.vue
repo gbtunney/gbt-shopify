@@ -3,32 +3,60 @@
     {{ message }}
     <div id="baseexample">
       <p>Scroll down the page</p>
-      <GroupInstance v-bind="$data.group">
-        <div slot-scope="{ ID, note,Items}">
-          {{Items}}
+     <GroupInstance v-bind="$data.group">
+        <div slot-scope="{ ID, note,Items,Status}">
+          Loading {{Status}}
           <div v-for="child, index in Items" :key="index">
-<!--            <product-instance-provider2  v-bind="child.$toJson()">
-              <div slot-scope="{Ready, loadTest,Product,SelectedVariant,RequestedQuantity,UpdateInstance,Instance}">
-                <div style="border:2px solid red">Ready..Loading {{loadTest}}</div>
-                {{child}}
-                <div class="flex" v-if="Ready">
-
-&lt;!&ndash;                  <SfQuantitySelector :qty="RequestedQuantity"  :min="0"
+            <ProductChild :id="child.id"  :handle="child.handle" :variant_id="child.variant_id">
+              <div slot-scope="{Ready, Product,SelectedVariant, RequestedQuantity,Instance}">
+                <div v-if="child">child:{{child.handle}}-</div>
+                <div class="flex" v-if="Product">
+                  {{ Product.title }}
+<!--               <SfQuantitySelector :qty="RequestedQuantity"  :min="0"
                       :max="SelectedVariant.inventory_quantity"
-                      @input="UpdateInstance({ quantity: $event},Instance)" />&ndash;&gt;
-                  <button class="bg-accent-secondary" @click="UpdateInstance({ quantity: 0},Instance)">REMOVE ME</button>
-                  {{RequestedQuantity}} - {{ Product.title }} :: {{ SelectedVariant.title }}
+                      @input="UpdateInstance({ quantity: $event},Instance)" />
+                  <button class="bg-accent-secondary" >REMOVE ME</button>-->
                 </div>
 
               </div>
-            </product-instance-provider2>-->
+            </ProductChild>
           </div>
           {{ID}}
           {{note}}
-        </div> <product-instance-provider2 handle="balance" :variant_id="4">
-
-      </product-instance-provider2>
+        </div>
       </GroupInstance>
+
+      <GroupInstance v-bind="getdata" :id="6433232324432323">
+        <div slot-scope="{ ID, note,Items,Status}">
+
+          <div v-if="Items">
+            Loading {{Status}}</div>
+          <div v-for="child, index in Items" :key="index">
+            <ProductChild :id="child.id" :handle="child.handle" :variant_id="child.variant_id" >
+              <div slot-scope="{Ready, Product,SelectedVariant, RequestedQuantity,Instance}">
+                <div v-if="child">child:{{child.handle}}-</div>
+
+                <div class="flex" v-if="Product">
+                  {{ Product.title }}
+                  <!--               <SfQuantitySelector :qty="RequestedQuantity"  :min="0"
+                                        :max="SelectedVariant.inventory_quantity"
+                                        @input="UpdateInstance({ quantity: $event},Instance)" />
+                                    <button class="bg-accent-secondary" >REMOVE ME</button>-->
+                </div>
+
+              </div>
+            </ProductChild>
+          </div>
+          {{ID}}
+          {{note}}
+        </div>
+      </GroupInstance>
+<!--      <product-instance-provider2 handle="balance" :variant_id="4">
+        <div slot-scope="{Ready, loadTest,Product,SelectedVariant,RequestedQuantity,UpdateInstance,Instance}">
+        <div v-if="Product">{{ Product.title }}</div>
+
+        </div>
+      </product-instance-provider2>-->
       <p v-pin="200">Stick me 200px from the top of the page</p>
     </div>
   </div>
@@ -43,18 +71,16 @@ import {
   Product,
 Variant
 } from "../library/models";
-import store from "../store"
 import productgroup from "@/assets/productgroup.json"
 
 import ProductInstanceProvider2 from '../library/components/product/ProductInstanceProvider2'
-
+import ProductChild from '../library/components/product/ProductChild'
 import GroupInstance from '../library/components/product/GroupInstance'
-import {ProductInstanceGroup} from "../library";
 
 
 export default {
   name: "App",
-  components: {GroupInstance,ProductInstanceProvider2},
+  components: {GroupInstance,ProductInstanceProvider2,ProductChild},
   data: function () {
     return {
       message: 'Hello',
@@ -62,17 +88,17 @@ export default {
     }
   },
   props: {},
+  computed:{
+    getdata(){
+      return {...this.$data.group}
+    }
+  },
 
- async mounted() {
-  // const response26 = await Product.api().fetchByHandle("local")
-  // const response26 = await Product.api().fetchAll()
- // console.log("ORM Response: Product ::query() :: ", response26)
- //  var product = Product.getProductByHandle("local");
-//var variant = product.Variants[0];
-   //console.log(" chhecking new functions " ,variant/*product.getOptionValueList("color")*/)
-
-  //const resp = await product.createVariantOptionPivot()
- //  console.log(" variant new functions " ,resp,variant.getOptionValue("color"))
+ async created() {
+    console.log("-------product",Product.all())
+   this.$store.commit('productloader/clear_loader')
+   this.$store.dispatch('entities/deleteAll')
+   console.log("--------------------product",Product.all())
 
    //TODO: replace this tomarrow.
    const mydata = {

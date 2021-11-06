@@ -4,13 +4,15 @@
 
 import {Model} from '@vuex-orm/core'
 import {Variant, ProductImage, ProductOption, ProductOptionValue, VariantOption} from './index'
-import {getRandomNumber, isInteger, slugify, toInteger} from "./../scripts/generic";
+import {axios_wait, getRandomNumber, isInteger, randomInt, slugify, toInteger} from "./../scripts/generic";
 import {isShopifyID} from "../scripts/shopify";
 
 const R = window.R
 console.log("ALERT TESTI", Variant)
 //todo: get this from settings
 import {ID_LENGTH} from "./../settings";
+import MockAdapter from "axios-mock-adapter";
+import axios from "axios";
 
 export class Product extends Model {
     static entity = 'products';
@@ -26,22 +28,19 @@ export class Product extends Model {
         ///make pivot table.
         model.createVariantOptionPivot()
         console.log("PRODUCT ::afterCreate ", model)
-        Product.store().commit('entities/products/addProductLoader', {handle: model.handle, status: "NOT_LOADING"})
-
     }
 
     static apiConfig = {
         actions: {
             fetchByHandle(handle) {
-                Product.store().commit('entities/products/addProductLoader', {handle: handle, status: "LOADING"})
                 return this.get(`/products/${handle}.json`,
                     {
                         dataTransformer: (response) => {
-
+                            console.log("myhandle", myhandle)
                             return Product.prototype.APITransformProductData(response.data.product)
                         }
                     }
-                )
+                ).then(value => axios_wait(randomInt(6000, 9000), value))
             },
             fetchAll() {
                 Product.commit((state) => {

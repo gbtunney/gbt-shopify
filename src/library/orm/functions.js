@@ -5,13 +5,16 @@ import {ProductInstanceBase} from "../models";
 
 /**
  * getEntity
- * @param {model} instance - Instance of vuex-orm model
+ * @param {model} instance -Model or Instance of vuex-orm model
  * @return {object} - returns object containing {entity,baseEntity}
  */
-export function getEntity( instance) {
+export function getEntity(instance) {
+    if (instance && instance.entity) {
+        return {entity: instance.entity, baseEntity: (instance.baseEntity) ? instance.baseEntity : false}
+    }
     if (instance && instance.constructor) {
         const {entity, baseEntity} = instance.constructor
-        return {entity: entity, baseEntity: baseEntity}
+        return {entity, baseEntity}
     }
     return false
 }
