@@ -16,6 +16,7 @@ import {
   LineItem, ProductInstanceBase
 } from '../../models'
 import {mapState} from "vuex";
+import Vue from "vue";
 
 const defaultInstance = ProductInstanceSingle.fields();
 
@@ -47,6 +48,10 @@ export default {
       type: String,
       default:  defaultInstance.type.value,
     },
+    group_id: {
+      type: [Boolean, Number],
+      default: false,
+    },
     message: {
       type: String,  /* ID OR SID */
       default: 'test nessage1111',
@@ -55,7 +60,7 @@ export default {
       type: [String,Boolean],
       default: defaultInstance.selection_mode.value,
       validator: function(value){
-      return   Object.keys(SELECTION_MODE_OPTIONS).indexOf(value) >= 0
+      return   Object.keys(Vue['$gbtconfig'].SELECTION_MODE_OPTIONS).indexOf(value) >= 0
       }
     },
     quantity_editable: {
@@ -311,16 +316,19 @@ export default {
     },
     SelectedVariant: {
       get: function () {
-        if (!this.Instance || !this.Instance.VariantID || !this.Product) return;
-        console.log("Variant ID!!", this.Instance.VariantID)
+        if (!this.Instance || !this.Instance.variant_id || !this.Product) return;
+        const shopifyID = this.Instance.getVariantPositionToID()
+        if (shopifyID != this.Instance.variant_id) {
+          console.log("-----------------NEED TO UPDATE ID!!", shopifyID, this.Instance.variant_id)
+          this.updateInstance({variant_id: shopifyID})
+        }
         return Variant.query().whereId(this.Instance.VariantID).with('options.Variants').first()
       },
       set: function (value) {
-        if (!this.Instance || !this.Instance.VariantID || !this.Product) return;
-        if ((value && !this.Instance.VariantID) || (value && value.id != this.Instance.VariantID)) {
+        if (!this.Instance || !this.Instance.variant_id || !this.Product) return;
+        if ((value && !this.Instance.variant_id) || (value && value.id != this.Instance.variant_id)) {
           //NOTE: We are resetting the quantity here.
           this.updateInstance({variant_id: value.id, requested_quantity: 1})
-          console.log("variant after ", this.SelectedVariant);
           this.$emit('changed', this.SelectedVariant)
         }
       }

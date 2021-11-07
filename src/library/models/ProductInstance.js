@@ -45,6 +45,14 @@ export class ProductInstanceBase extends Model {
         }
     }
 
+    static afterUpdate(model) {
+        ProductInstanceBase.store().dispatch('orm/logOrmEvent', ['afterUpdate', model, 'background:orange;color:black'])
+    }
+
+    static afterCreate(model) {
+        ProductInstanceBase.store().dispatch('orm/logOrmEvent', ['afterCreate', model, '', 'background:red;color:black'])
+    }
+
     static fields() {
         return {
             id: this.uid(() => getRandomNumber(ID_LENGTH)),
@@ -68,49 +76,6 @@ export class ProductInstanceBase extends Model {
         }
     }
 
-    static afterUpdate(model) {
-        ProductInstanceBase.store().dispatch('orm/logOrmEvent', ['afterUpdate', model])
-        ProductInstanceBase.store().commit('entities/productbase/increment', 1)
-    }
-
-    static afterCreate(model) {
-        ProductInstanceBase.store().dispatch('orm/logOrmEvent', ['afterCreate', model, [], 'red'])
-        //ProductInstanceBase.store().commit('entities/productbase/counter_reset', 5)
-    }
-
-    //REMOVE ???
-    ///** STATIC METHHIDS KEEP!!!!!! */  ////MOVE IDK ????
-    getClone(mode = false, idList = []) {
-        return cloneObject(this.$toJson(), mode, idList)
-    }
-
-////TODO::
-    ///REMOVE????????????
-    _updateByID(values, mode = false, idList = []) {
-        if (!values) return;
-        ProductInstanceBase.update({...values, id: this.id})
-        return;
-    }
-
-    get VariantID() {
-        if (this.variant_id) {
-            if (isShopifyID(this.variant_id)) return toInteger(this.variant_id)
-            if (this.handle) {
-                const _product_id = Product.productHandleToID(this.handle);
-                const position_index = (toInteger(this.variant_id) > 0) ? toInteger(this.variant_id) : 1;
-                const _variant = Variant.query()
-                    .where("product_id", _product_id)
-                    .where("position", position_index)
-                    .withAll().first()
-                if (_variant && _variant.id && isShopifyID(_variant.id)) {
-                    this.variant_id = toInteger(_variant.id);
-                    return toInteger(_variant.id);
-                }
-            }
-        }
-        return false;
-    }
-
     static mutators() {
         return {
             selection_mode(value) {
@@ -127,6 +92,28 @@ export class ProductInstanceBase extends Model {
             }
         }
     }
+
+    getVariantPositionToID() { //and integer
+        if (this.variant_id) {
+            if (isShopifyID(this.variant_id)) return toInteger(this.variant_id)
+            if (this.handle) {
+                const _product_id = Product.productHandleToID(this.handle);
+                const position_index = (toInteger(this.variant_id) > 0) ? toInteger(this.variant_id) : 1;
+                const _variant = Variant.query()
+                    .where("product_id", _product_id)
+                    .where("position", position_index)
+                    .first()
+                if (_variant && _variant.id && isShopifyID(_variant.id)) {
+                    return toInteger(_variant.id);
+                }
+            }
+        }
+        return
+    }
+
+    get VariantID() {
+        return this.variant_id
+    }
 }
 
 export class ProductInstanceSingle extends ProductInstanceBase {
@@ -137,23 +124,9 @@ export class ProductInstanceSingle extends ProductInstanceBase {
         return {
             ...super.fields(),
             quantity: this.number(1),
-             group_id: this.number(null),
+            group_id: this.number(null),
             Group: this.belongsTo(ProductInstanceGroup, "group_id"),
 
-        }
-    }
-
-    static mutators() {
-        return {
-            options_editable(value) {
-                if (R.is(Boolean, value)) return value;
-                else if (R.is(Array, value)) {     //expand to map
-                    console.log("setting option map.", value)
-                    return value.reduce((accumulator, currentValue, currentIndex, array) => {
-                        if (currentValue) return accumulator.set(currentValue, true)
-                    }, new Map());
-                }
-            }
         }
     }
 
@@ -185,12 +158,6 @@ export class ProductInstanceSingle extends ProductInstanceBase {
         };
         return R.pick(['id', 'quantity', 'properties'], newObj)
     }
-}
-//TODO::::REMOVE
-ProductInstanceSingle.prototype.get_option_editable = function (_key = false) {
-    if (R.is(Boolean, this.options_editable)) return this.options_editable;
-    const _map = new Map(this.options_editable);
-    return (_key && _map && _map.get(_key)) ? _map.get(_key) : false;
 }
 
 export class LineItem extends ProductInstanceBase {
@@ -235,13 +202,5 @@ export class LineItem extends ProductInstanceBase {
         }
     }
 }
-/*
-
-export {
-    ProductInstanceBase,
-    ProductInstanceSingle,
-    LineItem
-}
-*/
 
 export default ProductInstanceSingle

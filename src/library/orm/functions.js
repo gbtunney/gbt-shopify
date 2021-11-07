@@ -1,3 +1,5 @@
+import {cloneObject} from "../scripts/generic";
+
 const R =window.R
 
 /** FUNCTIONS ORM * */
@@ -33,6 +35,10 @@ export function updateWhere(where = {}, values = false) {
     })
 }
 
+///** STATIC METHHIDS KEEP!!!!!! */  ////MOVE IDK ????
+export function getClone(mode = false, idList = []) {
+    return cloneObject(this.$toJson(), mode, idList)
+}
 //DEMO FUNCTION
 //REMOVE?
 /*export function getProductByObject(where={}) {

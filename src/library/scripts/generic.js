@@ -147,11 +147,11 @@ export function slugify(value) {
         .replace(/[\s_-]+/g, '-');
 }
 //todo:document
-export const importantConsoleLog = function (message = "",
-                                             additional = [],
-                                             backgroundCOLOR = "rgba(101,9,13,0.66)",
-                                             borderCOLOR = "#323232") {
-    console.log(`%c ${message} `,
-        `background:${backgroundCOLOR}; border: 1px solid ${borderCOLOR};`,
-        ...additional);
+export const importantConsoleLog = function (message = "MESSAGE",
+                                             additional_messages = [],
+                                             additionalcss = "border:1px solid red;") {
+
+    console.log(`%c ${message} ${additional_messages.toString()}`,
+        additionalcss,
+    );
 }

@@ -68,6 +68,7 @@ export class ProductGroupBase extends Model {
 
             total_discount: this.number(null),
             line_level_total_discount: this.number(null),
+            selection_mode: this.string("normal").nullable(),
 
             currency: this.string("USD"),
         }

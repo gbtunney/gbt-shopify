@@ -30,10 +30,10 @@ const mutations = {
     // .dispatch('orm/logOrmEvent',
     // ['gillian',model,["testi stringggg ",{ttttttt:"!!!!!!!!!!!!!!"}],'blue','orange' ])
     //array with :[ "event string", model
-    logOrmEvent(state, [event = "no event to log", model, additional = [], ...args]) {
+    logOrmEvent(state, [event = "no event to log", model, additional = [], css =  '']) {
         const type = getEntity(model);
-        const message = `EVENT:: ${event} \n  TYPE:: ${(type && type.baseEntity) ? upperCase(type.baseEntity) : ""} \n`;
-        console.important(message, [" MODEL::", model, type, ...additional], ...args)
+        const message = `EVENT:: ${event} \n  TYPE:: ${(type && type.entity) ? upperCase(type.entity) : ""} \n`;
+        console.important(message,additional,css)
     }
 }
 /**

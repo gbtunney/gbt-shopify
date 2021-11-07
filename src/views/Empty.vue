@@ -7,12 +7,12 @@
         <div slot-scope="{ ID, note,Items,Status}">
           Loading {{Status}}
           <div v-for="child, index in Items" :key="index">
-            <ProductChild :id="child.id"  :handle="child.handle" :variant_id="child.variant_id">
+            <ProductChild v-bind="child.$toJson()"  :selection_mode="'groupitem'" >
               <div slot-scope="{Ready, Product,SelectedVariant, RequestedQuantity,Instance}">
                 <div v-if="child">child:{{child.handle}}-</div>
                 <div class="flex" v-if="Product">
                   {{ Product.title }}
-<!--               <SfQuantitySelector :qty="RequestedQuantity"  :min="0"
+<!--               <SfQuantitySelector :qty="RequestedQuantity"  :min="0":selection_mode="'groupitem'"
                       :max="SelectedVariant.inventory_quantity"
                       @input="UpdateInstance({ quantity: $event},Instance)" />
                   <button class="bg-accent-secondary" >REMOVE ME</button>-->
@@ -26,7 +26,7 @@
         </div>
       </GroupInstance>
 
-      <GroupInstance v-bind="getdata" :id="6433232324432323">
+      <GroupInstance v-bind="getdata" :id="4444444">
         <div slot-scope="{ ID, note,Items,Status}">
 
           <div v-if="Items">
@@ -97,7 +97,7 @@ export default {
  async created() {
     console.log("-------product",Product.all())
    this.$store.commit('productloader/clear_loader')
-   this.$store.dispatch('entities/deleteAll')
+  // this.$store.dispatch('entities/deleteAll')
    console.log("--------------------product",Product.all())
 
    //TODO: replace this tomarrow.

@@ -24,10 +24,13 @@ export class Product extends Model {
         }
     }
 
+    static afterUpdate(model) {
+        Product.store().dispatch('orm/logOrmEvent', ['afterUpdate', model, '', 'background:blue;color:white;'])
+    }
+
     static afterCreate(model) {
-        ///make pivot table.
         model.createVariantOptionPivot()
-        console.log("PRODUCT ::afterCreate ", model)
+        Product.store().dispatch('orm/logOrmEvent', ['afterCreate', model, '', 'background:purple;color:white;'])
     }
 
     static apiConfig = {
@@ -36,7 +39,6 @@ export class Product extends Model {
                 return this.get(`/products/${handle}.json`,
                     {
                         dataTransformer: (response) => {
-                            console.log("myhandle", myhandle)
                             return Product.prototype.APITransformProductData(response.data.product)
                         }
                     }

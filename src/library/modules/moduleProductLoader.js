@@ -1,6 +1,7 @@
 import {defaultMutations} from "vuex-easy-access";
 import {Product} from "../models/Product";
 import {deleteKeyMapImmutable, getMapImmutable, setKeyMapImmutable} from "../scripts/generic";
+import {ProductInstanceBase} from "../models";
 const R = window.R
 const RA = window.RA
 /**
@@ -38,21 +39,39 @@ const mutations = {
  * actions
  */
 const actions = {
-    load_items({commit, getters}, [...items]) {
+    load_items({commit, getters}, [items = [], load_mode = "LOAD_NEVER"]) {
         const keys = Object.keys(R.indexBy(R.prop('handle'), items));
         return Promise.all(keys.map(function (item) {
                 const handle = item
-                console.log("THE LOADER ISSS", getters.get_loader(handle))
                 if (getters.get_loader(handle)) {
                     return getters.get_loader(item)
                 } else {
-                    const promise = Product.api().fetchByHandle(handle).then(function (value) {
-                        commit('remove_loader', handle)
-                    })
-                    commit("add_loader", {
-                        key: handle,
-                        promise: promise
-                    })
+
+                    let promise = false;
+                    if (load_mode == 'LOAD_ALL') {
+                        //load all
+                        // Product.api().fetchAll();
+                    } else if (load_mode == 'LOAD_HANDLE_ALWAYS') {
+                        //load by handle
+                        if (!handle) return;
+                        promise = Product.api().fetchByHandle(handle)
+                    } else if (load_mode == 'LOAD_HANDLE_NOT_IN_DATABASE') {
+                        if (!handle) return;
+                        console.error("doLoader:  LOAD_HANDLE_NOT_IN_DATABASE:product", items)
+                        if (!Product.getProductByHandle(handle)) promise = Product.api().fetchByHandle(handle)
+                    } else if (load_mode == 'LOAD_NEVER') {
+                        //do nothing? instance???
+                    }
+                    if (promise) {
+                        promise.then(function (value) {
+                            console.log("REMOMOOMOMMOMOMOMOMOMOM", value)
+                            commit('remove_loader', handle)
+                        })
+                        commit("add_loader", {
+                            key: handle,
+                            promise: promise
+                        })
+                    }
                     return promise
                 }
             })

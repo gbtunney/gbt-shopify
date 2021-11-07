@@ -1,5 +1,5 @@
 <script>
-import {Editable_Defaults, LOAD_MODE, SELECTION_MODE_OPTIONS, USE_SERVER} from "../../settings";
+import {Editable_Defaults, LOAD_MODE , USE_SERVER} from "../../settings";
 import {axios_wait, getRandomNumber, isInteger, toInteger} from "../../scripts/generic";
 const R = window.R
 import {
@@ -17,9 +17,11 @@ import {
   ProductInstanceGroup,
 
 } from '../../models'
+import Vue from 'vue'
+
 
 const defaultInstance = ProductGroupBase.fields();
-
+console.warn(defaultInstance);
 export default {
   name: "GroupInstance",
   components: {},
@@ -60,13 +62,13 @@ export default {
       type: String,  /* ID OR SID */
       default:   defaultInstance.note.value,
     },
-   /* selection_mode:{
-      type: [String,Boolean],
-      default: `defaultInstance`.selection_mode.value,
-      validator: function(value){
-        return   Object.keys(SELECTION_MODE_OPTIONS).indexOf(value) >= 0
-      }*/
-    //},
+    selection_mode: {
+      type: [String, Boolean],
+      default: defaultInstance.selection_mode.value,
+     validator: function (value, that = this) {
+        return Object.keys( Vue['$gbtconfig'].SELECTION_MODE_OPTIONS).indexOf(value) >= 0
+      }
+    },
     childprops:{
       type: Object,
       default: function(){
@@ -102,10 +104,10 @@ export default {
       //TODO CHANGE VALIDATOR TO MY FUNCTION
       validator: function (value) {
         if (R.isEmpty(value)) return false;
-        if (R.is(String, value)) return LOAD_MODE.includes(value)
-        if (isInteger(value) && LOAD_MODE.length >= toInteger(value)) {
+        if (R.is(String, value)) return Vue['$gbtconfig'].LOAD_MODE.includes(value)
+        if (isInteger(value) && Vue['$gbtconfig'].LOAD_MODE.length >= toInteger(value)) {
           const index = toInteger(value);
-          return (LOAD_MODE[index]) ? true : false
+          return (Vue['$gbtconfig'].LOAD_MODE[index]) ? true : false
         }
         return false
       }
@@ -119,20 +121,23 @@ export default {
       default: true,
     }
   },
-  watch:{
+  watch: {
+    items: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        console.log(" items changed from " + oldValue + " to " + newValue, defaultInstance.selection_mode.value,)
+      }
+    },
     id: {
       immediate: true,
-      handler(value, oldValue) {
-        this.$store.dispatch('productloader/deleteAll')
-        if (value && (value != this.$data._refID)) this.$data._refID = value;
-        console.log("GROUP : ID IS BEING CHANGED!!!!!!!!! new:", value, "old:", oldValue, "ref",
-            this.$data._refID, "Instance", this.Instance,
-            "props!!", this.$props)
-        const list = this.$props.items;
-        const that = this
-        this.$store.dispatch("productloader/load_items", list) //.then(value => console.log("done!!!!!!!!!!!!!",that.Items  ))
-        const response = this.insertOrUpdateInstance(this.$props);
-
+      async handler(value, oldValue) {
+        //this.$store.dispatch('productloader/deleteAll') todo: MAKE DELETE PROP
+        if (value && (value != this.$data._refID)) {
+          console.log("GROUP : ID IS BEING CHANGED!!!!!!!!! new:", value, "REF :", this.$data._refID)
+          this.$data._refID = value;
+          this.initializeGroup()
+          const response = await this.insertOrUpdateInstance(this.$props);
+        }
       }
     },
   },
@@ -141,11 +146,8 @@ export default {
       return Array.from(this.$store.get('productloader/current_loading_map').values()).toString()
     },
     Instance: function () {
-      //return this.getCart
       return ProductInstanceBase.query().where("group_id", this.$data._refID).withAll().all();
-
     },
-
     Items: function () {
         const items = ProductInstanceBase.query().where("group_id", this.$data._refID).withAll().all();
         return items;
@@ -164,13 +166,14 @@ export default {
       return "LOADING"
       //return  this.$store.getters['entities/products/getProductLoader'](_handle)
     },*/
-    async insertOrUpdateInstance(_data = {}) {
-      return await ProductInstanceGroup.insertOrUpdate({
+    initializeGroup(data = this.$props) {
+      const {items} = this.$props
+      this.$store.dispatch("productloader/load_items", [items, 'LOAD_HANDLE_NOT_IN_DATABASE']/*this.$props.load_mode*/)
+    },
+    insertOrUpdateInstance(_data = {}) {
+      return ProductInstanceGroup.insertOrUpdate({
         data: _data
       })
-      /*return await ProductGroupBase.insertOrUpdate({
-        data: _data
-      })*/
     },
   },
   render() {
