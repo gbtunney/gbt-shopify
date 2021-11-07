@@ -152,7 +152,7 @@ export class Product extends Model {
     }
 
     async createVariantOptionPivot() {
-        const _variants = Variant.query().where("product_id", this.id).all()
+        const _variants = Variant.query().where("product_id", this.id).with('options').all()
         const product_pivot = _variants.reduce((accumulator, currentValue, currentIndex, array) => {
             return [...accumulator, ...currentValue.pivots]
         }, []);
