@@ -101,7 +101,7 @@ export class Product extends Model {
     }
 
     get Variants() {
-        return Variant.query().where("product_id", this.id).orderBy('position').with('options.Variants').all()
+        return Variant.query().where("product_id", this.id).orderBy('position').with('options.Variants|image').all()
     }
 
     get Options() {

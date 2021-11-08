@@ -183,8 +183,8 @@ const TAILWIND_THEME_CONFIG = {
 
       /** THEME EXTRAS - (not extended)  */
       container: {
-        /*center: true,
-        padding: '1rem'*/
+        center: true,
+        padding: '1rem'
       },
       rotate: {
         '45': '45deg',

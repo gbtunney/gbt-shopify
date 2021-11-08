@@ -5,11 +5,12 @@
         <div>
           <img v-tooltip="getToolTip(image)"
               @click="$emit('changed', { image: image, linked_option:  getLinkedOptionValue(image )} )"
-              :src="image.getSrc(250)"
+              :src="image.getSrc($props.image_size)"
               :alt="image.title"
               class="object-cover hover:cursor-pointer">
         </div>
       </slot>
+      <slot name="addl" v-bind:image="image" v-bind:url="image.getSrc($props.image_size)"></slot>
     </div>
   </div>
 </template>
@@ -31,6 +32,10 @@ export default {
       type: [Array, Boolean],
       default: () => []
     },
+    image_size: {
+      type: [Number],
+      default: 400
+    },
     updateFunc: {
       type: [Boolean, Function],
       default: false,
@@ -39,13 +44,6 @@ export default {
       type: [String, Boolean],
       default: false
     },
-  },
-  watch: {
-    //sid: async function (value) {
-    images: function (value) {
-      //  console.warn("!!!!images chhanged!!!!!",value);
-      // this.Images = value;
-    }
   },
   methods: {
     getToolTip: function (image) {
@@ -62,7 +60,7 @@ export default {
       if (!this.$props["optionHandle"] || !image) return;
       if (image && image.Variants && image.Variants.length > 0) {
         const [variant] = image.Variants
-        const _option_value = variant.getOptionValue(this.$props["optionHandle"], 'handle');
+        const _option_value = variant.getOptionValue(this.$props["optionHandle"]);
         if (_option_value) return _option_value;
       }
       return;
@@ -82,9 +80,9 @@ export default {
 }
 </script>
 <style type="text/css" lang="postcss" scoped>
-
 .grid-wrapper {
-  grid-gap: 8px; //todo: move this.
+  grid-gap: 8px;
+//todo: move this.
 }
 
 @supports (aspect-ratio: 1) {

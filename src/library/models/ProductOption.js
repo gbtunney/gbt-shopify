@@ -72,6 +72,9 @@ export class ProductOptionValue extends ProductOptionBase {
             option: this.belongsTo(ProductOption, "option_id"),
             Variants: this.belongsToMany(Variant, VariantOption, "option_value_id", "variant_id"),
             Images: this.belongsToMany(ProductImage, VariantOption, "option_value_id", "thumbnail_id"),
+
+            meta: this.attr(false),
+            hex_color: this.string('#FF0000').nullable()
             //todo: idk these pivots need help
         }
     }
