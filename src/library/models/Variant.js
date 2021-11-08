@@ -66,15 +66,14 @@ export class Variant extends Model {
     let result = ProductImage.query().whereHas('Variants', (query) => {
       query.where('id', _id)
     }).with('Variants').first()
-
-    if (result && result.id){
+   /* if (result && result.id){
       this.$update({
         id: _id,
         image_id: result.id
       })
       return result
-    }
-    return false;
+    }*/
+    return result;
   }
   get IsDigital(){
     if (this.inventory_management == null || this.inventory_management == false || this.available) return true;

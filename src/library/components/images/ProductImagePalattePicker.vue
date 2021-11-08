@@ -4,12 +4,10 @@
       <div v-for="image,index in Images" :key="index" class="grid-item p-2">
         <slot>
           <div>
-            <img v-tooltip="getToolTip(image)"
-                @click="$emit('changed', { image: image, linked_option:  getLinkedOptionValue(image )} )"
+            <img @click="$emit('changed', { image: image, linked_option:  getLinkedOptionValue(image )} )"
                 :src="image.getSrc($props.image_size)"
                 :alt="image.title"
                 class="object-cover hover:cursor-pointer w-full h-full">
-
             <div>Working Option :: {{ getImageTitle(image) }}</div>
             <div v-bind:style="{ background: getOptionHex(image) }">{{ getOptionHex(image) }}</div>
             <gVibrantJS class="w-1/2" @changed="updateInstance({ hex_color: $event},image)" :img_url="image.getSrc($props.image_size)">

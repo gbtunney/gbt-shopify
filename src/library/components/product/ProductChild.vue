@@ -2,6 +2,7 @@
 import {getRandomNumber, isInteger, toInteger,validateEnum} from "./../../scripts/generic"
 import {isShopifyID} from "./../../scripts/shopify"
 const R = window.R
+const RA = window.RA
 import {LoaderMixin} from './../../mixins/LoaderMixin'
 import {Editable_Defaults, LOAD_MODE, SELECTION_MODE_OPTIONS, USE_SERVER} from '../../settings'
 import {
@@ -60,8 +61,12 @@ export default {
       type: [String,Boolean],
       default: defaultInstance.selection_mode.value,
       validator: function(value){
-      return   Object.keys(Vue['$gbtconfig'].SELECTION_MODE_OPTIONS).indexOf(value) >= 0
+        return   Object.keys(Vue['$gbtconfig'].SELECTION_MODE_OPTIONS).indexOf(value) >= 0
       }
+    },
+    load_handle: {
+      type: Boolean,
+      default: false,
     },
     quantity_editable: {
       type: Boolean,
@@ -106,69 +111,60 @@ export default {
     id: {
       immediate: true,
       handler(value, oldValue) {
-        if (value && (value != this.$data._refID)) {
-          // this.$data._refID = value;
-          //    if (!this.Instance) {
-          // const response = await this.insertOrUpdateInstance(this.$props);
-          //console.log("TRDPOSNdsds", response)
-          // }
+        if (value/* && (value != this.RefID)*/) {
+          //console.log(" id changed from " ,value)
+          this.insertOrUpdateInstance(this.$props);
         }
+      }
+    },
+    load_handle: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        //console.log(" load_handle changed from " + oldValue + " to " + newValue)
+         this.initializeInstance()
       }
     },
     handle: {
       immediate: true,
-      handler(value, old) {
-        if (value != this.Handle) {
-          this.Handle = value;
-          // this.doLoader(this.LoaderMode)
+      handler(newValue, oldValue) {
+        if (newValue != this.Handle) {
+         // console.log(" Handle changed from " + oldValue + " to " + newValue)
+          this.initializeInstance()
+          if (!this.Instance) this.insertOrUpdateInstance(this.$props);
         }
       }
     }
   },
   mounted() {
-    this.$data._refID = this.$props.id
-    if (this.Instance) {
-      this.Handle = this.Instance.handle
-    } else {
-      this.Handle = this.$props.handle
-    }
     if (this.$props.selection_mode && SELECTION_MODE_OPTIONS[this.$props.selection_mode]) {
-      //console.error("selection mode", SELECTION_MODE_OPTIONS[this.$props.selection_mode])
+      console.error("selection mode", SELECTION_MODE_OPTIONS[this.$props.selection_mode])
     }
   },
   methods: {
-    doLoader(mode = this.$data._load_mode, handle = this.Handle) {
-      if (!handle) return;
-      console.log("doLoader :::::::::;", mode, handle)
-      if (mode == 'LOAD_ALL') {
-        //load all
-         Product.api().fetchAll();
-      } else if (mode == 'LOAD_HANDLE_ALWAYS') {
-        //load by handle
-        if (!handle) return;
-         Product.api().fetchByHandle(handle)
-      } else if (mode == 'LOAD_HANDLE_NOT_IN_DATABASE') {
-        if (!handle) return;
-        console.error("doLoader:  LOAD_HANDLE_NOT_IN_DATABASE:product",this.Status, this.Product,Product.getProductByHandle(handle))
-        if (!Product.getProductByHandle(handle)) Product.api().fetchByHandle(handle)
-      } else if (mode == 'LOAD_NEVER') {
-        //do nothing? instance???
-      }
+    initializeInstance(data = this.$props) {
+      const {handle, load_mode, load_handle} = this.$props
+      if (!this.Product || handle != this.Product.handle)
+        if (load_handle) {
+          this.$store.dispatch("productloader/load_items", [[this.$props], load_mode])
+        }
     },
-    async insertOrUpdateInstance(_data = {}) {
-      return await ProductInstanceBase.insertOrUpdate({
+    insertOrUpdateInstance(_data = {}) {
+      return ProductInstanceBase.insertOrUpdate({
         data: _data
       })
     },
     ///todo: replace
     async updateInstance(_data, instance) {
-      console.log("trying to update instance", _data,instance)
-      const response =  await ProductInstanceSingle.update({
-        where: this.$data._refID,
+      const response = await ProductInstanceSingle.update({
+        where: this.RefID,
         data: _data
       })
-      this.$emit('changed', this.Instance,response)
+      this.$emit('changed', this.Instance, response)
       return response
+    },
+    async removeInstance(instance) {
+      //todo: finish
+      return
     },
     //reduces the variant list by relevant options.
     getVariantsByOptionValues(option_value_array, boolRequireAll = true) {
@@ -190,26 +186,12 @@ export default {
         );
       }, mappedArray[0]);
     },
-    //todo: maybe use this below??
-    // merges 2 arrays of optionvalues by the option index.
     OptionValueList: function (option) {
-      if (!this.Ready || !option) return false;
+      if (!this.Product || !this.Instance | !option) return false;
       let that = this;
-      let _option = this.Product.getOption(option)
-
-      let _selectedOptions = this.SelectedOptionList
-
-      //GILLIAN TODOOOOOOOOO,  PLEASE fix this has to do w busted id
-
-      let valueListForOption = this.Product.getOptionValueList(option,"Variants")
-
-    //  console.log("THE OPTION ID@!!",ProductOptionValue.all(),_option, valueListForOption,typeof valueListForOption)
-
+      let valueListForOption = this.Product.getOptionValueList(option, "Variants")
       return valueListForOption.map(function (_value) {
-       // console.log("valueeee!",_selectedOptions,_value,that.getMergedOptionArray(_selectedOptions, _value))
-
-        let variantArr = that.getVariantsByOptionValues(that.getMergedOptionArray(_selectedOptions, _value));
-
+        let variantArr = that.getVariantsByOptionValues(that.getMergedOptionArray(_value));
         let isDisabled = false;
         if (variantArr && variantArr.length == 0) isDisabled = true;
         else if ((variantArr.length == 1 && variantArr[0].IsAvailable == false)) isDisabled = true;
@@ -221,55 +203,37 @@ export default {
       })
     },
     isOptionValueSelected(_value) {
-      if ( _value && _value.parent_handle &&  this.SelectedOption(_value.parent_handle) ) return (_value.id == this.SelectedOption(_value.parent_handle).id);
+      if (!_value || !_value.parent_handle) return false
+      const selected_value_for_parent = this.SelectedVariant.getOptionValue(_value.parent_handle)
+      if (selected_value_for_parent) return (_value["$id"] == selected_value_for_parent["$id"]);
       return false;
     },
     SelectedOptionValue: function (option) {
-     // if (!this.Ready) return;
-      if (!option ) return false;
-      return this.SelectedVariant.getOptionValue(option.id);
+      if (!this.Ready) return;
+      if (!option) return false;
+      return this.SelectedVariant.getOptionValue(option.handle);
     },
     //these are good.  change to 'update selected'
     updateOption(option) {
-      console.log("calling update option!!", option)
       if (!this.$props.enableoptions || !this.Product || !this.Product.id) return false
-      if (option.product_id != this.Product.id) return
-      //if option is editable , then search for it.
-      //if (this.getIsOptionEditable(option.option_id)) {
-      let newVarArray = this.getVariantsByOptionValues(this.getMergedOptionArray(this.SelectedOptionList, option));
+      let newVarArray = this.getVariantsByOptionValues(this.getMergedOptionArray(option));
+      console.log("updateOption ::: Called", newVarArray)
       if (newVarArray && newVarArray.length == 1) this.updateVariant(newVarArray[0])
-      // }
     },
     updateVariant(variant = {}, variant_editable = (this.Instance) ? this.Instance.variant_editable : this.$props.variant_editable) {  //TODO: change this name - i hate it.
       if (!variant_editable) return false;
       if (this.$props.ignoreInventory) this.SelectedVariant = variant; //doesnt do anythinggggg. override availability
       else if (variant.IsAvailable) this.SelectedVariant = variant;
     },
-
     //todo : move to variant or something
-    getMergedOptionArray(oldArray = [], replaceArray = []) {
-      if (!this.Product) return;
-      ///make map of old array. this should be minimised someohw?
-      let workingOptions = oldArray.reduce((accumulator, currentValue, currentIndex, array) => {
-        return accumulator.set(currentValue.option_id, currentValue)
-      }, new Map());
-      if (replaceArray && replaceArray.length == 0) return Array.from(workingOptions.values())
-      let _replaceArray = replaceArray;
-   //   console.log("edsdsds",workingOptions,replaceArray)
-      //if its a single value object push into array.
-      if (replaceArray && R.is(Object, replaceArray) ) _replaceArray = [replaceArray]
-      return Array.from(_replaceArray.reduce((accumulator, currentValue, currentIndex, array) => {
-        return accumulator.set(currentValue.option_id, currentValue)
-      }, workingOptions).values())
+    getMergedOptionArray(value) {
+      const value_map = R.indexBy(R.prop('parent_handle'), (!RA.isArray(value)) ? [value] : value);
+      return [...Object.values({...this.SelectedVariant.getOptionValueIndexedBy(), ...value_map})]
     },
     //replace w clone...
     async addToCart(instance) {
       console.log("SERVER TRYING TO ADD ITEM ",instance, [this.Instance.NewLineItem] )
       var itemaddresponse = await Cart.api().addItems([this.Instance], this.$props.useServer)
-    },
-    testFunction(){
-      const productquery =   Product.getProductByObject({ product_type:"Patterns" });
-      console.log("productquery ::: QUERY  ", Product.all(),productquery)
     },
   },
   computed: {
@@ -292,16 +256,14 @@ export default {
       }
       return false
     },
-    Handle: {
-      get: function () {
-        return this.$data._handle;
-      },
-      set: function (value) {
-        this.$data._handle = value;
-      }
+    RefID: function () {
+      return this.$props.id
+    },
+    Handle: function () {
+      return this.$props.handle
     },
     Ready: function () {
-      if (this.Status == "LOADING") return
+      // if (this.Status == "LOADING") return
       return (!this.isLoading && this.Product && this.Instance && this.SelectedVariant) ? true : false;
     },
     Status: function () {
@@ -309,8 +271,8 @@ export default {
       //return  this.$store.getters['entities/products/getProductLoader'](this.Handle)
     },
     Instance: function () {
-      if (this.$data._refID) {
-        return ProductInstanceBase.query().whereId(this.$data._refID).with("Variant|Group").first();
+      if (this.RefID) {
+        return ProductInstanceBase.query().whereId(this.RefID).with("Variant|Group").first();
       }
       return false;
     },
@@ -319,10 +281,10 @@ export default {
         if (!this.Instance || !this.Instance.variant_id || !this.Product) return;
         const shopifyID = this.Instance.getVariantPositionToID()
         if (shopifyID != this.Instance.variant_id) {
-          console.log("-----------------NEED TO UPDATE ID!!", shopifyID, this.Instance.variant_id)
+          console.log("-----------------variant is position, need to update to SID", shopifyID, this.Instance.variant_id)
           this.updateInstance({variant_id: shopifyID})
         }
-        return Variant.query().whereId(this.Instance.VariantID).with('options.Variants').first()
+        return Variant.query().whereId(this.Instance.variant_id).with('options.Variants|image').first()
       },
       set: function (value) {
         if (!this.Instance || !this.Instance.variant_id || !this.Product) return;
@@ -338,34 +300,29 @@ export default {
       return this.SelectedVariant.Image
     },
     SelectedOptionList: function () {
-      if (!this.Ready || !this.Instance.variant_id || this.SelectedVariant ) return
-      return false;
-      //todo: see withh
-      /*
-      let query = Variant.query().whereId(this.Instance.variant_id).with('options.Variants').first();
-      if (!query || !R.propIs(Array, 'options', query)) return false;
-      return query["options"]*/
+      if (!this.Ready || !this.Instance.variant_id || !this.SelectedVariant) return
+      return this.SelectedVariant.options;
     },
     RequestedQuantity: function () {
       if (!this.Ready) return;
-        return this.Instance.quantity;
+      return this.Instance.quantity;
     },
     Product: function () {
       if (!this.Handle) return;
       return Product.getProductByHandle(this.Handle)
     },
     ProductImage: function () {
+      //todo: fix
       if (!this.Product || !this.Ready) return;
-      //pick image in position 1
-      /// this.Product.Image  TODO: < idk why i cant use thihs????
       return ProductImage.query().where("product_id", this.Product.id).where("position", 1).orderBy('position').withAll().first()
     },
     Variants: function () {
-      if (!this.Product || !this.Ready) return;
+      if (!this.Product || !this.Instance) return;
       return this.Product.Variants;
     },
     Options: function () {
-      if (!this.$props.enableoptions || !this.Ready) return false
+      if (!this.Product || !this.Instance) return;
+      //if (!this.$props.enableoptions || !this.Ready) return false
       return this.Product.Options;
     },
     Images: function () {
@@ -401,7 +358,6 @@ export default {
           UpdateOption: this.updateOption,
           UpdateVariant: this.updateVariant,
           addToCartEnabled: this.$props.add_to_cart_enabled,
-          test: this.testFunction,
           addToCart: this.addToCart,
           loadTest: this.Status,
           /*addToCart: (variant,qty) => Shopify.addItem( this.SelectedVariant, 2  )*/
