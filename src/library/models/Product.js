@@ -30,7 +30,7 @@ export class Product extends Model {
 
     static afterCreate(model) {
         model.createVariantOptionPivot()
-        Product.store().dispatch('orm/logOrmEvent', ['afterCreate', model, '', 'background:purple;color:white;'])
+        Product.store().dispatch('orm/logOrmEvent', ['afterCreate', model, [model.title], 'background:purple;color:white;'])
     }
 
     static apiConfig = {
@@ -128,7 +128,9 @@ export class Product extends Model {
             .withAll().first();
     }
 
-    getOptionValueList(value = false, relations = true) {
+    getOptionValueList(value = false,
+                       relations = true,
+                       colorCompareHex= '#FF0000') {
         if (!value || R.isEmpty(value)) return
         var _optionParentHandle = false
         var _query;
@@ -148,15 +150,20 @@ export class Product extends Model {
         if (relations == true) return _query.withAll().all();
         if (relations == false) return _query.all();
         if (R.is(String, relations)) return _query.with(relations).all();
+     /*   _query.map(function(value){
+            value.compareColor( colorCompareHex )
+                //const orderedArray = inventors.sort((personA, personB) => personA.year > personB.year ? 1 : -1)
+        })*/
+
         return false
     }
 
-    async createVariantOptionPivot() {
+     createVariantOptionPivot() {
         const _variants = Variant.query().where("product_id", this.id).with('options').all()
         const product_pivot = _variants.reduce((accumulator, currentValue, currentIndex, array) => {
             return [...accumulator, ...currentValue.pivots]
         }, []);
-        return await VariantOption.insert({
+         VariantOption.create({
             data: product_pivot
         })
     }

@@ -1,45 +1,11 @@
 <template>
   <div class="App">
     <div id="baseexample">
-      <p>Scroll down the page</p>
-      <GroupInstance v-bind="$data.group">
-        <div slot-scope="{ ID, note,Items,Status}">
-          Loading {{ Status }}
-          <TestingComponent :items="Items"/>
-          {{ ID }}
-          {{ note }}
-        </div>
-      </GroupInstance>
-      <!--      <GroupInstance v-bind="getdata" :id="4444444">
-              <div slot-scope="{ ID, note,Items,Status}">
-
-                <div v-if="Items">
-                  Loading {{Status}}</div>
-                <div v-for="child, index in Items" :key="index">
-                  <ProductChild :id="child.id" :handle="child.handle" :variant_id="child.variant_id" >
-                    <div slot-scope="{Ready, Product,SelectedVariant, RequestedQuantity,Instance}">
-                      <div v-if="child">child:{{child.handle}}-</div>
-
-                      <div class="flex" v-if="Product">
-                        {{ Product.title }}
-                        &lt;!&ndash;               <SfQuantitySelector :qty="RequestedQuantity"  :min="0"
-                                              :max="SelectedVariant.inventory_quantity"
-                                              @input="UpdateInstance({ quantity: $event},Instance)" />
-                                          <button class="bg-accent-secondary" >REMOVE ME</button>&ndash;&gt;
-                      </div>
-
-                    </div>
-                  </ProductChild>
-                </div>
-                {{ID}}
-                {{note}}
-              </div>
-            </GroupInstance>-->
-      <product-child handle="local" :variant_id="8" :load_handle="true">
+      <div class="flex">
+      <product-child handle="local" :variant_id="8" class="border border-primary w-1/2" :load_handle="true">
         <div slot-scope="{Ready, loadTest,Product,Variants,SelectedVariant,UpdateOption,Options,OptionValueList,SelectedOptionValue,UpdateInstance,Images,Instance,UpdateVariant}">
           <div v-if="Product">{{ Product.title }}</div>
           <hr>
-
           <div
               v-for="productOption,index in Options" v-bind:key="index"
               class="product-option-wrapper m-8">
@@ -51,39 +17,40 @@
                 label="title"
                 :autoscroll=true
                 :clearable=false>
-              <template #option="{ title , isSelected,$isDisabled ,Thumbnail }">
+              <template #option="{title,thumbnail,isSelected,image,$isDisabled,hex_color,parent_handle} ">
                 <div
                     :class="isSelected ? 'bg-primary-lt' : '' "
                     class="flex font-secondary uppercase items-center text-lg flex-row h-full w-full p-2.5">
-
-
-                  <span :style="Thumbnail? '' : 'hidden' " style="height: 1.5em; width:auto;aspect-ratio: 1; " class=" border border-primary-dk  mr-8 ">
-                            <img v-if='Thumbnail' :src="Thumbnail.getSrc(150)" class="object-cover"/>
+                  <span v-if="title" v-bind:style="{ background:hex_color }"  style="height: 1.5em; width:auto;aspect-ratio: 1; " :class="(parent_handle != 'color')?'hidden':''" class=" border border-primary-dk  mr-8 ">
+                            <img v-if='thumbnail' :src="thumbnail.getSrc(150)" />
                           </span>
-
-                  <span :class="isSelected? 'font-bold' : '' ">{{ $isDisabled }}-{{ title }}</span>
-
+                  <span  v-if="title" :class="isSelected? 'font-bold text-white' : '' ">{{!$isDisabled}}{{ title }}</span>
                 </div>
               </template>
-              <template #selected-option-container="{ option, deselect, multiple, disabled }">
+              <template #selected-option-container="{option, deselect, multiple, disabled }">
                 <SfProperty :name="productOption.title" :value="option.title"/>
               </template>
+<!--            <template #option="props ,{ title , isSelected,$isDisabled ,Thumbnail,parent_handle, hex_color }">
+
+
+                </div>
+              </template>-->
+<!--                  <template #selected-option-container="props">
+                    <div v-if="props" ></div>
+                <SfProperty :name="productOption.title" :value="productOption.title"/>
+              </template>-->
+<!--              <template #selected-option-container="{ option, deselect, multiple, disabled }">
+                <SfProperty :name="productOption.title" :value="option.title"/>
+              </template>-->
             </v-select>
           </div>
           <ProductImageGrid
               :columnCount="8"
               optionHandle="color"
               option-handle="color"
-              :image_size="1600"
+              :image_size="400"
               :images="Images"
-              v-if="false">
-
-            <template v-slot:addl="{url}">
-              {{ url }}
-              <gVibrantJS class="w-1/2" :img_url="url" url="fdfdfdfdfdfd">
-              </gVibrantJS>
-
-            </template>
+              >
           </ProductImageGrid>
 
           <hr>
@@ -110,26 +77,28 @@
                   </template>
                 </SfProductOption>
 
-                &lt;!&ndash; <span :class="isSelected? 'font-bold' : '' ">{{ title }} </span>&ndash;&gt;
+                <span :class="isSelected? 'font-bold' : '' ">{{ title }} </span>
               </div>
             </template>
             <template #selected-option-container="{ option, deselect, multiple, disabled }">
               <div class="vs__selected">
-                <span v-if="option.Product">{{ option.Product.title }} / </span>
+                <span v-if="option.Product">{{ option }} / </span>
                 <span>{{ option.title }}</span>
               </div>
             </template>
           </v-select>
         </div>
       </product-child>
+      </div>
     </div>
   </div>
 </template>
 <script>
 import {Product} from "../library/models";
-import productgroup from "@/assets/productgroup.json" //data
+import ProductChild from '../library/components/product/ProductChild'
 import GroupInstance from '../library/components/product/GroupInstance'
 import TestingComponent from "./TestingComponent";
+import gUIColorFrame from '../library/components/ui/gUIColorFrame.vue'
 import {
   SfProductOption,
   SfQuantitySelector,
@@ -140,15 +109,15 @@ import {
   SfImage,
   SfColorPicker
 } from "@storefront-ui/vue";
-import ProductChild from '../library/components/product/ProductChild'
+
 import vSelect from 'vue-select'
 import ProductImageGrid from '@/library/components/images/ProductImageGrid.vue';
 import ProductImagePalattePicker from '@/library/components/images/ProductImagePalattePicker.vue';
-import gVibrantJS from '@/library/components/experiment/gVibrantJS.vue';
 
 export default {
   name: "App",
   components: {
+    gUIColorFrame,
     TestingComponent,
     GroupInstance,
     SfQuantitySelector,
@@ -158,11 +127,10 @@ export default {
     SfProperty,
     ProductImagePalattePicker,
     ProductImageGrid,
-    gVibrantJS
   },
   data: function () {
     return {
-      group: productgroup,
+      colorselection: false,
     }
   },
   props: {},
@@ -180,4 +148,4 @@ export default {
   },
 }
 </script>
-
+<style   type="text/css" lang="css" src="vue-select/dist/vue-select.css"></style>

@@ -19,6 +19,14 @@ const routes: Array<RouteConfig> = [
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   {
+    path: '/color-sort',
+    name: 'Color Sort',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "about" */ '../views/ColorSort.vue')
+  },
+  {
     path: '/colors',
     name: 'ColorPlayground',
     // route level code-splitting
@@ -27,12 +35,12 @@ const routes: Array<RouteConfig> = [
     component: () => import(/* webpackChunkName: "about" */ '../views/ColorPlayground.vue')
   },
   {
-    path: '/test',
-    name: 'Test',
+    path: '/group',
+    name: 'Product Group',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/Test.vue')
+    component: () => import(/* webpackChunkName: "about" */ '../views/ProductGroup.vue')
   },{
     path: '/projecttest',
     name: 'ProjectTest',

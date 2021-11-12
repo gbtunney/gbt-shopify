@@ -17,6 +17,9 @@ import {getVuexModules, getVuexPlugins,registerConfig} from "../scripts/vuehelpe
 import createEasyAccess from "vuex-easy-access";
 import createPersistedState from "vuex-persistedstate";
 import VTooltip from "v-tooltip";
+import vSelect from "vue-select";
+
+
 
 const base_app_config =
     {
@@ -44,8 +47,13 @@ const base_app_config =
                     el.style.top = binding.value + 'px'
                 }
             }
+        }, //Vue.component("v-select", vSelect);
+        component: {
+            'v-select' :{
+                enabled:true,
+                params: vSelect
+            }
         },
-        component: {},
         use: {
             "v-tooltip": {
                 enabled: true,

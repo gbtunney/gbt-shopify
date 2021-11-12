@@ -4,10 +4,9 @@
       <router-link to="/test">Test</router-link>|
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link>|
+      <router-link to="color-sort">Color Sort</router-link>|
       <router-link to="/colors">ColorPlayground</router-link>|
-
-      <router-link to="/projecttest">UNIT TESTTTTTT</router-link>|
-
+      <router-link to="/group">Product Group</router-link>|
       <router-link to="/empty">empty</router-link> |
 
       <button class="border border-red" @click="$store.dispatch('entities/deleteAll')" >

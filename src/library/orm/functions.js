@@ -21,6 +21,30 @@ export function getEntity(instance) {
     return false
 }
 
+export function updateWhereID(where = {}, values = false) {
+
+
+   /* store.dispatch('entities/update', {
+        entity: 'users',
+        where: 2,
+        data: { age: 24 }
+    })*/
+
+
+    if (!values || R.isEmpty(where)) return false;
+
+    const predWhere = R.whereEq(where);
+    //todoL    ??????????
+    ProductInstanceBase.update({
+        where: (instance) => {
+            return predWhere(instance)
+        },
+        data: {active: true}
+    })
+}
+
+
+
 ///DEMO FUNCTION
 //MOVE TO ACTION?? wtf??????????
 export function updateWhere(where = {}, values = false) {

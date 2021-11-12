@@ -26,6 +26,8 @@ import {Product, Variant, ProductImage} from "./";
 
 import {getRandomNumber, slugify} from "./../scripts/generic";
 import {ID_LENGTH} from "../settings";
+import chroma from "chroma-js";
+
 //************** End Imports *****************//
 
 const BASE_ENTITY = 'productoptionbase'
@@ -71,29 +73,42 @@ export class ProductOptionValue extends ProductOptionBase {
             thumbnail_id: this.number(null),
             option: this.belongsTo(ProductOption, "option_id"),
             Variants: this.belongsToMany(Variant, VariantOption, "option_value_id", "variant_id"),
-            Images: this.belongsToMany(ProductImage, VariantOption, "option_value_id", "thumbnail_id"),
+            Images: this.belongsToMany(Variant, VariantOption, "option_value_id", "thumbnail_id"),
 
             meta: this.attr(false),
-            hex_color: this.string('#FF0000').nullable()
+            hex_color: this.string('#FF0000',value => (chroma.valid(value)) ? value : false ).nullable() //chroma.valid('red');
             //todo: idk these pivots need help
+        }
+    }
+    compareColor(_hex_color ){
+        if (this.hex_color) {
+            return {
+                deltaE: chroma.deltaE(this.hex_color, _hex_color) ,
+                distance: chroma.distance(this.hex_color, _hex_color)
+            }
+          //  { deltaE:chroma.deltaE(this.hex_color, _hex_color) , distance: chroma.distance(this.hex_color, _hex_color)}
         }
     }
 
     //todo: idk these pivots need help - this does not work... !!
-    get Thumbnail() {
-        if (this.thumbnail_id) return ProductImage.query().whereId(this.thumbnail_id).withAll().first();
+     get Thumbnail() {
+      //  if (this.thumbnail_id) return ProductImage.query().whereId(this.thumbnail_id).withAll().first();
         if (this.Variants && this.Variants.length > 0) {
             const [firstvariant] = this.Variants;
-            return firstvariant.Image;
+            if (firstvariant.image_id){
+                return ProductImage.query().whereId(firstvariant.image_id).first()
+            }
         }
         return false;
     }
+
 
     get Option() { //this is incase its undefined
         if (this.option) return this.option
         if (this.option_id && !this.option) return ProductOption.query().whereId(this.option_id).first();
         return false;
     }
+
 }
 
 
@@ -120,7 +135,7 @@ export class VariantOption extends Model {
         return {
             variant_id: this.number(null),
             option_value_id: this.number(null),
-            thumbnail_id: this.number(null)
+            thumbnail_id: this.number(null).nullable()
         }
     }
 }

@@ -47,11 +47,14 @@ export class Variant extends Model {
   //TODO: GILLIAN NOTES this.$query().all();
   get pivots() {
     const variant_id = this.id
+    const {  image_id }=this
+    const thumbbnail_id =  (image_id ) ? image_id : false
+console.log("variant created ",thumbbnail_id,image_id,variant_id )
     return this.options.map(function (option_value) {
       return {
         variant_id,
+        thumbbnail_id,
         option_value_id: option_value.id,
-        /*thumbnail_id: (variant.Image) ? variant.Image.id : false*/
       }
     })
   }

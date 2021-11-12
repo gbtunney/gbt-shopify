@@ -10,7 +10,7 @@
                 class="object-cover hover:cursor-pointer w-full h-full">
             <div>Working Option :: {{ getImageTitle(image) }}</div>
             <div v-bind:style="{ background: getOptionHex(image) }">{{ getOptionHex(image) }}</div>
-            <gVibrantJS class="w-1/2" @changed="updateInstance({ hex_color: $event},image)" :img_url="image.getSrc($props.image_size)">
+            <gVibrantJS class="w-1/2" @changed="updateInstance({ hex_color: $event},getLinkedOptionValue(image))" :img_url="image.getSrc($props.image_size)">
             </gVibrantJS>
           </div>
         </slot>
@@ -24,8 +24,13 @@
 </template>
 <script>
 import gVibrantJS from './../experiment/gVibrantJS'
+
 import {ProductOptionValue} from "../../models";
-import {cloneObject} from "../../scripts/generic";
+import {cloneObject, toInteger} from "../../scripts/generic";
+  import chroma from "chroma-js";
+import {getEntity} from "../../orm/functions";
+const R = window.R;
+const RA = window.RA;
 
 export default {
   name: "ProductImagePalattePicker",
@@ -57,12 +62,57 @@ export default {
       type: [Object, Boolean],
       default: false
     },
+    merge_values: {
+      type: [Array, Boolean],
+      default: false
+    },
+  },
+  watch:{
+    merge_values: {
+     /* immediate: true,*/
+      async handler(value, oldValue) {
+        if (value/* && (value != this.RefID)*/) {
+          if (!this.$props.product) return
+          console.log(" mergeeeeeee  ged from ", value)
+          if (this.$props.merge_values) this.mergeAddlData(this.$props.merge_values)
+        }
+      }
+    },
   },
   methods: {
-    async updateInstance(_data, image) {
-      const _linked = this.getLinkedOptionValue(image);
-      const response = await ProductOptionValue.update({
-        where: [_linked["product_id"], _linked["handle"]],
+    async mergeAddlData(mergeArr = []) {
+      if (!this.$props.product) return
+      const product_id = this.$props.product.id
+      const that = this;
+      let newarr = mergeArr.map(function (item) {
+        var position = chroma.deltaE('#c36a85', item.hex_color);
+        var id = [product_id, item.handle]
+        return {...item, ['$id']: id, position: position, product_id: product_id}
+      })
+      //update by array!!!!
+    /*  const response = await ProductOptionValue.update({
+        data: newarr
+      })*/
+      const response = await this.$store.dispatch('entities/update', {
+        entity: 'productoptionvalue',
+        data: newarr
+      })
+      console.log("!new app  ", response, newarr);
+
+
+      /*getEntity*/
+      /*
+       store.dispatch('entities/update', {
+        entity: 'users',
+        where: 2,
+        data: { age: 24 }
+    })
+       */
+    },
+     updateInstance(_data) {
+     // const _linked = this.getLinkedOptionValue(image)
+      const response =  ProductOptionValue.update({
+        where: [_data["product_id"], _data["handle"]],
         data: _data
       })
       //this.$emit('changed', this.Instance, response)

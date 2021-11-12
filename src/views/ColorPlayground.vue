@@ -7,6 +7,7 @@
         <div>{{ SelectedVariant.title }}</div>
         <ProductImagePalattePicker
             :product="Product"
+            :merge_values="$data.merge"
             :columnCount="6"
             optionHandle="color"
             option-handle="color"
@@ -36,12 +37,22 @@ export default {
   components: {gVibrantJS, ProductChild, ProductImagePalattePicker},
   data: function () {
     return {
-      handle: 'local'
+      handle: 'local',
+      merge: false,
+      colorselection: false,
     }
+  },
+  mounted() {
+    this.$data.merge = handleoptiontest;
   },
   props: {},
   methods: {},
-  computed: {}
+  computed: {
+    selectedHexColor() {
+      if (!this.$data.colorselection || !this.$data.colorselection.hex) return
+      return this.$data.colorselection.hex
+    }
+  }
 }
 </script>
 <!--

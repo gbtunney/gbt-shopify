@@ -6,8 +6,8 @@ import Vuex from "vuex";
 import {gVueUtils} from "./library/plugin/gVueUtils.plugin";
 import store from './store'
 import './assets/tailwind.css'
+import 'vue-select/dist/vue-select.css'
 import VTooltip from "v-tooltip";
-
 Vue.config.productionTip = false
 Vue.use(Vuex)
 const app_settings = {

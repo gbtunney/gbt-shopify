@@ -18,6 +18,7 @@ import {
 } from '../../models'
 import {mapState} from "vuex";
 import Vue from "vue";
+import {getEntity} from "../../orm/functions";
 
 const defaultInstance = ProductInstanceSingle.fields();
 
@@ -126,11 +127,14 @@ export default {
     },
     handle: {
       immediate: true,
-      handler(newValue, oldValue) {
+      async handler(newValue, oldValue) {
         if (newValue != this.Handle) {
          // console.log(" Handle changed from " + oldValue + " to " + newValue)
           this.initializeInstance()
-          if (!this.Instance) this.insertOrUpdateInstance(this.$props);
+          if (!this.Instance){
+            const entities =this.insertOrUpdateInstance(this.$props);
+            console.log("THE HANDLE IS!!! !!!   ", entities)
+          }
         }
       }
     }
@@ -188,9 +192,12 @@ export default {
     },
     OptionValueList: function (option) {
       if (!this.Product || !this.Instance | !option) return false;
+      console.log("total amoubnt if values ",option, ProductOptionValue.query().where("product_id",this.Product.id ).count() )
+
       let that = this;
-      let valueListForOption = this.Product.getOptionValueList(option, "Variants")
+      let valueListForOption = this.Product.getOptionValueList(option, "Variants|Images")
       return valueListForOption.map(function (_value) {
+      // console.log( "VALUULUU compare!!!",_value,_value.compareColor('#FF0000') )
         let variantArr = that.getVariantsByOptionValues(that.getMergedOptionArray(_value));
         let isDisabled = false;
         if (variantArr && variantArr.length == 0) isDisabled = true;
@@ -199,6 +206,7 @@ export default {
           ..._value,
           $isDisabled: isDisabled,
           isSelected: that.isOptionValueSelected(_value),
+         thumbnail : _value.Thumbnail
         }
       })
     },
@@ -216,8 +224,12 @@ export default {
     //these are good.  change to 'update selected'
     updateOption(option) {
       if (!this.$props.enableoptions || !this.Product || !this.Product.id) return false
+
+
       let newVarArray = this.getVariantsByOptionValues(this.getMergedOptionArray(option));
-      console.log("updateOption ::: Called", newVarArray)
+      console.log("upbeforeed", newVarArray,ProductOptionValue.query().whereId([this.Product.id,option.handle]).with("Variants|image").all() )
+
+      console.log("updateOption ::: Called", newVarArray, getEntity(option) )
       if (newVarArray && newVarArray.length == 1) this.updateVariant(newVarArray[0])
     },
     updateVariant(variant = {}, variant_editable = (this.Instance) ? this.Instance.variant_editable : this.$props.variant_editable) {  //TODO: change this name - i hate it.
@@ -235,6 +247,9 @@ export default {
       console.log("SERVER TRYING TO ADD ITEM ",instance, [this.Instance.NewLineItem] )
       var itemaddresponse = await Cart.api().addItems([this.Instance], this.$props.useServer)
     },
+   /* setThumbnail(){
+
+    }*/
   },
   computed: {
     ...mapState('entities/products', {   //cartLoading
@@ -290,7 +305,7 @@ export default {
         if (!this.Instance || !this.Instance.variant_id || !this.Product) return;
         if ((value && !this.Instance.variant_id) || (value && value.id != this.Instance.variant_id)) {
           //NOTE: We are resetting the quantity here.
-          this.updateInstance({variant_id: value.id, requested_quantity: 1})
+          this.updateInstance({variant_id: value.id, quantity: 1})
           this.$emit('changed', this.SelectedVariant)
         }
       }
