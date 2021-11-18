@@ -83,10 +83,15 @@ export class ProductOptionValue extends ProductOptionBase {
     compareColor(_hex_color ){
         if (this.hex_color) {
             return {
-                deltaE: chroma.deltaE(this.hex_color, _hex_color) ,
-                distance: chroma.distance(this.hex_color, _hex_color)
+                deltaE: chroma.deltaE(this.hex_color, _hex_color).toFixed(2),
+                distance: chroma.distance(this.hex_color, _hex_color).toFixed(2),
+                luminance: (chroma(this.hex_color).luminance() - chroma(_hex_color).luminance()).toFixed(2),
+                temperature: (chroma(this.hex_color).temperature()),
+                hue: chroma(this.hex_color).get('hsl.h').toFixed(2),
+                comp: (chroma(this.hex_color).get('hsl.h').toFixed(2) - ((chroma(_hex_color).get('hsl.h') > 180) ? (chroma(_hex_color).get('hsl.h') - 180).toFixed(2) : (chroma(_hex_color).get('hsl.h') + 180).toFixed(2))),
+                sat: chroma(this.hex_color).get('hsl.s').toFixed(2)
             }
-          //  { deltaE:chroma.deltaE(this.hex_color, _hex_color) , distance: chroma.distance(this.hex_color, _hex_color)}
+            //  { deltaE:chroma.deltaE(this.hex_color, _hex_color) , distance: chroma.distance(this.hex_color, _hex_color)}
         }
     }
 

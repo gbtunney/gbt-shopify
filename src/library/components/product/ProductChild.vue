@@ -130,7 +130,7 @@ export default {
       async handler(newValue, oldValue) {
         if (newValue != this.Handle) {
          // console.log(" Handle changed from " + oldValue + " to " + newValue)
-          this.initializeInstance()
+          //his.initializeInstance()
           if (!this.Instance){
             const entities =this.insertOrUpdateInstance(this.$props);
             console.log("THE HANDLE IS!!! !!!   ", entities)
@@ -158,12 +158,12 @@ export default {
       })
     },
     ///todo: replace
-    async updateInstance(_data, instance) {
-      const response = await ProductInstanceSingle.update({
+    updateInstance(_data, instance) {
+      const response =  ProductInstanceSingle.update({
         where: this.RefID,
         data: _data
       })
-      this.$emit('changed', this.Instance, response)
+      //this.$emit('changed', this.Instance, response)
       return response
     },
     async removeInstance(instance) {
@@ -192,7 +192,7 @@ export default {
     },
     OptionValueList: function (option) {
       if (!this.Product || !this.Instance | !option) return false;
-      console.log("total amoubnt if values ",option, ProductOptionValue.query().where("product_id",this.Product.id ).count() )
+     // console.log("total amoubnt if values ",option, ProductOptionValue.query().where("product_id",this.Product.id ).count() )
 
       let that = this;
       let valueListForOption = this.Product.getOptionValueList(option, "Variants|Images")
@@ -224,16 +224,13 @@ export default {
     //these are good.  change to 'update selected'
     updateOption(option) {
       if (!this.$props.enableoptions || !this.Product || !this.Product.id) return false
-
-
       let newVarArray = this.getVariantsByOptionValues(this.getMergedOptionArray(option));
-      console.log("upbeforeed", newVarArray,ProductOptionValue.query().whereId([this.Product.id,option.handle]).with("Variants|image").all() )
-
       console.log("updateOption ::: Called", newVarArray, getEntity(option) )
       if (newVarArray && newVarArray.length == 1) this.updateVariant(newVarArray[0])
     },
     updateVariant(variant = {}, variant_editable = (this.Instance) ? this.Instance.variant_editable : this.$props.variant_editable) {  //TODO: change this name - i hate it.
       if (!variant_editable) return false;
+      console.log("variant update  ::: Called", variant )
       if (this.$props.ignoreInventory) this.SelectedVariant = variant; //doesnt do anythinggggg. override availability
       else if (variant.IsAvailable) this.SelectedVariant = variant;
     },
@@ -318,9 +315,13 @@ export default {
       if (!this.Ready || !this.Instance.variant_id || !this.SelectedVariant) return
       return this.SelectedVariant.options;
     },
-    RequestedQuantity: function () {
+    Quantity: function () {
       if (!this.Ready) return;
       return this.Instance.quantity;
+    },
+    QuantityAvailable: function () {
+      if (!this.Ready ||  !this.Instance.variant_id || !this.SelectedVariant) return;
+      return ( this.SelectedVariant.inventory_quantity -  this.Instance.quantity);
     },
     Product: function () {
       if (!this.Handle) return;
@@ -368,7 +369,8 @@ export default {
 
           //instance variables
           Instance: this.Instance,
-          RequestedQuantity: this.RequestedQuantity,
+          QuantityAvailable: this.QuantityAvailable,
+          Quantity: this.Quantity,
           UpdateInstance: this.updateInstance, //these are all functions
           UpdateOption: this.updateOption,
           UpdateVariant: this.updateVariant,

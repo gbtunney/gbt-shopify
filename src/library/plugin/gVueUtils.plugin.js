@@ -245,7 +245,8 @@ export const  getAppVuexPlugins = function(flags={},_settings=BASE_CONFIG){
             plugin: createPersistedState,
             options: {
             key: _settings.LOCAL_STORAGE_KEY,
-                storage: window.sessionStorage
+                storage: window.sessionStorage,
+              /*  paths: ['entities/products']*/
         },
     },
     }

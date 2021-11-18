@@ -12,10 +12,6 @@ export default {
   components: {},
   data: function () {
     return {
-      styleObject: {
-        color: 'red',
-        fontSize: '13px'
-      }
     }
   },
   watch:{
@@ -30,7 +26,7 @@ export default {
     getStyle: function () {
       return {
         color: this.invertLuminance,
-        fontSize: '20px',
+        fontSize: '16px',
         border: '1px solid red',
         width: `${this.$props.width}px`,
         height: `${this.$props.height}px`,
@@ -61,5 +57,6 @@ export default {
 <style lang="scss" type="text/scss" scoped>
 .gColorSwatch{
   overflow: hidden;
+  font-size: 9px;
 }
 </style>

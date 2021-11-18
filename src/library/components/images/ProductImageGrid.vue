@@ -45,6 +45,9 @@ export default {
       default: false
     },
   },
+  mounted(){
+    this.$emit('mounted', this)
+  },
   methods: {
     getToolTip: function (image) {
       return {

@@ -49,7 +49,7 @@ export class Variant extends Model {
     const variant_id = this.id
     const {  image_id }=this
     const thumbbnail_id =  (image_id ) ? image_id : false
-console.log("variant created ",thumbbnail_id,image_id,variant_id )
+//console.log("variant created ",thumbbnail_id,image_id,variant_id )
     return this.options.map(function (option_value) {
       return {
         variant_id,
