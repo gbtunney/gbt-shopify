@@ -5,7 +5,7 @@
         <div>
           <img v-tooltip="getToolTip(image)"
               @click="$emit('changed', { image: image, linked_option:  getLinkedOptionValue(image )} )"
-              :src="image.getSrc($props.image_size)"
+              :src="image.getSrc(...[...$props.image_size])"
               :alt="image.title"
               class="object-cover hover:cursor-pointer">
         </div>
@@ -33,7 +33,7 @@ export default {
       default: () => []
     },
     image_size: {
-      type: [Number],
+      type: [Number,Array],
       default: 400
     },
     updateFunc: {

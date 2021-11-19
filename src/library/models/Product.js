@@ -39,7 +39,7 @@ export class Product extends Model {
                 return this.get(`/products/${handle}.json`,
                     {
                         dataTransformer: (response) => {
-                            return Product.prototype.APITransformProductData(response.data.product)
+                            return APITransformProductData(response.data.product)
                         }
                     }
                 ).then(value => axios_wait(randomInt(6000, 9000), value))
@@ -54,7 +54,7 @@ export class Product extends Model {
                         dataTransformer: (response) => {
                             let _products = response.data.products;
                             if (_products.length > 0) return _products.map(function (_product) {
-                                return Product.prototype.APITransformProductData(_product)
+                                return APITransformProductData(_product)
                             })
                             else return _products;
                         }
@@ -130,6 +130,7 @@ export class Product extends Model {
 
     getOptionValueList(value = false,
                        relations = true,
+                       sortBy = 'title',
                        colorCompareHex= '#FF0000') {
         if (!value || R.isEmpty(value)) return
         var _optionParentHandle = false
@@ -145,7 +146,7 @@ export class Product extends Model {
             .query()
             .where("product_id", this.id)
             .where("parent_handle", _optionParentHandle)
-            .orderBy('position')
+            .orderBy(sortBy)
 
         if (relations == true) return _query.withAll().all();
         if (relations == false) return _query.all();
@@ -154,7 +155,6 @@ export class Product extends Model {
             value.compareColor( colorCompareHex )
                 //const orderedArray = inventors.sort((personA, personB) => personA.year > personB.year ? 1 : -1)
         })*/
-
         return false
     }
 
@@ -188,7 +188,7 @@ export class Product extends Model {
 
 //REMOVE?
 /*INCOMING DATA: n*/ //TODO: shoud be switched to static method.
-Product.prototype.APITransformProductData = function (_product) {
+export const APITransformProductData = function (_product) {
     //make id public
     let product_ID = _product.id;
     let option_arr = []

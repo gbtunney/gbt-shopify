@@ -27,6 +27,10 @@
             <div class="w-1/2">
               <!-- COLUMN 2 -->
               <div v-if="Product">{{ Product.title }}</div>
+         <div class="gill-svg  g-svg" :style="svg_css('#FF0000')">
+           <inline-svg  src="/svg/leaves-a.svg" fill="red"></inline-svg>
+         </div>
+
               <div
                   v-for="productOption,index in Options" v-bind:key="index"
                   class="product-option-wrapper m-8">
@@ -39,11 +43,19 @@
                     :autoscroll=true
                     :clearable=false>
                   <template #option="{title,thumbnail,isSelected,image,$isDisabled,hex_color,parent_handle} ">
-                    <div :class="[{ 'bg-primary-lt': isSelected }, {'cursor-default opacity-40': $isDisabled}]"
-                        class="flex font-secondary uppercase items-center text-lg flex-row h-full w-full p-2.5">
+                    <!-- class="flex font-secondary uppercase items-center text-lg flex-row h-full w-full p-2.5"-->
+                    <div :class="[{ 'bg-primary-lt': isSelected }, {'cursor-default opacity-40': $isDisabled}]">
                   <span v-if="title" v-bind:style="{ background:hex_color }" style="height: 1.5em; width:auto;aspect-ratio: 1; " :class="(parent_handle != 'color')?'hidden':''" class=" border border-primary-dk  mr-8 ">
-                            <img v-if='thumbnail' :src="thumbnail.getSrc(150)"/>
+                            <img v-if='false' :src="thumbnail.getSrc(150)"/>
                           </span>
+
+                      <span v-if="title" style="height: 2.5em; "
+                          :class="(parent_handle != 'color')?'hidden':''"
+                          :style="svg_css(hex_color)"
+                          class="g-svg mr-8 ">
+                               <inline-svg src="/svg/leaves-a.svg" />
+                      </span>
+
                       <span v-if="title" :class="isSelected? 'font-bold text-white' : '' ">{{ title }}</span>
                     </div>
                   </template>
@@ -130,10 +142,12 @@ import {
 import vSelect from 'vue-select'
 import ProductImageGrid from '@/library/components/images/ProductImageGrid.vue';
 import ProductImagePalattePicker from '@/library/components/images/ProductImagePalattePicker.vue';
+import InlineSvg from 'vue-inline-svg';
 
 export default {
   name: "App",
   components: {
+    InlineSvg,
     gUIColorFrame,
     TestingComponent,
     GroupInstance,
@@ -167,6 +181,12 @@ export default {
     console.log("--------------------product", Product.all())
   },
   methods: {
+    svg_css(_hex_color = '#FFFF00') {
+      return {
+        '--fill-color': _hex_color,
+        '--height': this.height + 'px'
+      }
+    },
     getSrcSet(_images = []) {
       if (!_images) return
       return _images.map(function (image) {
@@ -195,7 +215,14 @@ export default {
 }
 </script>
 <style type="text/css" lang="css" src="vue-select/dist/vue-select.css"></style>
+<style lang="postcss" type="text/css" scoped>
+.g-svg >>> path, .g-svg >>> rect, .g-svg >>> g, .g-svg >>> circle {
+  fill: var(--fill-color);
+}
+</style>
+
 <style lang="scss" type="text/scss">
+
 .sf-gallery {
   --gallery-flex-direction: column;
   flex-direction: column-reverse;
