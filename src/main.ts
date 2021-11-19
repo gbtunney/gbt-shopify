@@ -9,6 +9,7 @@ import './assets/tailwind.css'
 import 'vue-select/dist/vue-select.css'
 import VTooltip from "v-tooltip";
 
+const LOGGING = true;
 Vue.config.productionTip = false
 Vue.use(Vuex)
 
@@ -19,19 +20,30 @@ import Vuetify, {
     VDataTable,
 } from 'vuetify/lib'
 
-
 Vue.use(Vuetify, {
     components: {
         VApp,
         VDataTable,
-
     },
-
 })
-const vuetify = new Vuetify({})
 const app_settings = {
+  /*  "TYPEKIT_ID" : "kxg6qeb",*/
     "LOCAL_STORAGE_KEY": "owoolvuex",
     "SHOPIFY_BASE_URL": "https://o-wool-stage.myshopify.com",
+    "WEBFONT_CONFIG" : {
+        typekit: {
+            id: 'kxg6qeb' //TYPEKIT_ID
+        },
+        fontloading: function (familyName, fvd) {
+            if (LOGGING) console.log("loading", familyName, fvd)
+        },
+        fontactive: function (familyName, fvd) {
+            if (LOGGING) console.log("fontactive", familyName, fvd)
+        },
+        fontinactive: function (familyName, fvd) {
+            if (LOGGING) console.error("fontinactive", familyName, fvd)
+        }
+    }
 }
 
 const app_config =
@@ -82,6 +94,6 @@ Vue.use(gVueUtils,
 new Vue({
     router,
     store,
-    vuetify: vuetify,
+    vuetify: new Vuetify({}),
     render: h => h(App)
 }).$mount('#app')

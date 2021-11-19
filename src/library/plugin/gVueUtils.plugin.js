@@ -5,6 +5,8 @@ import VuexORMisDirtyPlugin from '@vuex-orm/plugin-change-flags';
 import VuexORMSearch from "@vuex-orm/plugin-search";
 import Vue from 'vue'
 
+const R = window.R;
+
 
 import {installORM} from "../orm/database";
 import {Models} from "../models";
@@ -18,6 +20,11 @@ import createEasyAccess from "vuex-easy-access";
 import createPersistedState from "vuex-persistedstate";
 import VTooltip from "v-tooltip";
 import vSelect from "vue-select";
+
+/** WEB FONT LOADER! */
+import WebFont from 'webfontloader'
+//import {WEBFONT_CONFIG} from "./settings";
+//WebFont.load(WEBFONT_CONFIG);
 
 
 
@@ -179,6 +186,15 @@ export const gVueUtils = {
         Vue['$gbtconfig'] =  mergedSettings
         Vue.prototype.$gbtconfig = mergedSettings
         console.important = importantConsoleLog;
+
+        /* * WEBFONT LOADER * */
+        const hasWebFontSettings = R.has('WEBFONT_CONFIG');
+
+        if ( hasWebFontSettings(mergedSettings) ){
+           const WEBFONT_CONFIG =  R.prop('WEBFONT_CONFIG', mergedSettings);
+            WebFont.load(WEBFONT_CONFIG);
+            console.warn("SETTINGGGGG "  , WEBFONT_CONFIG)
+        }
 
         var configArr  = toArray(mergedConfiguration)
         configArr.forEach(function(_config){

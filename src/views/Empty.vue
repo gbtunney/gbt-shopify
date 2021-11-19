@@ -12,10 +12,8 @@
                   :current="$data.image_index"
                   :enable-zoom="true"
                   :images='getSrcSet(Images)'
-                  :slider-options='{ "type": "slider",
-          "autoplay": false, "rewind": false,
-          "gap": 0   }'>
-                <template #thumbs="{ active: activeIndex, go }">
+                  :slider-options='{ "type": "slider","autoplay": false, "rewind": false,"gap": 0   }'>
+              <template #thumbs="{ active: activeIndex, go }">
                   <ProductImageGrid @mounted="setCallback(go)"
                       @changed="imageChanged($event, go , UpdateOption) "
                       option-handle="color"
@@ -27,10 +25,6 @@
             <div class="w-1/2">
               <!-- COLUMN 2 -->
               <div v-if="Product">{{ Product.title }}</div>
-         <div class="gill-svg  g-svg" :style="svg_css('#FF0000')">
-           <inline-svg  src="/svg/leaves-a.svg" fill="red"></inline-svg>
-         </div>
-
               <div
                   v-for="productOption,index in Options" v-bind:key="index"
                   class="product-option-wrapper m-8">
@@ -47,13 +41,12 @@
                     <div :class="[{ 'bg-primary-lt': isSelected }, {'cursor-default opacity-40': $isDisabled}]">
                   <span v-if="title" v-bind:style="{ background:hex_color }" style="height: 1.5em; width:auto;aspect-ratio: 1; " :class="(parent_handle != 'color')?'hidden':''" class=" border border-primary-dk  mr-8 ">
                             <img v-if='false' :src="thumbnail.getSrc(150)"/>
-                          </span>
-
+                  </span>
                       <span v-if="title" style="height: 2.5em; "
                           :class="(parent_handle != 'color')?'hidden':''"
                           :style="svg_css(hex_color)"
                           class="g-svg mr-8 ">
-                               <inline-svg src="/svg/leaves-a.svg" />
+                               <inline-svg src="/svg/leaves-a.svg"/>
                       </span>
 
                       <span v-if="title" :class="isSelected? 'font-bold text-white' : '' ">{{ title }}</span>
@@ -64,11 +57,8 @@
                   </template>
                 </v-select>
                 <hr>
-
               </div>
               <hr>
-
-
               <div v-if="SelectedVariant">
                 <v-select autocomplete="on"
                     v-if="Variants"
