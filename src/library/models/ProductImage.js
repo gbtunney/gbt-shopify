@@ -51,8 +51,8 @@ export class ProductImage extends Model {
     }
 
     /** Static  Methods  */
-    getSrc(_width = false, _height = false) {
-        return ShopifyMediaURL(this.src, _width, _height);
+    getSrc(...args) {
+        return ShopifyMediaURL(this.src, ...args);
     }
 }
 export default ProductImage
