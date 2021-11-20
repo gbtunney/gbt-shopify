@@ -1,6 +1,14 @@
 @use "sass:color";
 
 ////*******************
+///Tailwind Styles - apply list
+////*******************
+@mixin includeTailwindStyles($stylelist){  //todo: future maybbe try make theme conditional
+	@apply #{$stylelist};
+	@content;
+}
+
+////*******************
 ///LAYOUT - dimensions, positions
 ////*******************
 
@@ -161,6 +169,6 @@
 			height: auto;
 			width: 100%;
 			color: red;
-		}   
+		}
 	}
 }

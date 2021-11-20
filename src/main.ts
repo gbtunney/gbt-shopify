@@ -5,8 +5,12 @@ import Vuex from "vuex";
 
 import {gVueUtils} from "./library/plugin/gVueUtils.plugin";
 import store from './store'
-import './assets/tailwind.css'
+
+/* * STYLES * */
+import './library/styles/css/tailwind.css'
+import './library/styles/project/project.scss'
 import 'vue-select/dist/vue-select.css'
+
 import VTooltip from "v-tooltip";
 
 const LOGGING = true;
@@ -58,7 +62,7 @@ const app_config =
                 const formatter = new Intl.NumberFormat('en-US', {
                     style: 'currency',
                     currency: 'USD',
-                    minimumFractionDigits: 0
+                    minimumFractionDigits: 2
                 });
                 return formatter.format(value);
             }

@@ -73,7 +73,6 @@ const CUSTOM_BASE_COLORS = {
     '900': '#56675f'
   },
   "brandGrey": {
-    "lt": "#555555",
     "dk": "#585858",
   },
 }
@@ -155,7 +154,7 @@ const PLUGIN_CONFIG = {
     source: require('@tailwindcss/aspect-ratio'),
   },
   'css-variables': {
-    enabled: false,
+    enabled: true,
     source: require('tailwind-css-variables')(
         { /*modules*/}, {postcssEachVariables: true}
     )

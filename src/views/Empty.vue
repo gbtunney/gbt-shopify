@@ -24,7 +24,12 @@
             </div>
             <div class="w-1/2">
               <!-- COLUMN 2 -->
-              <div v-if="Product">{{ Product.title }}</div>
+              <gCSSSelector :targetEl="'.testSelector'">
+
+              </gCSSSelector>
+              <h1 class="font-style-sm-caps " v-if="Product">{{ Product.title }}</h1>
+              <g-s-v-g :css="'p-8 w-1/2'" :bg_color="'--color-gumleaf-600'" :color="'--color-corn-600'" path="/svg/divider.svg"></g-s-v-g>
+              <g-kabob height="2em" :css="'p-2 border-8 border-red-700 w-1/2'" :bg_color="'--color-gumleaf-600'" :color="'--color-primary'" path="/svg/divider.svg"></g-kabob>
               <div
                   v-for="productOption,index in Options" v-bind:key="index"
                   class="product-option-wrapper m-8">
@@ -38,22 +43,30 @@
                     :clearable=false>
                   <template #option="{title,thumbnail,isSelected,image,$isDisabled,hex_color,parent_handle} ">
                     <!-- class="flex font-secondary uppercase items-center text-lg flex-row h-full w-full p-2.5"-->
-                    <div :class="[{ 'bg-primary-lt': isSelected }, {'cursor-default opacity-40': $isDisabled}]">
-                  <span v-if="title" v-bind:style="{ background:hex_color }" style="height: 1.5em; width:auto;aspect-ratio: 1; " :class="(parent_handle != 'color')?'hidden':''" class=" border border-primary-dk  mr-8 ">
+                    <div :class="[{ 'bg-primary-lt': isSelected }, {'cursor-default opacity-40': $isDisabled}]"
+                          class="product_option ">
+<!--                  <span v-if="title" v-bind:style="{ background:hex_color }" style="height: 1.5em; width:auto;aspect-ratio: 1; " :class="(parent_handle != 'color')?'hidden':''" class=" border border-primary-dk  mr-8 ">
                             <img v-if='false' :src="thumbnail.getSrc(150)"/>
-                  </span>
-                      <span v-if="title" style="height: 2.5em; "
+                  </span>-->
+                      <span v-if="title"
                           :class="(parent_handle != 'color')?'hidden':''"
                           :style="svg_css(hex_color)"
-                          class="g-svg mr-8 ">
+                          class="g-svg h-full mr-8 ">
                                <inline-svg src="/svg/leaves-a.svg"/>
                       </span>
 
-                      <span v-if="title" :class="isSelected? 'font-bold text-white' : '' ">{{ title }}</span>
+                      <span
+                          v-if="title"
+                          :class="isSelected? 'font-bold text-white' : '' "
+                          class="font-style-sm-caps ">
+                        {{ title }}
+                      </span>
                     </div>
                   </template>
-                  <template #selected-option-container="{option, deselect, multiple, disabled }">
-                    <SfProperty :name="productOption.title" :value="option.title"/>
+                  <template #selected-option="{title }">
+                    <div class="font-style-sm-caps">
+                      <span class="font-bold  ">{{productOption.title}}</span> : <span>{{title}}</span>
+                    </div>
                   </template>
                 </v-select>
                 <hr>
@@ -96,12 +109,12 @@
                     :max="SelectedVariant.inventory_quantity"
                     @input="UpdateInstance({ quantity: $event},Instance)"/>
                 <h5 v-if="SelectedVariant">available units: {{ QuantityAvailable }}</h5>
-                <h6 class="text-red" v-if="QuantityAvailable <= 5">less than 5 available units: {{ QuantityAvailable }}</h6>
+                <h6 class="text-red-700 font-style-primary" v-if="QuantityAvailable <= 5">less than 5 available units: {{ QuantityAvailable }}</h6>
 
                 <SfButton
-                    class="color-primary"
+                    class="bg-accent-primary-dk text-light font-style-sm-caps text-3xl "
                     @click="addToCart"
-                >Add to Cart | {{ Instance.TotalPrice | toCurrency }}
+                >Add to Cart &#8226; {{ Instance.TotalPrice | toCurrency }}
                 </SfButton>
               </div>
 
@@ -114,10 +127,13 @@
 </template>
 <script>
 import {Product} from "../library/models";
+import InlineSvg from 'vue-inline-svg';
+import gKabob from "../library/components/ui/gKabob.vue"
 import ProductChild from '../library/components/product/ProductChild'
 import GroupInstance from '../library/components/product/GroupInstance'
-import TestingComponent from "./TestingComponent";
 import gUIColorFrame from '../library/components/ui/gUIColorFrame.vue'
+import gSVG from "../library/components/ui/gSVG.vue"
+
 import {
   SfProductOption,
   SfQuantitySelector,
@@ -126,20 +142,20 @@ import {
   SfIcon,
   SfGallery,
   SfImage,
-  SfColorPicker
+  SfColorPicker,
 } from "@storefront-ui/vue";
 
 import vSelect from 'vue-select'
 import ProductImageGrid from '@/library/components/images/ProductImageGrid.vue';
 import ProductImagePalattePicker from '@/library/components/images/ProductImagePalattePicker.vue';
-import InlineSvg from 'vue-inline-svg';
+import gCSSSelector from "../library/components/ui/gCSSSelector";
 
 export default {
   name: "App",
   components: {
+    gSVG,
     InlineSvg,
     gUIColorFrame,
-    TestingComponent,
     GroupInstance,
     SfQuantitySelector,
     SfProductOption,
@@ -149,7 +165,9 @@ export default {
     ProductImagePalattePicker,
     ProductImageGrid,
     SfGallery,
-    SfButton
+    SfButton,
+    gKabob,
+    gCSSSelector
   },
   data: function () {
     return {
@@ -170,6 +188,7 @@ export default {
     // this.$store.dispatch('entities/deleteAll')
     console.log("--------------------product", Product.all())
   },
+
   methods: {
     svg_css(_hex_color = '#FFFF00') {
       return {
@@ -211,12 +230,51 @@ export default {
 }
 </style>
 
-<style lang="scss" type="text/scss">
-
+<style lang="scss" type="text/scss" >
+@import "../../src/library/styles/scss/gMixins";
 .sf-gallery {
   --gallery-flex-direction: column;
   flex-direction: column-reverse;
-
 }
+.product_option{
+  $base-list: pr-7 pl-7 pt-3 pb-3  h-14 text-xl;
+  @include includeTailwindStyles($base-list);
+}
+
+.vs__dropdown-option--highlight  .product_option{
+  $base-list: bg-accent-primary text-light-lt;
+  @include includeTailwindStyles($base-list);
+}
+
+
+.vs__dropdown-option{
+  margin: 0;padding: 0;
+}
+.vs__dropdown-toggle{
+  //border on outside of option
+  $base-list: rounded-none border-primary-lt border;
+  @include includeTailwindStyles($base-list);
+}
+.product_option{
+  @include u-vcenter
+}
+
+/*
+.vs__dropdown-option--highlight {
+  background: $vs-state--bg;
+  color: $vs-state-active-color;
+}
+
+.vs__dropdown-option--deselect {
+  background: $vs-state-deselect-bg;
+  color: $vs-state-deselect-color;
+}
+
+.vs__dropdown-option--disabled {
+  background: inherit;
+  color: $vs-state-disabled-color;
+  cursor: inherit;
+}
+*/
 
 </style>

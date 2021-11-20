@@ -1,0 +1,25 @@
+@use "sass:list";
+
+@import '../scss/gMixins';
+
+.font-style-primary {
+	$font-key: font-primary;
+	$base-list: normal-case font-normal not-italic no-underline tracking-normal;
+	$var: list.append($base-list, $font-key);
+	@include includeTailwindStyles($var);
+}
+
+.font-style-sm-caps {
+	$font-key: font-secondary;
+	$base-list: uppercase font-normal not-italic no-underline tracking-normal leading-tight;
+	$var: list.append($base-list, $font-key);
+	@include includeTailwindStyles($var);
+}
+
+.full {
+	@include includeTailwindStyles(w-full h-full);
+}
+
+.auto {
+	@include includeTailwindStyles(w-auto h-auto);
+}
