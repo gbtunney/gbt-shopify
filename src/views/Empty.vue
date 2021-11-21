@@ -13,7 +13,7 @@
                   :enable-zoom="true"
                   :images='getSrcSet(Images)'
                   :slider-options='{ "type": "slider","autoplay": false, "rewind": false,"gap": 0   }'>
-              <template #thumbs="{ active: activeIndex, go }">
+                <template #thumbs="{ active: activeIndex, go }">
                   <ProductImageGrid @mounted="setCallback(go)"
                       @changed="imageChanged($event, go , UpdateOption) "
                       option-handle="color"
@@ -28,8 +28,15 @@
 
               </gCSSSelector>
               <h1 class="font-style-sm-caps " v-if="Product">{{ Product.title }}</h1>
-              <g-s-v-g :css="'p-8 w-1/2'" :bg_color="'--color-gumleaf-600'" :color="'--color-corn-600'" path="/svg/divider.svg"></g-s-v-g>
-              <g-kabob height="2em" :css="'p-2 border-8 border-red-700 w-1/2'" :bg_color="'--color-gumleaf-600'" :color="'--color-primary'" path="/svg/divider.svg"></g-kabob>
+<!--              <g-button  v-model="'true'" :color="'&#45;&#45;color-corn-900'" :border="8">
+                <div><h1>HEEE!!</h1>
+                  <g-s-v-g :css="'p-8 w-1/2'"   v-wrap:sibling.next="'gillian'"  :color="'&#45;&#45;color-corn-600'" path="/svg/divider.svg"></g-s-v-g>
+                </div>
+              </g-button>-->
+              <button  v-tw="{ 'div':'  .p-8  w-1/2','md:div':[' bg-accent-primary ' ]}">
+                <div>GILLIANNNNNNN</div>
+              </button>
+              <g-kabob height="2em" v-tw="' .p-8  w-1/2'" :css="'p-2 border-8  w-1/2'" :bg_color="'--color-gumleaf-600'" :color="'--color-primary'" path="/svg/divider.svg"></g-kabob>
               <div
                   v-for="productOption,index in Options" v-bind:key="index"
                   class="product-option-wrapper m-8">
@@ -43,11 +50,13 @@
                     :clearable=false>
                   <template #option="{title,thumbnail,isSelected,image,$isDisabled,hex_color,parent_handle} ">
                     <!-- class="flex font-secondary uppercase items-center text-lg flex-row h-full w-full p-2.5"-->
-                    <div :class="[{ 'bg-primary-lt': isSelected }, {'cursor-default opacity-40': $isDisabled}]"
-                          class="product_option ">
-<!--                  <span v-if="title" v-bind:style="{ background:hex_color }" style="height: 1.5em; width:auto;aspect-ratio: 1; " :class="(parent_handle != 'color')?'hidden':''" class=" border border-primary-dk  mr-8 ">
-                            <img v-if='false' :src="thumbnail.getSrc(150)"/>
-                  </span>-->
+                    <div :class="[
+                        { 'is_selected': isSelected },
+                        {'is_disabled': $isDisabled}]"
+                        class="product_option ">
+                <span v-if="false" v-bind:style="{ background:hex_color }" style="height: 1.5em; width:auto;aspect-ratio: 1; " :class="(parent_handle != 'color')?'hidden':''" class=" border border-primary-dk  mr-8 ">
+                            <img v-if='thumbnail' :src="thumbnail.getSrc(150)"/>
+                  </span>
                       <span v-if="title"
                           :class="(parent_handle != 'color')?'hidden':''"
                           :style="svg_css(hex_color)"
@@ -65,7 +74,7 @@
                   </template>
                   <template #selected-option="{title }">
                     <div class="font-style-sm-caps">
-                      <span class="font-bold  ">{{productOption.title}}</span> : <span>{{title}}</span>
+                      <span class="font-bold  ">{{ productOption.title }}</span> : <span>{{ title }}</span>
                     </div>
                   </template>
                 </v-select>
@@ -129,6 +138,7 @@
 import {Product} from "../library/models";
 import InlineSvg from 'vue-inline-svg';
 import gKabob from "../library/components/ui/gKabob.vue"
+import gButton from "../library/components/ui/gButton.vue"
 import ProductChild from '../library/components/product/ProductChild'
 import GroupInstance from '../library/components/product/GroupInstance'
 import gUIColorFrame from '../library/components/ui/gUIColorFrame.vue'
@@ -154,6 +164,7 @@ export default {
   name: "App",
   components: {
     gSVG,
+    gButton,
     InlineSvg,
     gUIColorFrame,
     GroupInstance,
@@ -223,58 +234,60 @@ export default {
   }
 }
 </script>
-<style type="text/css" lang="css" src="vue-select/dist/vue-select.css"></style>
+<style type="text/css" lang="css" src="vue-select/dist/vue-select.css"/>
 <style lang="postcss" type="text/css" scoped>
 .g-svg >>> path, .g-svg >>> rect, .g-svg >>> g, .g-svg >>> circle {
   fill: var(--fill-color);
 }
 </style>
-
-<style lang="scss" type="text/scss" >
+<style lang="scss" type="text/scss" scoped>
 @import "../../src/library/styles/scss/gMixins";
+
+.is_selected {
+  @include includeTailwindStyles(bg-primary-dk text-white);
+}
+
+.vs__dropdown-option--highlight .is_selected {
+  @include includeTailwindStyles( opacity-80 cursor-default);
+}
+
+.is_disabled {
+  @include includeTailwindStyles(bg-light-lt text-black cursor-default opacity-40);
+}
+</style>
+<style lang="scss" type="text/scss">
+@import "../../src/library/styles/scss/gMixins";
+
 .sf-gallery {
   --gallery-flex-direction: column;
   flex-direction: column-reverse;
 }
-.product_option{
-  $base-list: pr-7 pl-7 pt-3 pb-3  h-14 text-xl;
-  @include includeTailwindStyles($base-list);
+
+.vs__dropdown-option {
+  margin: 0;
+  padding: 0;
 }
 
-.vs__dropdown-option--highlight  .product_option{
-  $base-list: bg-accent-primary text-light-lt;
-  @include includeTailwindStyles($base-list);
-}
-
-
-.vs__dropdown-option{
-  margin: 0;padding: 0;
-}
-.vs__dropdown-toggle{
+//outside border
+.vs__dropdown-toggle {
   //border on outside of option
   $base-list: rounded-none border-primary-lt border;
   @include includeTailwindStyles($base-list);
 }
-.product_option{
-  @include u-vcenter
+
+.product_option {
+  $base-list: pr-7 pl-7 pt-3 pb-3 h-14 text-xl;
+  @include includeTailwindStyles($base-list);
+  @include u-vcenter;
 }
 
-/*
 .vs__dropdown-option--highlight {
-  background: $vs-state--bg;
-  color: $vs-state-active-color;
-}
+  background-color: transparent !important;
 
-.vs__dropdown-option--deselect {
-  background: $vs-state-deselect-bg;
-  color: $vs-state-deselect-color;
+  .product_option {
+    $base-list: bg-accent-primary text-light-lt;
+    @include includeTailwindStyles($base-list);
+  }
 }
-
-.vs__dropdown-option--disabled {
-  background: inherit;
-  color: $vs-state-disabled-color;
-  cursor: inherit;
-}
-*/
 
 </style>

@@ -24,6 +24,7 @@ import Vuetify, {
     VDataTable,
 } from 'vuetify/lib'
 
+import {vWrap,vTW} from './library/directives/vWrap.js'
 Vue.use(Vuetify, {
     components: {
         VApp,
@@ -69,13 +70,8 @@ const app_config =
         },
         mixin: {},
         directive: {
-            'pin': {
-                bind: function (el, binding, vnode) {
-                    el.style.background = 'blue'
-                    el.style.position = 'fixed'
-                    el.style.top = binding.value + 'px'
-                }
-            }
+            'wrap': vWrap,
+            'tw': vTW
         },
         component: {},
         use: {

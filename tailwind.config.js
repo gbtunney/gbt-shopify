@@ -74,7 +74,21 @@ const CUSTOM_BASE_COLORS = {
   },
   "brandGrey": {
     "dk": "#585858",
+    "DEFAULT": '#7f7f7f',
+    "lt": "#b0b0b0",
   },
+  "white":{
+    "DEFAULT":'#FFFFFF'
+  },
+  "grey":{
+    "DEFAULT":'#7f7f7f'
+  },
+  "black":{
+    "DEFAULT":'#000000'
+  },
+  "transparent":{
+    "DEFAULT":'transparent'
+  }
 }
 
 ///**** PROJECT CUSTOM (BRAND) COLORS **** use base values to reference ***///
@@ -104,7 +118,7 @@ const CUSTOM_THEME_COLORS = {
   },
   "primary": {
     "lt": getColor('brandGrey', 'lt'),
-    "DEFAULT": getColor('brandGrey', 'dk'),
+    "DEFAULT": getColor('brandGrey', 'DEFAULT'),
     "dk": getColor('brandGrey', 'dk'),
   },
 }
