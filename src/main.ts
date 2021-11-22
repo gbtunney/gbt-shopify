@@ -24,7 +24,7 @@ import Vuetify, {
     VDataTable,
 } from 'vuetify/lib'
 
-import {vWrap,vTW} from './library/directives/vWrap.js'
+import {vWrap,vTW} from './library/directives'
 Vue.use(Vuetify, {
     components: {
         VApp,

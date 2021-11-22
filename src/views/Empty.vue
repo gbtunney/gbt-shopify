@@ -33,10 +33,11 @@
                   <g-s-v-g :css="'p-8 w-1/2'"   v-wrap:sibling.next="'gillian'"  :color="'&#45;&#45;color-corn-600'" path="/svg/divider.svg"></g-s-v-g>
                 </div>
               </g-button>-->
-              <button  v-tw="{ 'div':'  .p-8  w-1/2','md:div':[' bg-accent-primary ' ]}">
+              <button  v-tw:classes="'.p-8 xl:div.bg-accent-primary  p-12  abc:border-8 '" v-tw:children.lg="[{ 'div' : '.p-8 .bg-accent-secondary  text-3xl border-8 '},{'.icon' : 'bg-white border-2'} ]">
                 <div>GILLIANNNNNNN</div>
+                <span class="icon">gilliannn</span>
               </button>
-              <g-kabob height="2em" v-tw="' .p-8  w-1/2'" :css="'p-2 border-8  w-1/2'" :bg_color="'--color-gumleaf-600'" :color="'--color-primary'" path="/svg/divider.svg"></g-kabob>
+              <g-kabob height="2em" v-tw:classes.md="' .p-8  w-1/2'" :css="'p-2 border-8  w-1/2'" :bg_color="'--color-gumleaf-600'" :color="'--color-primary'" path="/svg/divider.svg"></g-kabob>
               <div
                   v-for="productOption,index in Options" v-bind:key="index"
                   class="product-option-wrapper m-8">
