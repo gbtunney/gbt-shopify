@@ -3,12 +3,11 @@ import VuexORM from "@vuex-orm/core";
 import VuexORMAxios from "@vuex-orm/plugin-axios";
 import VuexORMisDirtyPlugin from '@vuex-orm/plugin-change-flags';
 import VuexORMSearch from "@vuex-orm/plugin-search";
+import {installORM} from "../orm/database";
 import Vue from 'vue'
 
-const R = window.R;
+const R = window.R; //ramda
 
-
-import {installORM} from "../orm/database";
 import {Models} from "../models";
 import moduleProductLoader from '../modules/moduleProductLoader'
 //import {moduleLoadStatus} from '../modules/moduleLoadStatus'
@@ -18,15 +17,13 @@ import {importantConsoleLog, toArray} from "./../scripts/generic";
 import {getVuexModules, getVuexPlugins,registerConfig} from "../scripts/vuehelpers";
 import createEasyAccess from "vuex-easy-access";
 import createPersistedState from "vuex-persistedstate";
+import faker from "faker"
 import VTooltip from "v-tooltip";
 import vSelect from "vue-select";
 
+
 /** WEB FONT LOADER! */
 import WebFont from 'webfontloader'
-//import {WEBFONT_CONFIG} from "./settings";
-//WebFont.load(WEBFONT_CONFIG);
-
-
 
 const base_app_config =
     {
@@ -71,6 +68,7 @@ const base_app_config =
 
 const BASE_CONFIG = { // base non-project stuff.
     "SID_LENGTH" :  10000000000,
+    "FAKER" :  true, ///adds faker like $faker
     "LOAD_MODE":  ['LOAD_ALL', 'LOAD_HANDLE_ALWAYS', 'LOAD_HANDLE_NOT_IN_DATABASE', 'LOAD_NEVER'],
     "MINIMUM_QUANTITY" : 1,
     "LOCAL_STORAGE_KEY" : "vuex_no_name",
@@ -180,27 +178,33 @@ export const gVueUtils = {
 
         const { settings={} , config ={}  } =options;
 
-
-        const mergedSettings = {...BASE_CONFIG,...settings}
         const mergedConfiguration = {...base_app_config,...config}
+
+        /* * Settings init * */
+        const mergedSettings = {...BASE_CONFIG,...settings}
+
         Vue['$gbtconfig'] =  mergedSettings
         Vue.prototype.$gbtconfig = mergedSettings
         console.important = importantConsoleLog;
 
-        /* * WEBFONT LOADER * */
-        const hasWebFontSettings = R.has('WEBFONT_CONFIG');
-
-        if ( hasWebFontSettings(mergedSettings) ){
-           const WEBFONT_CONFIG =  R.prop('WEBFONT_CONFIG', mergedSettings);
-            WebFont.load(WEBFONT_CONFIG);
-            console.warn("SETTINGGGGG "  , WEBFONT_CONFIG)
+        /* * Faker * */
+       // FAKER
+        if ( R.has('FAKER')(mergedSettings) ){
+            console.log("faker:  ",faker.internet.email())
+            Vue['$faker'] =  faker
+            Vue.prototype.$faker = mergedSettings
         }
 
-        var configArr  = toArray(mergedConfiguration)
-        configArr.forEach(function(_config){
+        /* * WEBFONT LOADER * */
+        if ( R.has('WEBFONT_CONFIG')(mergedSettings) )WebFont.load(R.prop('WEBFONT_CONFIG', mergedSettings));
+
+        /* * Custom CONFIGURATION Initializing * */
+        toArray(mergedConfiguration).forEach(function(_config){
             console.log("settings !!!!!!", _config)
             registerConfig(_config)
         })
+
+        //todo: move thhis
         const ormplugins = {
             register: VuexORM, /// class like Vuex, VuexORM , Vue,
                 enabled: true,
@@ -233,7 +237,6 @@ export const gVueUtils = {
         }
 
         registerConfig(ormplugins)
-
     },
     register( _config ){
         registerConfig(_config)
@@ -242,6 +245,8 @@ export const gVueUtils = {
 export const getAppVuexModules =  function(flags={},_settings){
    return getVuexModules(vuexConfigModules)
 }
+
+///what is thihs?????????//
 export const  getAppVuexPlugins = function(flags={},_settings=BASE_CONFIG){
    let _plugins=  {
        plugins: {

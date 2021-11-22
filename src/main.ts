@@ -12,6 +12,7 @@ import './library/styles/project/project.scss'
 import 'vue-select/dist/vue-select.css'
 
 import VTooltip from "v-tooltip";
+import {vWrap, vTW, vFaker} from './library/directives'
 
 const LOGGING = true;
 Vue.config.productionTip = false
@@ -24,7 +25,6 @@ import Vuetify, {
     VDataTable,
 } from 'vuetify/lib'
 
-import {vWrap,vTW} from './library/directives'
 Vue.use(Vuetify, {
     components: {
         VApp,
@@ -71,7 +71,8 @@ const app_config =
         mixin: {},
         directive: {
             'wrap': vWrap,
-            'tw': vTW
+            'tw': vTW,
+            'faker': vFaker
         },
         component: {},
         use: {
