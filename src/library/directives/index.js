@@ -35,23 +35,48 @@ export const vWrap = {
 export default vWrap;
 
 export const vTW = {
-    bind: function (el, binding, vnode) {
+    update: function (el, binding, vnode) {
         const _el = el
 
+       // console.log("directive  updated!!!!!!", el,binding)
         //********UID
         const rootSelector = `v-tw-${randomInt(10, 15000)}`;
 
         ///*****root element
-        let dataObbject = {[binding.arg]: (binding.value) ? binding.value : false};
+        let dataObject = {}
+        if ( !binding.arg && binding.value && RA.isObject(binding.value)){
+            dataObject =binding.value;
+        }else if(binding.arg){
+            dataObject=   {[binding.arg]: (binding.value) ? binding.value : false};
+        }
+        console.log("dataobject  updated!!!!!!", dataObject)
+
+
         const [variant = false] = Array.from(Object.keys(binding.modifiers));
-        const classes = (dataObbject.cxlasses) ? dataObbject.classes : false;
+        const classes = (dataObject.classes) ? dataObject.classes : false;
 
         ///*****apply classes to root element
         const classestoDom = explodeClassesString(classes, variant)
         _el.classList.add(rootSelector, ...classestoDom)
 
+        ///*****parent argument
+        const parentclasses  =  explodeClassesString((dataObject.parent) ? dataObject.parent : false, variant)
+        const parent_uid = `${rootSelector}-parent`;
+        //hack
+        vnode.context.$nextTick(() => {
+            vnode.elm.parentElement.classList.add(parent_uid, ...parentclasses)
+        });
+
+        //todo: make this work w all siblings
+        ///*****siblings argument
+        const siblingclasses  =  explodeClassesString((dataObject.sibling) ? dataObject.sibling : false, variant)
+        const sibling_uid = `${rootSelector}-sibling`;
+        vnode.context.$nextTick(() => {
+            vnode.elm.nextElementSibling.classList.add(sibling_uid, ...siblingclasses)
+        });
+
         ///*****get classes to children arg
-        const children = (dataObbject.children) ? dataObbject.children : [];
+        const children = (dataObject.children) ? dataObject.children : [];
         var temp = children.forEach(function (item) {
             const key = (Object.keys(item).length > 0) ? Object.keys(item)[0] : false;
             const classes_child = explodeClassesString((Object.values(item).length > 0) ? Object.values(item)[0] : false, variant)
@@ -66,7 +91,7 @@ export const vTW = {
 }
 
 const trimCharsBlacklist = ['.', "'", '"', ' ', '-', "[", "]", "(", ")"]
-const regexpExplodeClases = new RegExp(/[ x,]+/) ///spliter
+const regexpExplodeClases = new RegExp(/[ ,]+/) ///spliter
 
 //keep
 export const outertrimFunc = function (string) {

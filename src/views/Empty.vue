@@ -13,28 +13,32 @@
                   :enable-zoom="true"
                   :images='getSrcSet(Images)'
                   :slider-options='{ "type": "slider","autoplay": false, "rewind": false,"gap": 0   }'>
-                <template #thumbs="{ active: activeIndex, go }">
+                <templapte #thumbs="{ active: activeIndex, go }">
                   <ProductImageGrid @mounted="setCallback(go)"
                       @changed="imageChanged($event, go , UpdateOption) "
                       option-handle="color"
                       :images="Images">
                   </ProductImageGrid>
-                </template>
+                </templapte>
               </SfGallery>
             </div>
             <div class="w-1/2">
               <!-- COLUMN 2 -->
-              <gCSSSelector :targetEl="'.testSelector'">
+              <gCSSSelectorNew @change="_updated" :targetEl="'.testSelector'">
 
-              </gCSSSelector>
+              </gCSSSelectorNew>
+              <button class="testprops butoon!!!!!!!!!!" v-tw="selectorTest">
+                <div>TCSS est button!!!!!!</div>
+                <span class="icon">gilliannn</span>
+              </button>
               <h1 class="font-style-sm-caps " v-if="Product">{{ Product.title }}</h1>
-<!--              <g-button  v-model="'true'" :color="'&#45;&#45;color-corn-900'" :border="8">
-                <div><h1>HEEE!!</h1>
-                  <g-s-v-g :css="'p-8 w-1/2'"   v-wrap:sibling.next="'gillian'"  :color="'&#45;&#45;color-corn-600'" path="/svg/divider.svg"></g-s-v-g>
-                </div>
-              </g-button>-->
-              <button  v-tw:classes="'.p-8 xl:div.bg-accent-primary  p-12  abc:border-8 '" v-tw:children.lg="[{ 'div' : '.p-8 .bg-accent-secondary  text-3xl border-8 '},{'.icon' : 'bg-white border-2'} ]">
-                <div>GILLIANNNNNNN</div>
+              <!--              <g-button  v-model="'true'" :color="'&#45;&#45;color-corn-900'" :border="8">
+                              <div><h1>HEEE!!</h1>
+                                <g-s-v-g :css="'p-8 w-1/2'"   v-wrap:sibling.next="'gillian'"  :color="'&#45;&#45;color-corn-600'" path="/svg/divider.svg"></g-s-v-g>
+                              </div>
+                            </g-button>-->
+              <button v-tw:classes="'.p-8 xl:div.bg-accent-primary  p-12  abc:border-8 '" v-tw:sibling="'p-8 border-8 bg-dark'" v-tw:children.lg="[{ 'div' : '.p-8 .bg-accent-secondary  text-3xl border-8 '},{'.icon' : 'bg-white border-2'} ]">
+                <div>SIBLING TESTOR</div>
                 <span class="icon">gilliannn</span>
               </button>
               <g-kabob height="2em" v-tw:classes.md="' .p-8  w-1/2'" :css="'p-2 border-8  w-1/2'" :bg_color="'--color-gumleaf-600'" :color="'--color-primary'" path="/svg/divider.svg"></g-kabob>
@@ -159,7 +163,7 @@ import {
 import vSelect from 'vue-select'
 import ProductImageGrid from '@/library/components/images/ProductImageGrid.vue';
 import ProductImagePalattePicker from '@/library/components/images/ProductImagePalattePicker.vue';
-import gCSSSelector from "../library/components/ui/gCSSSelector";
+import gCSSSelectorNew from "../library/components/ui/gCSSSelectorNew.vue";
 
 export default {
   name: "App",
@@ -179,13 +183,14 @@ export default {
     SfGallery,
     SfButton,
     gKabob,
-    gCSSSelector
+    gCSSSelectorNew
   },
   data: function () {
     return {
       colorselection: false,
       image_index: 1,
-      glide: false
+      glide: false,
+      selectorTest: false
     }
   },
   props: {},
@@ -202,6 +207,10 @@ export default {
   },
 
   methods: {
+    _updated(styleArr) {
+      console.log("-------updated!!!t", styleArr)
+      this.$data.selectorTest = styleArr;
+    },
     svg_css(_hex_color = '#FFFF00') {
       return {
         '--fill-color': _hex_color,
@@ -249,7 +258,7 @@ export default {
 }
 
 .vs__dropdown-option--highlight .is_selected {
-  @include includeTailwindStyles( opacity-80 cursor-default);
+  @include includeTailwindStyles(opacity-80 cursor-default);
 }
 
 .is_disabled {
