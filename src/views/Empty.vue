@@ -29,9 +29,12 @@
                 <h1>NEW</h1>
                 <hr>
                 <button style="border-color: blueviolet" class="border-8"> Element 1 </button>
-                <button v-wrap.siblings="'border-8 bg-accent-primary'" style="border-color: blueviolet" > Element 2 </button>
+                <button v-wrap.span.2="'border-8 bg-accent-primary'" style="border-color: blueviolet" > Element 2 </button>
                 <button style="border-color: blueviolet"> Element 3 </button>
                 <button style="border-color: pink" > Element 4 </button>
+                <button style="border-color: pink" > Element 5 </button>
+  `                <button style="border-color: pink" > Element 6 </button>
+
               </div>
 
 

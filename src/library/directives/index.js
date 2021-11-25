@@ -6,7 +6,7 @@ const R = window.R
 const RA = window.RA
 import {contains, sentenceCase, trim} from '../scripts/stringUtils'
 import {wrapAll} from '../scripts/dom-utils'
-import {convToArray, outertrimFunc, toInteger} from "../scripts/generic";
+import {convToArray, isInteger, outertrimFunc, toInteger} from "../scripts/generic";
 
 export const vFaker = {
     bind: function (el, binding, vnode) {
@@ -40,82 +40,84 @@ const formatString = function (str, format = false) {
     else if (format == 'lowercase') return String(str).toLowerCase();
     return str
 }
-
-const wrapNodes = function (elArray = [], parentClasses = false, element = 'div', remove = true) {
+const createNewElement = function (_attr = {}, _classes = false, el = 'div') {
+    const newEl = document.createElement(el);
+    Object.entries(_attr).forEach(function ([key, value]) {
+        newEl.setAttribute(key, value)
+    })
+    if (_classes && _classes.length > 0) newEl.classList.add(..._classes)
+    return newEl
+}
+const wrapChildren = function (elArray, ...args) {
     if (!elArray || elArray.length == 0) return
-
-    const _remove = remove;
-    const newDiv = document.createElement(element);
+    const newEl = createNewElement(...args)
     const [firstElement] = elArray
     const parentfirstEl = firstElement.parentElement;
-    if (parentClasses) newDiv.classList.add(...parentClasses);
-
     elArray.forEach(el => {
-        newDiv.appendChild(el.cloneNode(true))
+        newEl.appendChild(el.cloneNode(true))
     })
-
-    parentfirstEl.insertBefore(newDiv, firstElement)
-
+    parentfirstEl.insertBefore(newEl, firstElement)
     elArray.forEach(el => {
-        if (_remove) el.remove()
+        el.remove()
     })
-
+    return newEl;
 }
 
-/* let allSiblings = []
-              document.querySelectorAll(`.${parentSelector} > * `).forEach(el => {
-                  if ( el != _el ){
-                      allSiblings.push( el );
-                  }
-                  //  el.classList.add(uid, ...classes_child)
-              })*/
 export const vWrap = {
     bind: function (el, binding, vnode) {
         const _el = el
-        let dataObject = {}
-        if (!binding.arg && binding.value && RA.isObject(binding.value)) {
-            dataObject = binding.value;
-        } else if (binding.arg) {
-            dataObject = {[binding.arg]: (binding.value) ? binding.value : false};
-        } else if (R.is(String, binding.value)) {
-            dataObject = {classes: binding.value}
-        }
-        const [variant = false] = Array.from(Object.keys(binding.modifiers));
-
-        ///*****explode parent classes
-        const parentClassesAddl = explodeClassesString((dataObject.classes) ? dataObject.classes : false)
-        const defaultel = (dataObject.el) ? dataObject.el : 'div'
-        const limit = (dataObject.limit) ? toInteger(dataObject.limit) : false
-        const removeElements = true;
-
+        const UID = randomInt(10, 15000)
         //********UID
-        const rootSelectorUID = `v-wrap-${randomInt(10, 15000)}`;
-        _el.classList.add(rootSelectorUID)
+        const rootClass = `v-wrap-${UID}`;
+        _el.classList.add(rootClass)
 
-        const parentSelector = `${rootSelectorUID}-parent`//`v-wrap-${randomInt(10, 15000)}`
-        const siblingClassesNext = `${rootSelectorUID}-sibling`//`v-wrap-${randomInt(10, 15000)}`
-        //  const siblingSelectorPrev=  `${rootSelectorUID}-prevsibling`//`v-wrap-${randomInt(10, 15000)}`
+        const parentUIDClass = `${rootClass}-parent`//`v-wrap-${randomInt(10, 15000)}`
+        const siblingUIDClass = `${rootClass}-sibling`//`v-wrap-${randomInt(10, 15000)}`
 
-        const parentSelArr = (parentClassesAddl && parentClassesAddl.length > 0) ? [parentSelector, ...parentClassesAddl] : [parentSelector]
+        ///ASSIGN DATAOBJJECT
+        let dataObject = {'data-wrap-id': UID};
+        if (binding.value && RA.isObject(binding.value)) {
+            dataObject = {...dataObject, ...binding.value}
+        } else if (binding.arg && RA.isString(binding.value)) {
+            dataObject = {...dataObject, [binding.arg]: binding.value}
+        } else if (RA.isString(binding.value)) {
+            dataObject = {...dataObject, class: binding.value}
+        }
+        let parentClasses = explodeClassesString((dataObject.class) ? dataObject.class : false)
+        dataObject = R.omit(['class'], dataObject)
+        dataObject = {...dataObject, class: parentUIDClass}
 
-        vnode.context.$nextTick(() => {
-            //add parent class.
-            if (_el.parentElement) {
-                //  _el.parentElement.classList.add(parentSelector)
+        ///ASSIGN MODIFIERS
+        let modifiers = {
+            el: 'div',
+            siblings: false,
+            limit: false
+        }
+        Array.from(Object.keys(binding.modifiers)).forEach(function (modifier) {
+            if (isInteger(modifier)) {
+                modifiers = {...modifiers, siblings: true, limit: toInteger(modifier)}
+            } else if (modifier == "*") {
+                modifiers = {...modifiers, siblings: true, limit: false}
+            } else if (RA.isString(modifier)) {
+                modifiers = {...modifiers, el: modifier}
             }
-            const sibs = Array.from(document.querySelectorAll(`.${rootSelectorUID} ~ * `))
-            sibs.forEach(el => {
-                el.classList.add(siblingClassesNext)
-            })
-
-            const elArr = (variant == 'siblings') ?
-                [_el, ...(limit === false) ? sibs : sibs.slice(0, limit)]
-                : [_el]
-            console.warn("direct sibling!@!!!!", parentSelArr, elArr, limit)
-            wrapNodes(elArr, parentSelArr)
+        })
+        let childArray = [_el]
+        vnode.context.$nextTick(() => {
+            if (modifiers.siblings) {
+                let sibs = Array.from(document.querySelectorAll(`.${rootClass} ~ * `))
+                if (modifiers.limit !== false) sibs = sibs.slice(0, modifiers.limit)
+                sibs.forEach(el => {
+                    el.classList.add(siblingUIDClass)
+                })
+                if (sibs && sibs.length > 0) childArray = [...childArray, ...sibs]
+            }
+            const testel = wrapChildren(childArray, dataObject, parentClasses, modifiers.el)
+            console.warn("VWRAP CALLED!!!!!!!! ", testel)
         });
     }
 }
+
 export default vWrap;
 
 //todo: add remove classes maybe??
