@@ -3,8 +3,10 @@
     <h2>CSS Selectors</h2>
     <textarea v-model="StyleString" rows="4" cols="50"/>
     <v-select
-        :options="Selectors"
+        :options="$options.GetSelectors()"
         multiple
+        :filterable="false"
+        :noDrop="true"
         v-model="value"
         @option:selected="_updateStyle"
         @option:deselected="_updateStyle($event,false )"/>
@@ -17,6 +19,7 @@
 import selectors from '@/assets/selectors.json'
 import vSelect from 'vue-select'
 
+const R =window.R
 export default {
   name: "gCSSSelector222",
   components: {vSelect},
@@ -29,7 +32,12 @@ export default {
   },
   data: function () {
     return {value: false,
-      childselector: false }
+      childselector: false,
+      _selectors : Object.freeze( R.take(2000, selectors.simpleSelectors.classes))
+    }
+  },
+  GetSelectors (){
+   return Object.freeze( selectors.simpleSelectors.classes)
   },
   methods: {
     cleanClassname(_classname) {
@@ -95,7 +103,8 @@ export default {
   },
   computed: {
     Selectors: function () {
-      return selectors.simpleSelectors.classes
+      console.log("FROZEN!!!!!!!!!!!!!!!!!!!",Object.freeze( selectors.simpleSelectors.classes) )
+      return Object.freeze( selectors.simpleSelectors.classes)
     },
     StyleArr: function () {
       if (!this.$data.value) return

@@ -24,22 +24,28 @@
             </div>
             <div class="w-1/2">
               <!-- COLUMN 2 -->
+
+              <div>
+                <h1>NEW</h1>
+                <hr>
+                <button style="border-color: blueviolet" class="border-8"> Element 1 </button>
+                <button v-wrap.siblings="'border-8 bg-accent-primary'" style="border-color: blueviolet" > Element 2 </button>
+                <button style="border-color: blueviolet"> Element 3 </button>
+                <button style="border-color: pink" > Element 4 </button>
+              </div>
+
+
               <gCSSSelectorNew @change="_updated" :targetEl="'.testSelector'">
 
               </gCSSSelectorNew>
               <button class="testprops butoon!!!!!!!!!!" v-tw="selectorTest">
                 <div>TCSS est button!!!!!!</div>
-                <span class="icon">gilliannn</span>
+                <span v-faker:internet.uppercase="'email'" class="icon">gilliannn</span>
               </button>
               <h1 class="font-style-sm-caps " v-if="Product">{{ Product.title }}</h1>
-              <!--              <g-button  v-model="'true'" :color="'&#45;&#45;color-corn-900'" :border="8">
-                              <div><h1>HEEE!!</h1>
-                                <g-s-v-g :css="'p-8 w-1/2'"   v-wrap:sibling.next="'gillian'"  :color="'&#45;&#45;color-corn-600'" path="/svg/divider.svg"></g-s-v-g>
-                              </div>
-                            </g-button>-->
               <button v-tw:classes="'.p-8 xl:div.bg-accent-primary  p-12  abc:border-8 '" v-tw:sibling="'p-8 border-8 bg-dark'" v-tw:children.lg="[{ 'div' : '.p-8 .bg-accent-secondary  text-3xl border-8 '},{'.icon' : 'bg-white border-2'} ]">
-                <div>SIBLING TESTOR</div>
-                <span class="icon">gilliannn</span>
+                <div v-faker:f="'manufacturer'" />
+                <span v-faker:ss.uppercase  class="icon">gilliannn</span>
               </button>
               <g-kabob height="2em" v-tw:classes.md="' .p-8  w-1/2'" :css="'p-2 border-8  w-1/2'" :bg_color="'--color-gumleaf-600'" :color="'--color-primary'" path="/svg/divider.svg"></g-kabob>
               <div

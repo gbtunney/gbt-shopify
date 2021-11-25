@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 import * as RA from 'ramda-adjunct'
+//import {convToArray} from "../directives";
 
 window.R = R;
 window.RA = RA
@@ -76,6 +77,19 @@ export function toArray(value) {
     if (R.is(Array, value)) return value
     return false;
 }
+
+//todo: combine with above
+//like above but sets (? non obeject to one item array?)
+export const convToArray = function (value) {
+    return [...[value]]
+}
+
+const trimCharsBlacklistDefault = ['.', "'", '"', ' ', '-', "[", "]", "(", ")"]
+
+export const outertrimFunc = function (value, _blacklistCharsArr = trimCharsBlacklistDefault) {
+    return R.trim(RA.trimCharsEnd(_blacklistCharsArr, RA.trimCharsStart(_blacklistCharsArr, (value).toString())))
+}
+
 
 /**
  * Rename multiple keys of an object at once
