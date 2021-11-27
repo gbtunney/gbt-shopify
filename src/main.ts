@@ -2,6 +2,8 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import Vuex from "vuex";
+import Clipboard from 'v-clipboard'
+
 
 import {gVueUtils} from "./library/plugin/gVueUtils.plugin";
 import store from './store'
@@ -76,6 +78,11 @@ const app_config =
         },
         component: {},
         use: {
+            "v-clipboard":{
+                enabled: true,
+
+                params: Clipboard
+            },
             "v-tooltip": {
                 enabled: true,
                 params: VTooltip

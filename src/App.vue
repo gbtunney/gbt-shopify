@@ -8,6 +8,7 @@
       <router-link to="/colors">ColorPlayground</router-link>|
       <router-link to="/group">Product Group</router-link>|
       <router-link to="/empty">empty</router-link> |
+      <router-link to="/directive">directive</router-link> |
 
       <button class="border border-red" @click="$store.dispatch('entities/deleteAll')" >
         DELETE ALL ORM STORE!!!!
