@@ -12,6 +12,8 @@ import {Models} from "../models";
 import moduleProductLoader from '../modules/moduleProductLoader'
 //import {moduleLoadStatus} from '../modules/moduleLoadStatus'
 import ormmodule from "../modules/ormmodule";
+import modulePageStyler from "../modules/modulePageStyler";
+
 //import {moduleShopify} from "../modules/moduleShopify";
 import {importantConsoleLog, toArray} from "./../scripts/generic";
 import {getVuexModules, getVuexPlugins,registerConfig} from "../scripts/vuehelpers";
@@ -153,6 +155,13 @@ const Editable_Defaults = {
 const vuexConfigModules  =
 {
     modules: [
+        {
+            enabled: true,
+
+            module:{
+             page_styler2: modulePageStyler
+          }
+        },
         {
             enabled: true,
             module: {

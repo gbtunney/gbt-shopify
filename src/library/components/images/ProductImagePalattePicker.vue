@@ -8,14 +8,16 @@
                 :src="image.getSrc($props.image_size)"
                 :alt="image.title"
                 class="object-cover hover:cursor-pointer w-full h-full">
+            <input type="text" :value="getColorStory(image)" v-on:keyup.enter="updateInstance({ meta: $event.target._value},getLinkedOptionValue(image))">
             <div>Working Option :: {{ getImageTitle(image) }}</div>
             <div v-bind:style="{ background: getOptionHex(image) }">{{ getOptionHex(image) }}</div>
-            <gVibrantJS class="w-1/2" @changed="updateInstance({ hex_color: $event},getLinkedOptionValue(image))" :img_url="image.getSrc($props.image_size)">
-            </gVibrantJS>
+            <gVibrantJS class="w-1/2" @changed="updateInstance({ hex_color: $event},getLinkedOptionValue(image))" :img_url="image.getSrc($props.image_size)"/>
           </div>
         </slot>
       </div>
-      <h1>Option dump</h1>
+      <button v-text="'Option dump copy to cliboard'" ref="clipboardbbtn"
+          class="bg-accent-secondary-dk text-accent-primary-lt p-1 m-1 uppercase hover:bg-corn-50 hover:border-accent-secondary-dk hover:text-accent-secondary-dk border-2 border-solid uppercase"
+          @click="$clipboard(OptionValueDump)"/>
     </div>
     <code>
       {{ OptionValueDump }}
@@ -38,6 +40,7 @@ export default {
   data: function () {
     return {
       image_array: [],
+      color_story: [],
       test: "gilliansslklkjlkl"
     }
   },
@@ -109,14 +112,19 @@ export default {
     })
        */
     },
-     updateInstance(_data) {
+     updateInstance(_data, _option) {
+      console.log("UPDATED!!!!!!!!!!!!!!!!!!!!", _data,_option)
      // const _linked = this.getLinkedOptionValue(image)
       const response =  ProductOptionValue.update({
-        where: [_data["product_id"], _data["handle"]],
+        where: [_option["product_id"], _option["handle"]],
         data: _data
       })
       //this.$emit('changed', this.Instance, response)
       return response
+    },
+    getColorStory(image) {
+      const _linked = this.getLinkedOptionValue(image);
+      if (_linked && _linked.meta) return _linked.meta;
     },
     getImageTitle(image) {
       const _linked = this.getLinkedOptionValue(image);
@@ -142,7 +150,7 @@ export default {
       if (!this.$props.product) return
       var valuelist = this.$props.product.getOptionValueList('color')
       return valuelist.map(function (item) {
-        return cloneObject(item.$toJson(), 'pick', ["handle", "hex_color"])
+        return cloneObject(item.$toJson(), 'pick', ["handle", "meta","hex_color"])
       })
     },
     Images: function () {
