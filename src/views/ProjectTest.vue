@@ -4,7 +4,7 @@
   </div>
 </template>
 <script>
-import Cart, {ProductGroupBase} from "../library/models/Cart";
+import Cart, {ProductGroupBase} from "../library/models";
 import ProductInstanceSingle from "../library/models/ProductInstance";
 
 export default {
@@ -28,3 +28,4 @@ export default {
   props: {}
 }
 </script>
+

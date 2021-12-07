@@ -60,7 +60,7 @@
 import {Product, ProductOptionValue} from "../library/models";
 import vSelect from 'vue-select'
 import {Slider, Chrome} from 'vue-color'
-import gCSSSelector from '../library/components/ui/gCSSSelector.vue'
+import gCSSSelector from '../library/components/ui/gCSSSelectorV3.vue'
 import gUIColorFrame from '../library/components/ui/gUIColorFrame.vue'
 
 import {VDataTable} from 'vuetify/lib'

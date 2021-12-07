@@ -4,40 +4,18 @@ import Vue from 'vue'
 import Vuex from "vuex";
 import Clipboard from 'v-clipboard'
 
-
-//import {gVueUtils} from "./library/plugin/gVueUtils.plugin";
-//import store from './store'
-
-/* * STYLES * */
-//import './library/styles/css/tailwind.css'
-//import './library/styles/project/project.scss'
 import 'vue-select/dist/vue-select.css'
 
 import VTooltip from "v-tooltip";
-import {vWrap, vTW, vFaker} from './library/directives'
+import {vWrap, vTW, vFaker} from '../directives'
 
 const LOGGING = true;
-Vue.config.productionTip = false
-Vue.use(Vuex)
-console.log("HI")
-// src/main.js
-/*
-import Vuetify, {
-    VApp, // required
-    VDataTable,
-} from 'vuetify/lib'
 
-Vue.use(Vuetify, {
-    components: {
-        VApp,
-        VDataTable,
-    },
-})*/
 const app_settings = {
-    /*  "TYPEKIT_ID" : "kxg6qeb",*/
+    "TYPEKIT_ID": "kxg6qeb",
     "LOCAL_STORAGE_KEY": "owoolvuex",
     "SHOPIFY_BASE_URL": "https://o-wool-stage.myshopify.com",
-   /* "WEBFONT_CONFIG" : {
+    "WEBFONT_CONFIG": {
         typekit: {
             id: 'kxg6qeb' //TYPEKIT_ID
         },
@@ -50,7 +28,7 @@ const app_settings = {
         fontinactive: function (familyName, fvd) {
             if (LOGGING) console.error("fontinactive", familyName, fvd)
         }
-    }*/
+    }
 }
 
 const app_config =
@@ -97,12 +75,3 @@ export const init = {
     config: app_config
 }
 export default init
-
-/*
-new Vue({
-    router,
-    store,
-    vuetify: new Vuetify({}),
-    render: h => h(App)
-}).$mount('#app')
-*/

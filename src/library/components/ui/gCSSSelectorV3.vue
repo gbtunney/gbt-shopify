@@ -41,9 +41,9 @@
 </template>
 
 <script>
-import selectors from '@/assets/selectors.json'
+import selectors from './../../data/selectors.json'
 import vSelect from 'vue-select'
-import {randomInt, renameKeys} from "@/library/scripts/generic";
+import {randomInt, renameKeys} from "./../../scripts/generic";
 import {outertrimFunc} from "../../scripts/generic";
 const R = window.R
 const RA = window.RA

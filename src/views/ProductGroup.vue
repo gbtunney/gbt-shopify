@@ -26,8 +26,7 @@
   </div>
 </template>
 <script>
-import productgroup from "@/assets/productgroup.json" //data
-
+import productgroup from "../library/data/productgroup.json" //data
 import ProductChild from '../library/components/product/ProductChild'
 import GroupInstance from '../library/components/product/GroupInstance'
 import {SfQuantitySelector} from "@storefront-ui/vue";

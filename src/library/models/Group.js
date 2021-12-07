@@ -26,7 +26,7 @@ const R = window.R;
 import {isDevMode} from "../scripts/vuehelpers";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
-import CartData from "@/assets/cart.json"
+import CartData from "./../data/cart.json"
 //************** End imports *****************//
 
 const BASE_ENTITY = 'productgroupbase'

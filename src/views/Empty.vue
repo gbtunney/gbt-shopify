@@ -150,7 +150,7 @@ import {
 import vSelect from 'vue-select'
 import ProductImageGrid from '@/library/components/images/ProductImageGrid.vue';
 import ProductImagePalattePicker from '@/library/components/images/ProductImagePalattePicker.vue';
-import gCSSSelectorNew from "../library/components/ui/gCSSSelectorNew.vue";
+import gCSSSelectorNew from "../library/components/ui/gCSSSelectorV3.vue";
 
 export default {
   name: "App",
