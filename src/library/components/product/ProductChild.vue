@@ -4,7 +4,10 @@ import {isShopifyID} from "./../../scripts/shopify"
 const R = window.R
 const RA = window.RA
 import {LoaderMixin} from './../../mixins/LoaderMixin'
-import {Editable_Defaults, LOAD_MODE, SELECTION_MODE_OPTIONS, USE_SERVER} from '../../settings'
+
+import options from "../../options.json"
+const {EDITABLE_DEFAULTS,LOAD_MODE,SELECTION_MODE_OPTIONS } = options
+console.log("SELECTION_MODE_OPTIONS",SELECTION_MODE_OPTIONS)
 import {
   ProductInstanceSingle,
   Product,
@@ -62,7 +65,7 @@ export default {
       type: [String,Boolean],
       default: defaultInstance.selection_mode.value,
       validator: function(value){
-        return   Object.keys(Vue['$gbtconfig'].SELECTION_MODE_OPTIONS).indexOf(value) >= 0
+        return   Object.keys(SELECTION_MODE_OPTIONS).indexOf(value) >= 0
       }
     },
     load_handle: {
@@ -71,19 +74,19 @@ export default {
     },
     quantity_editable: {
       type: Boolean,
-      default: Editable_Defaults["quantity"]
+      default: EDITABLE_DEFAULTS["quantity"]
     },
     variant_editable: {
       type: Boolean,
-      default: Editable_Defaults["variant"]
+      default: EDITABLE_DEFAULTS["variant"]
     },
     options_editable: {
       type: [Boolean, Array],
-      default: Editable_Defaults["options"]
+      default: EDITABLE_DEFAULTS["options"]
     },
     add_to_cart_enabled: {
       type: Boolean,
-      default: Editable_Defaults["addToCart"]
+      default: EDITABLE_DEFAULTS["addToCart"]
     },
     load_mode: {
       type: [Boolean, String, Number],

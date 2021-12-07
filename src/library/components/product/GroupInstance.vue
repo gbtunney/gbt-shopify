@@ -1,6 +1,7 @@
 <script>
-import {Editable_Defaults, LOAD_MODE , USE_SERVER} from "../../settings";
-import {axios_wait, getRandomNumber, isInteger, toInteger} from "../../scripts/generic";
+import options from "../../options.json"
+const {EDITABLE_DEFAULTS } = options
+import { getRandomNumber, isInteger, toInteger} from "../../scripts/generic";
 const R = window.R
 import {
   Product,
@@ -84,19 +85,19 @@ export default {
     },
     quantity_editable: {
       type: Boolean,
-      default: Editable_Defaults["quantity"]
+      default: EDITABLE_DEFAULTS["quantity"]
     },
     variant_editable: {
       type: Boolean,
-      default: Editable_Defaults["variant"]
+      default: EDITABLE_DEFAULTS["variant"]
     },
     options_editable: {
       type: [Boolean, Array],
-      default: Editable_Defaults["options"]
+      default: EDITABLE_DEFAULTS["options"]
     },
     add_to_cart_enabled: {
       type: Boolean,
-      default: Editable_Defaults["addToCart"]
+      default: EDITABLE_DEFAULTS["addToCart"]
     },
     load_mode: {
       type: [Boolean, String, Number],

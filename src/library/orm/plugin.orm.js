@@ -8,6 +8,7 @@ import settings from "./../settings.json"
 
 import {registerModels} from "./database";
 import {registerGlobalVariable} from "../scripts/vuehelpers";
+import {importantConsoleLog} from "../scripts/generic";
 
 const {SHOPIFY_BASE_URL}= settings
 
@@ -17,6 +18,7 @@ export const PluginOrm = {
        // install.installed = true
 
         registerGlobalVariable('axios',axios)
+        console.important = importantConsoleLog;
 
         VuexORM.use( VuexORMAxios, {
             axios,
