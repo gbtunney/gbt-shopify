@@ -22,8 +22,8 @@
 
 //todo: import {ID_LENGTH} from "../settings";
 import {Model} from '@vuex-orm/core'
-import {Product, Variant, ProductImage} from "./";
-
+import {Product, ProductImage} from "./";
+import Variant from './Variant'
 import {getRandomNumber, slugify} from "./../scripts/generic";
 import {ID_LENGTH} from "../settings";
 import chroma from "chroma-js";
@@ -76,11 +76,12 @@ export class ProductOptionValue extends ProductOptionBase {
             Images: this.belongsToMany(Variant, VariantOption, "option_value_id", "thumbnail_id"),
 
             meta: this.attr(false),
-            hex_color: this.string('#FF0000',value => (chroma.valid(value)) ? value : false ).nullable() //chroma.valid('red');
+            hex_color: this.string('#FF0000', value => (chroma.valid(value)) ? value : false).nullable() //chroma.valid('red');
             //todo: idk these pivots need help
         }
     }
-    compareColor(_hex_color ){
+
+    compareColor(_hex_color) {
         if (this.hex_color) {
             return {
                 deltaE: chroma.deltaE(this.hex_color, _hex_color).toFixed(2),
@@ -96,11 +97,11 @@ export class ProductOptionValue extends ProductOptionBase {
     }
 
     //todo: idk these pivots need help - this does not work... !!
-     get Thumbnail() {
-      //  if (this.thumbnail_id) return ProductImage.query().whereId(this.thumbnail_id).withAll().first();
+    get Thumbnail() {
+        //  if (this.thumbnail_id) return ProductImage.query().whereId(this.thumbnail_id).withAll().first();
         if (this.Variants && this.Variants.length > 0) {
             const [firstvariant] = this.Variants;
-            if (firstvariant.image_id){
+            if (firstvariant.image_id) {
                 return ProductImage.query().whereId(firstvariant.image_id).first()
             }
         }
@@ -121,7 +122,8 @@ export class ProductOption extends ProductOptionBase {
 
     static entity = 'productoptions'
     static baseEntity = BASE_ENTITY
-    static primaryKey =  ['product_id', 'handle']
+    static primaryKey = ['product_id', 'handle']
+
     static fields() {
         return {
             ...super.fields(),

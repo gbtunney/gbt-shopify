@@ -17,8 +17,8 @@
  * * @baseentity  - productgroupbase */
 
 import {Model} from '@vuex-orm/core'
-import {ProductInstanceSingle, LineItem, Variant} from './'
-import {getRandomNumber, isInteger, toInteger} from "../scripts/generic";
+import {ProductInstanceSingle, LineItem} from './'
+import {getRandomNumber} from "../scripts/generic";
 import {ID_LENGTH} from "../settings";
 
 const R = window.R;

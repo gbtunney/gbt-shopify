@@ -3,16 +3,14 @@
  * @entity - products */
 
 import {Model} from '@vuex-orm/core'
-import {Variant, ProductImage, ProductOption, ProductOptionValue, VariantOption} from './index'
+import {ProductImage, ProductOption, ProductOptionValue, VariantOption} from './index'
+import Variant from './Variant'
 import {axios_wait, getRandomNumber, isInteger, randomInt, slugify, toInteger} from "./../scripts/generic";
 import {isShopifyID} from "../scripts/shopify";
 
 const R = window.R
-console.log("ALERT TESTI", Variant)
 //todo: get this from settings
 import {ID_LENGTH} from "./../settings";
-import MockAdapter from "axios-mock-adapter";
-import axios from "axios";
 
 export class Product extends Model {
     static entity = 'products';

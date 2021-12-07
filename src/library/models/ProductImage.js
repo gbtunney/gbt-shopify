@@ -3,7 +3,8 @@
 * @entity  - productimages */
 
 import {Model} from '@vuex-orm/core'
-import {Product, Variant} from './'
+import {Product} from './'
+import Variant from './Variant'
 import {ShopifyMediaURL} from "./../scripts/shopify";
 import {getRandomNumber} from "../scripts/generic";
 

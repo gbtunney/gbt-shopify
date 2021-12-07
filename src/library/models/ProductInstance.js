@@ -17,18 +17,14 @@
 * @baseentity {string}- productbase */
 
 import {Model} from '@vuex-orm/core'
-import {Variant, Product, ProductInstanceGroup, Cart} from "./";
+import {Product, ProductInstanceGroup, Cart} from "./";
+import Variant from './Variant'
 import {Editable_Defaults, ID_LENGTH, SELECTION_MODE_OPTIONS} from "../settings";
 import {isShopifyID} from "../scripts/shopify";
 import {
-    cloneObject,
-    getContainsLetter,
-    getHasLetter,
-    getRandomNumber, isInteger,
-    stringContainsUppercase,
+    getRandomNumber,
     toInteger
 } from "../scripts/generic";
-import {upperCase} from "../scripts/stringUtils";
 
 const R = window.R;
 //************** End Imports *****************//
