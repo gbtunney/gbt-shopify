@@ -3,7 +3,7 @@ import VuexORM from "@vuex-orm/core";
 import VuexORMAxios from "@vuex-orm/plugin-axios";
 import VuexORMisDirtyPlugin from '@vuex-orm/plugin-change-flags';
 import VuexORMSearch from "@vuex-orm/plugin-search";
-import {installORM} from "../orm/database";
+import {registerModels} from "../orm/database";
 import Vue from 'vue'
 
 const R = window.R; //ramda
@@ -172,7 +172,6 @@ const vuexConfigModules  =
             enabled: true,
             module: {
                 orm: ormmodule
-
             }
         },
     ],
@@ -265,7 +264,7 @@ export const  getAppVuexPlugins = function(flags={},_settings=BASE_CONFIG){
     },
         "vuex-orm-custom": {
         enabled: true,
-            plugin: installORM,
+            plugin: registerModels,
             options: {
             models: Models,
         }

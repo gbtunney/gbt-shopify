@@ -1,11 +1,5 @@
 import {isFunction, toArray} from "./generic";
-import VuexORM from "@vuex-orm/core";
-import VuexORMAxios from "@vuex-orm/plugin-axios";
-import axios from "axios";
-import {SHOPIFY_BASE_URL} from "../settings";
-import VuexORMSearch from "@vuex-orm/plugin-search";
-import VuexORMisDirtyPlugin from "@vuex-orm/plugin-change-flags";
-
+import Vue from "vue";
 const R = window.R;
 
 export function isDevMode() {
@@ -17,6 +11,11 @@ export function validateEnvMode(value = "development", key = 'NODE_ENV') {
         || !process.env
         || !process.env[key]) return false;
     return (process.env[key] == value)
+}
+
+export function registerGlobalVariable(key, value) {
+    Vue[`$${key}`] = value
+    Vue.prototype[`$${key}`] = value
 }
 //PARENT
 /*const testdata = {

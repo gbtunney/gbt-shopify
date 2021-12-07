@@ -11,7 +11,7 @@ function initDatabase(_database, models = []) {
     })
 }
 
-export function installORM(config) {
+export function registerModels(config) {
     // Create a new instance of Database.
     let _database = new VuexORM.Database()
     const {models = []} = config;

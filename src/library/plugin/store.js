@@ -1,6 +1,7 @@
 import Vuex from 'vuex'
+import Vue from "vue"
 import  {getAppVuexModules, getAppVuexPlugins} from "./gVueUtils.plugin";
-import Vue from "vue";
+
 
 //todo: move
 Vue.use(Vuex)
