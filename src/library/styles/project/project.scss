@@ -1,6 +1,8 @@
 @use "sass:list";
 
 @import '../scss/gMixins';
+@import "../scss/timber";
+@import "../scss/theme";
 
 .font-style-primary {
 	$font-key: font-primary;
@@ -22,4 +24,8 @@
 
 .auto {
 	@include includeTailwindStyles(w-auto h-auto);
+}
+
+.border, .border-8 {
+	@include includeTailwindStyles(border-solid);
 }

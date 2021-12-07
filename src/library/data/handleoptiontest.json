@@ -1,0 +1,96 @@
+[
+  {
+    "handle": "red-squirrel",
+    "hex_color": "#91663d"
+  },
+  {
+    "handle": "wissahickon",
+    "hex_color": "#758d83"
+  },
+  {
+    "handle": "alumroot",
+    "hex_color": "#5e2950"
+  },
+  {
+    "handle": "ash",
+    "hex_color": "#7f7167"
+  },
+  {
+    "handle": "basswood",
+    "hex_color": "#423c44"
+  },
+  {
+    "handle": "bee-balm",
+    "hex_color": "#bf5396"
+  },
+  {
+    "handle": "bluebell",
+    "hex_color": "#9cc4d8"
+  },
+  {
+    "handle": "cresheim-creek",
+    "hex_color": "#5ca4b6"
+  },
+  {
+    "handle": "cedar-berry",
+    "hex_color": "#4888ac"
+  },
+  {
+    "handle": "fringetree",
+    "hex_color": "#cebaa9"
+  },
+  {
+    "handle": "ganoga-falls",
+    "hex_color": "#323d56"
+  },
+  {
+    "handle": "gingko-nut",
+    "hex_color": "#a38347"
+  },
+  {
+    "handle": "gray-birch",
+    "hex_color": "#7d767c"
+  },
+  {
+    "handle": "juneberry",
+    "hex_color": "#612d3f"
+  },
+  {
+    "handle": "pachysandra",
+    "hex_color": "#28403d"
+  },
+  {
+    "handle": "porcupine",
+    "hex_color": "#7a7271"
+  },
+  {
+    "handle": "purple-loosestrife",
+    "hex_color": "#44344c"
+  },
+  {
+    "handle": "river-oat",
+    "hex_color": "#be873b"
+  },
+  {
+    "handle": "scarlet-oak",
+    "hex_color": "#a42735"
+  },
+  {
+    "handle": "steelhead",
+    "meta": "steely dan",
+    "hex_color": "#7b7f8a"
+  },
+  {
+    "handle": "wild-geranium",
+    "hex_color": "#897174"
+  },
+  {
+    "handle": "wood-dove",
+    "hex_color": "#bcb3b4"
+  },
+  {
+    "handle": "wood-fern",
+    "hex_color": "#9c9e70"
+  }
+]
+

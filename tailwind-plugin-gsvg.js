@@ -20,6 +20,20 @@ module.exports = ({addUtilities, addComponents, theme, config}) => {
 
         }
     })
+    const textShadow = {
+        'text-shadow': {
+            'text-shadow': '0 2px 4px rgba(0,0,0,0.10)',
+            '&-md': {
+                'text-shadow': '0 4px 8px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);'
+            },
+            '&-lg': {
+                'text-shadow': '0 15px 30px rgba(0,0,0,0.11), 0 5px 15px rgba(0,0,0,0.08)'
+            },
+            '&-npne': {
+                'text-shadow': 'none'
+            }
+        }
+    }
     const svgComponent = {
         '.g-svg': {
             display: 'inline-block',
@@ -30,6 +44,7 @@ module.exports = ({addUtilities, addComponents, theme, config}) => {
             },
         },
     }
+    addUtilities(textShadow)
     addUtilities(svgTheme)
     addComponents(svgComponent)
 };

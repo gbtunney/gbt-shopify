@@ -7,7 +7,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "audit:build": "vue-cli-service build --mode audit",
-    "audit:styles": "list-selectors dist/css/app.053a8621.css > src/assets/selectors.json -pretty",
+    "audit:styles": "list-selectors dist/css/app.053a8621.css > src/library/data/selectors.json -pretty",
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs"
   },

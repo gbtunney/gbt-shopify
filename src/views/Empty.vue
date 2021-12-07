@@ -13,40 +13,22 @@
                   :enable-zoom="true"
                   :images='getSrcSet(Images)'
                   :slider-options='{ "type": "slider","autoplay": false, "rewind": false,"gap": 0   }'>
-                <templapte #thumbs="{ active: activeIndex, go }">
+                <template #thumbs="{ active: activeIndex, go }">
                   <ProductImageGrid @mounted="setCallback(go)"
                       @changed="imageChanged($event, go , UpdateOption) "
                       option-handle="color"
                       :images="Images">
                   </ProductImageGrid>
-                </templapte>
+                </template>
               </SfGallery>
             </div>
             <div class="w-1/2">
               <!-- COLUMN 2 -->
-
-              <div>
-                <h1>NEW</h1>
-                <hr>
-                <button style="border-color: blueviolet" class="border-8"> Element 1 </button>
-                <button v-wrap.span.2="'border-8 bg-accent-primary'" style="border-color: blueviolet" > Element 2 </button>
-                <button v-tw="'.p-8 xl:div.bg-accent-primary  p-12  abc:border-8'" style="border-color: blueviolet"> Element 3 </button>
-                <button style="border-color: pink" > Element 4 </button>
-                <button style="border-color: pink" > Element 5 </button>
-  `             <button style="border-color: pink" > Element 6 </button>
-              </div>
-              <gCSSSelectorNew @change="_updated" :targetEl="'.testSelector'">
-              </gCSSSelectorNew>
-              <button class="testprops butoon!!!!!!!!!!" v-tw="selectorTest">
-                <div>TCSS est button!!!!!!</div>
-                <span v-faker:internet.uppercase="'email'" class="icon">gilliannn</span>
-              </button>
               <h1 class="font-style-sm-caps " v-if="Product">{{ Product.title }}</h1>
-              <button v-tw:classes="'.p-8 xl:div.bg-accent-primary  p-12  abc:border-8 '" v-tw:sibling="[{classes:'text-red'},{selector:'hr' ,classes:'p-8 border-8 bg-dark'}]" v-tw:children.lg="[{ selector: 'div' ,'classes' : '.p-8 .bg-accent-secondary  text-3xl border-8 '},{ selector: '.icon' , classes:'bg-white border-2'} ]">
-                <div v-faker:f="'manufacturer'" />
-                <span v-faker:ss.uppercase  class="icon">gilliannn</span>
-              </button>
-              <g-kabob height="2em" v-tw.md="' .p-8  w-1/2'" :css="'p-2 border-8  w-1/2'" :bg_color="'--color-gumleaf-600'" :color="'--color-primary'" path="/svg/divider.svg"></g-kabob>
+              <g-kabob height="2em"  :css="'p-8 border-8  w-1/2'" :bg_color="'--color-gumleaf-600'" :color="'--color-primary'" path="/svg/divider.svg">
+              Middle
+
+              </g-kabob>
               <div
                   v-for="productOption,index in Options" v-bind:key="index"
                   class="product-option-wrapper m-8">

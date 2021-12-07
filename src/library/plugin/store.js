@@ -1,5 +1,5 @@
 import Vuex from 'vuex'
-import  {getAppVuexModules, getAppVuexPlugins} from "../library/plugin/gVueUtils.plugin";
+import  {getAppVuexModules, getAppVuexPlugins} from "./gVueUtils.plugin";
 import Vue from "vue";
 
 //todo: move

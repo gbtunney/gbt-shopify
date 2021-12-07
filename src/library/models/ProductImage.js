@@ -38,7 +38,7 @@ export class ProductImage extends Model {
     get srcset() {
         return {
             "desktop": {
-                "url": this.getSrc(600, 1200)
+                "url": this.getSrc(1000, 1200)
             },
             "mobile": {
                 "url": this.getSrc(200, 200)

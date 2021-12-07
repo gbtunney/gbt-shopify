@@ -36,10 +36,6 @@ export default {
       type: [Number,Array],
       default: 400
     },
-    updateFunc: {
-      type: [Boolean, Function],
-      default: false,
-    },
     optionHandle: { //obbject binding.
       type: [String, Boolean],
       default: false
@@ -52,7 +48,7 @@ export default {
     getToolTip: function (image) {
       return {
         content: this.getImageTitle(image),
-        classes: 'bg-primary text-light p-0.5 z-50'
+        classes: 'bg-brandGrey-dk-op80 shadow-2xl text-xl font-style-primary text-light py-2 px-6 z-50'
       }
     },
     getImageTitle(image) {

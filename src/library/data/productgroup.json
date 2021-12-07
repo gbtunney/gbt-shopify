@@ -1,4 +1,5 @@
 {
+  "id": 12345578899,
   "currency": "USD",
   "note": "gillians group",
   "items": [
@@ -10,24 +11,7 @@
       "meta": "null",
       "url": "null",
       "handle": "balance",
-      "variant_id": 6,
-      "Variant": null,
-      "selection_mode": "extended",
-      "add_to_cart_enabled": false,
-      "quantity_editable": true,
-      "variant_editable": true,
-      "options_editable": true,
-      "quantity": 1
-    },
-    {
-      "type": "INSTANCE",
-      "properties": {
-        "message": "item 2"
-      },
-      "meta": "null",
-      "url": "null",
-      "handle": "balance",
-      "variant_id": 8,
+      "variant_id": 22589290119286,
       "Variant": null,
       "selection_mode": "extended",
       "add_to_cart_enabled": false,
@@ -56,19 +40,20 @@
     {
       "type": "INSTANCE",
       "properties": {
-        "message": "balance!!!"
+        "message": "item 2"
       },
       "meta": "null",
       "url": "null",
       "handle": "local",
-      "variant_id": 4,
+      "variant_id": 5,
       "Variant": null,
       "selection_mode": "extended",
       "add_to_cart_enabled": false,
       "quantity_editable": true,
       "variant_editable": true,
       "options_editable": true,
-      "quantity": 3
+      "quantity": 2
     }
   ]
 }
+

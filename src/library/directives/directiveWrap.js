@@ -3,7 +3,7 @@ import {explodeClassesString} from "./index";
 
 const R = window.R
 const RA = window.RA
-import {randomInt} from "@/library/scripts/generic";
+import {randomInt} from "./../scripts/generic";
 import {isInteger, toInteger} from "../scripts/generic";
 
 const createNewElement = function (_attr = {}, _classes = false, el = 'div') {

@@ -4,7 +4,6 @@ import {ProductImage} from './ProductImage'
 import {ProductOptionBase, ProductOption, VariantOption, ProductOptionValue} from './ProductOption'
 import {ProductInstanceBase, ProductInstanceSingle, LineItem} from './ProductInstance'
 import {Cart, ProductInstanceGroup, ProductGroupBase} from './Group'
-///import {Shop} from './Shop'
 import {ProductMetaAttr} from './ProductMetaAttr'
 
 const ALL_MODELS = [
@@ -39,6 +38,5 @@ export {
     ProductInstanceGroup,
     LineItem,
     Cart,
-
 }
 export default Models;

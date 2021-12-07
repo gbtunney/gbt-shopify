@@ -6,9 +6,10 @@
       </slot>
     </div>
     <div class="gKabob__center kabob-hairline w-full" :class="($props.hr)? 'hr' : ''">
-      <slot name="center">
-        <span class="p-px  gKabob_center__inner ">MIDDLE</span>
-      </slot>
+      <span class="p-px ">
+        <!--gKabob_center__inner -->
+      <slot/>
+        </span>
     </div>
     <div class="gKabob__right">
       <slot name="right">

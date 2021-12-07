@@ -1,5 +1,5 @@
 // noinspection JSVoidFunctionReturnValueUsed
-import {randomInt} from "@/library/scripts/generic";
+import {randomInt} from "./../scripts/generic";
 const R = window.R
 const RA = window.RA
 import { isArray, isInteger, toInteger} from "../scripts/generic";

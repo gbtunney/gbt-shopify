@@ -74,11 +74,13 @@ const CUSTOM_BASE_COLORS = {
   },
   "brandGrey": {
     "dk": "#585858",
+    "dk-op80": "rgba(88,88,88,0.8)",
     "DEFAULT": '#7f7f7f',
     "lt": "#b0b0b0",
   },
   "white":{
-    "DEFAULT":'#FFFFFF'
+    "DEFAULT":'#FFFFFF',
+    "op80":'rgba(255,255,255,0.8)'
   },
   "grey":{
     "DEFAULT":'#7f7f7f'
