@@ -19,7 +19,8 @@
 import {Model} from '@vuex-orm/core'
 import {ProductInstanceSingle, LineItem} from './'
 import {getRandomNumber} from "../scripts/generic";
-import {ID_LENGTH} from "../settings";
+import settings from "./../settings.json";
+const {UID_LENGTH} = settings
 
 const R = window.R;
 
@@ -52,7 +53,7 @@ export class ProductGroupBase extends Model {
 
     static fields() {
         return {
-            id: this.uid(() => getRandomNumber(ID_LENGTH)),
+            id: this.uid(() => getRandomNumber(UID_LENGTH)),
             timestamp: this.number(0, value => Date.now()),
             type: this.attr('GROUP'),
 

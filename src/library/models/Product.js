@@ -10,7 +10,8 @@ import {isShopifyID} from "../scripts/shopify";
 
 const R = window.R
 //todo: get this from settings
-import {ID_LENGTH} from "./../settings";
+import settings from "./../settings.json"
+const {UID_LENGTH} = settings
 
 export class Product extends Model {
     static entity = 'products';
@@ -64,7 +65,7 @@ export class Product extends Model {
 
     static fields() {
         return {
-            id: this.uid(() => getRandomNumber(ID_LENGTH)),
+            id: this.uid(() => getRandomNumber(UID_LENGTH)),
             handle: this.string(null), ///already a slug
             title: this.string(null),
             meta: this.string(null).nullable(),

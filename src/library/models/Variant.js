@@ -4,8 +4,9 @@
 
 import {Model} from '@vuex-orm/core'
 import {getRandomNumber, slugify} from "./../scripts/generic"
-import {Product, ProductImage,ProductOptionValue,VariantOption} from "./";
-import {ID_LENGTH, MINIMUM_QUANTITY} from './../settings'
+import {Product, ProductImage, ProductOptionValue, VariantOption} from "./"
+import settings from "./../settings.json"
+const {UID_LENGTH, MINIMUM_QUANTITY} = settings
 const R = window.R
 //************** End Imports *****************//
 
@@ -21,7 +22,7 @@ export class Variant extends Model {
   }
   static fields() {
     return {
-      id: this.uid(() =>getRandomNumber(ID_LENGTH)),
+      id: this.uid(() =>getRandomNumber(UID_LENGTH)),
       // handle: maybe generate a slug from options??
       title: this.string(null),
       position: this.number(null), //the index  ///set this to increment?
@@ -49,7 +50,6 @@ export class Variant extends Model {
     const variant_id = this.id
     const {  image_id }=this
     const thumbbnail_id =  (image_id ) ? image_id : false
-//console.log("variant created ",thumbbnail_id,image_id,variant_id )
     return this.options.map(function (option_value) {
       return {
         variant_id,

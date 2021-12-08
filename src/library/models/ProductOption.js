@@ -22,11 +22,14 @@
 
 //todo: import {ID_LENGTH} from "../settings";
 import {Model} from '@vuex-orm/core'
-import {Product, ProductImage} from "./";
+import {Product, ProductImage} from "./"
 import Variant from './Variant'
-import {getRandomNumber, slugify} from "./../scripts/generic";
-import {ID_LENGTH} from "../settings";
-import chroma from "chroma-js";
+import chroma from "chroma-js"
+
+import {getRandomNumber, slugify} from "./../scripts/generic"
+import settings from "./../settings.json"
+const {UID_LENGTH} = settings
+
 
 //************** End Imports *****************//
 
@@ -45,7 +48,7 @@ export class ProductOptionBase extends Model {
 
     static fields() {
         return {
-            id: this.uid(() => getRandomNumber(ID_LENGTH)),
+            id: this.uid(() => getRandomNumber(UID_LENGTH)),
             type: this.attr('VALUE'), // Exposing the discriminator field.
             handle: this.string(null, value => slugify(value)),
             sid: this.number(null),  ////thhihs is the origonal ID, it should have been converted to sid.

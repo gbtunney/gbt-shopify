@@ -3,5 +3,7 @@
   "UID_LENGTH": 10000000000,
   "LOCAL_STORAGE_KEY": "owoolvuex",
   "TYPEKIT_ID": "kxg6qeb",
-  "LOGGING" : true
+  "LOGGING" : true,
+  "USE_MOCK_SERVER" : false,
+  "MINIMUM_QUANTITY": 1
 }

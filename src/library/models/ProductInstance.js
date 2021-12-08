@@ -17,16 +17,19 @@
 * @baseentity {string}- productbase */
 
 import {Model} from '@vuex-orm/core'
-import {Product, ProductInstanceGroup, Cart} from "./";
+import {Product, ProductInstanceGroup, Cart} from "./"
 import Variant from './Variant'
-import {Editable_Defaults, ID_LENGTH, SELECTION_MODE_OPTIONS} from "../settings";
-import {isShopifyID} from "../scripts/shopify";
-import {
-    getRandomNumber,
-    toInteger
-} from "../scripts/generic";
 
-const R = window.R;
+import options from './../options.json'
+import settings from "./../settings.json"
+
+const {EDITABLE_DEFAULTS, SELECTION_MODE_OPTIONS} = options
+const {UID_LENGTH} = settings
+
+import {isShopifyID} from "../scripts/shopify"
+import {getRandomNumber, toInteger} from "../scripts/generic"
+
+const R = window.R
 //************** End Imports *****************//
 
 const BASE_ENTITY = 'productbase' //todo: change name
@@ -51,7 +54,7 @@ export class ProductInstanceBase extends Model {
 
     static fields() {
         return {
-            id: this.uid(() => getRandomNumber(ID_LENGTH)),
+            id: this.uid(() => getRandomNumber(UID_LENGTH)),
             type: this.attr('INSTANCE'),
             /* timestamp: this.number(0, value => Date.now()),*/
             properties: this.attr({message: false}),
@@ -65,10 +68,10 @@ export class ProductInstanceBase extends Model {
             quantity: this.number(1),
             //*** preferences
             selection_mode: this.string("normal").nullable(),
-            add_to_cart_enabled: this.boolean(Editable_Defaults["addToCart"]), /// this is bool to allow a add to cart button for TOTAL GROUP.
-            quantity_editable: this.boolean(Editable_Defaults["quantity"]),
-            variant_editable: this.boolean(Editable_Defaults["variant"]),
-            options_editable: this.attr(Editable_Defaults["options"]), //future pref dont know when implement
+            add_to_cart_enabled: this.boolean(EDITABLE_DEFAULTS["addToCart"]), /// this is bool to allow a add to cart button for TOTAL GROUP.
+            quantity_editable: this.boolean(EDITABLE_DEFAULTS["quantity"]),
+            variant_editable: this.boolean(EDITABLE_DEFAULTS["variant"]),
+            options_editable: this.attr(EDITABLE_DEFAULTS["options"]), //future pref dont know when implement
         }
     }
 

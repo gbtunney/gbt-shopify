@@ -5,19 +5,17 @@
 import {Model} from '@vuex-orm/core'
 import {Product} from './'
 import Variant from './Variant'
-import {ShopifyMediaURL} from "./../scripts/shopify";
-import {getRandomNumber} from "../scripts/generic";
-
-//TODO::::REMOVE
-import {ID_LENGTH} from "../settings";
-
+import {ShopifyMediaURL} from "./../scripts/shopify"
+import {getRandomNumber} from "../scripts/generic"
+import settings from "./../settings.json"
+const {UID_LENGTH} = settings
 
 export class ProductImage extends Model {
     static entity = 'productimages'
 
     static fields() {
         return {
-            id: this.uid(() => getRandomNumber(ID_LENGTH)),
+            id: this.uid(() => getRandomNumber(UID_LENGTH)),
             position: this.number(null),
             alt: this.string(null),
             width: this.number(500),

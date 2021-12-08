@@ -1,13 +1,14 @@
 /* eslint-disable */
 import {Model} from '@vuex-orm/core'
-import {getRandomNumber} from "../scripts/generic";
-import {ID_LENGTH} from "../settings";
+import {getRandomNumber} from "../scripts/generic"
+import settings from "./../settings.json"
+const {UID_LENGTH} = settings
 
 export default class ProductMetaAttr extends Model {
     static entity = 'productmetaattrs'
     static fields() {
         return {
-            id: this.uid(() =>getRandomNumber(ID_LENGTH)),
+            id: this.uid(() =>getRandomNumber(UID_LENGTH)),
             handle: this.string(null),
             value: this.attr(null),
             title: this.string(null), ///IDK MAYBE NOT

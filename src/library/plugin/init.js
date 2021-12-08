@@ -12,20 +12,7 @@ import {vWrap, vTW, vFaker} from '../directives'
 const LOGGING = true;
 
 const app_settings = {
-    "WEBFONT_CONFIG": {
-        typekit: {
-            id: 'kxg6qeb' //TYPEKIT_ID
-        },
-        fontloading: function (familyName, fvd) {
-            if (LOGGING) console.log("loading", familyName, fvd)
-        },
-        fontactive: function (familyName, fvd) {
-            if (LOGGING) console.log("fontactive", familyName, fvd)
-        },
-        fontinactive: function (familyName, fvd) {
-            if (LOGGING) console.error("fontinactive", familyName, fvd)
-        }
-    }
+
 }
 
 const app_config =

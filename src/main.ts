@@ -4,8 +4,8 @@ import router from './router'
 import Vuex from "vuex";
 
 /* * STYLES * */
-//import './library/styles/scss/tailwind.scss'
-//import './library/styles/project/project.scss'
+import './library/styles/scss/tailwind.scss'
+import './library/styles/project/project.scss'
 import 'vue-select/dist/vue-select.css'
 
 /* * 3rd party plugins * */
