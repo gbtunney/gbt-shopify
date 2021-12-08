@@ -1,9 +1,6 @@
 <template>
   <div class="DefaultProductView">
-   <h1>DefaultProductView</h1>
-    <default-product-page>
-
-    </default-product-page>
+    <default-product-page/>
   </div>
 </template>
 <script>

@@ -35,7 +35,7 @@ export const store = new Vuex.Store({
         orm: ormmodule
     },
     plugins: [
-        createEasyAccess,
+        createEasyAccess(),
         registerModels({
             models: Models
         }),

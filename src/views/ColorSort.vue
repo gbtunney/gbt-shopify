@@ -3,11 +3,8 @@
     <h1>Color Sorting</h1>
 
     <div class="w-full">
-      <gCSSSelector :targetEl="'.testSelector'">
-
-      </gCSSSelector>
       <div class="flex">
-        <chrome @input="TestComp" v-model="colorselection"/>
+        <chrome  v-model="colorselection"/>
         <div>
           <gUIColorFrame :hex_color="($data.colorselection && $data.colorselection.hex) ? $data.colorselection.hex : ''"/>
           <div class="testSelector">{{ SelectionProps }}</div>
@@ -51,7 +48,6 @@
             </v-data-table>
           </div>
         </product-child>
-
       </div>
     </div>
   </div>
@@ -60,23 +56,22 @@
 import {Product, ProductOptionValue} from "../library/models";
 import vSelect from 'vue-select'
 import {Slider, Chrome} from 'vue-color'
-import gCSSSelector from '../library/components/ui/gCSSSelectorV3.vue'
 import gUIColorFrame from '../library/components/ui/gUIColorFrame.vue'
 
-import {VDataTable} from 'vuetify/lib'
-import Vuetify from 'vuetify';
 import Vue from 'vue'
-
-const vuetify = new Vuetify();
-import ProductChild from '../library/components/product/ProductChild'
 import chroma from "chroma-js";
+
+import ProductChild from '../library/components/product/ProductChild'
 import ChromaColor from "../library/models/ChromaColor";
 
+import  {
+    VApp,
+    VDataTable,
+} from 'vuetify/lib'
 
-Vue.use(vuetify)
 export default {
   name: "ColorSort",
-  components: {vSelect, Slider, Chrome, gUIColorFrame, VDataTable, ProductChild, gCSSSelector},
+  components: {vSelect, Slider, Chrome, gUIColorFrame, VApp,VDataTable, ProductChild},
   data: function () {
     return {
       selectedProduct: false,

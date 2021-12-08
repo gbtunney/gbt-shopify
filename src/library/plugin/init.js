@@ -12,9 +12,6 @@ import {vWrap, vTW, vFaker} from '../directives'
 const LOGGING = true;
 
 const app_settings = {
-    "TYPEKIT_ID": "kxg6qeb",
-    "LOCAL_STORAGE_KEY": "owoolvuex",
-    "SHOPIFY_BASE_URL": "https://o-wool-stage.myshopify.com",
     "WEBFONT_CONFIG": {
         typekit: {
             id: 'kxg6qeb' //TYPEKIT_ID
@@ -58,7 +55,6 @@ const app_config =
         use: {
             "v-clipboard":{
                 enabled: true,
-
                 params: Clipboard
             },
             "v-tooltip": {
