@@ -11,6 +11,7 @@ import createPersistedState from "vuex-persistedstate"
 
 /* * Modules * */
 import {Models} from "../models"
+import globalSettings from "../modules/globalSettings";
 import moduleProductLoader from '../modules/moduleProductLoader'
 import ormmodule from "../modules/ormmodule"
 import modulePageStyler from "../modules/modulePageStyler"
@@ -30,6 +31,7 @@ export const store = new Vuex.Store({
     mutations: {},
     actions: {},
     modules: {
+        global:globalSettings,
         page_styler2: modulePageStyler,
         productloader: moduleProductLoader,
         orm: ormmodule
