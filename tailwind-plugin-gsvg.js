@@ -7,6 +7,7 @@ module.exports = ({addUtilities, addComponents, theme, config}) => {
     const tailwindPrefix = config("prefix", "");
     const svgTheme = Array.from(Object.entries(flatten)).map((value, key) => {
         const [_key, _value] = value
+        //console.log(`.${tailwindPrefix}fg-${CUSTOM_NAME}-${_key}`)
         return {
             [`.${tailwindPrefix}bg-${CUSTOM_NAME}-${_key}`]: {
                 "background-color": `${_value}`
