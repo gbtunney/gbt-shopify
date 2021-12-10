@@ -24,7 +24,10 @@ export default {
   },
   props: {
     /**
-     * Sets the svg path
+     * SVG Path
+     *
+     * @property {number} newValue new value set
+     * @property {number} oldValue value that was set before the change
      */
     path: {
       default: false,
@@ -56,14 +59,14 @@ export default {
      */
     height: {
       default: false,
-      type: [Boolean, String]
+      type: [Boolean,Number, String]
     },
     /** Additional CSS classes
      */
-    css: {
-      default: '',
+    addl_css: {
+      default: 'w-full',
       type: [String,Array]
-    }
+    },
   },
   watch: {
     color: {
@@ -76,9 +79,8 @@ export default {
   },
   computed: {
     getCSS() {
-      console.warn("hhhhhh", [this.$props.css, ...this.svg_color_classes()])
-
-      return [this.$props.css, ...this.svg_color_classes()]
+      console.warn("hhhhhh", [this.$props.addl_css, ...this.svg_color_classes()])
+      return [this.$props.addl_css, ...this.svg_color_classes()]
     }
   },
   methods: {
@@ -92,7 +94,7 @@ export default {
       console.warn("hhhhhh", (isInteger(_width)), (isInteger(_width)) ? `${_width}px` : _width)
       return {
         ...(_width) ? {'width': (isInteger(_width)) ? `${_width}px` : _width} : {},
-        ...(_height) ? {'height': (isInteger(_height)) ? `${_height} px` : _height} : {},
+        ...(_height) ? {'height': (isInteger(_height)) ? `${_height}px` : _height} : {},
         ...(chroma.valid(_hex_color)) ? {'--color': _hex_color} : {'--color': `var(${_hex_color})`},
         ...(_bg_hex_color == false || _bg_hex_color == 'false')
             ? {'--bg-color': 'transparent'} : (chroma.valid(_bg_hex_color))
@@ -119,26 +121,23 @@ export default {
 </style>
 
 <docs lang="md">
-G SVG!!
-
 ## Examples
 
-Icon:
+Basic Icon (using css properties):
 
 ```jsx
 <gSVG path="/svg/divider.svg" css="w-1/12 fg-fill-accent-secondary-dk bg-accent-primary"></gSVG>
 
 ```
-
 Icon with Tailwind color
 
 ```jsx
-<gSVG path="/svg/divider.svg" width="280" color="--color-corn-200" bg_color="--color-corn-700"></gSVG>
+<gSVG path="/svg/divider.svg" width="120" color="--color-corn-200" bg_color="--color-corn-700"></gSVG>
 
 ```
 Icon with Hex color & Percent Width
 
 ```jsx
-<gSVG path="/svg/divider.svg" width="30%" color="#FF0000" bg_color="#ffa1f2"></gSVG>
+<gSVG path="/svg/divider.svg" width="10%" color="#FF0000" bg_color="#ffa1f2"></gSVG>
 ```
 </docs>
