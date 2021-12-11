@@ -13,12 +13,15 @@
 import InlineSvg from 'vue-inline-svg';
 import chroma from "chroma-js";
 import {isInteger} from "../../scripts/generic";
+import {DimensionsMixin} from "../../mixins/DimensionsMixin"
+import {colorThemeMixin} from "../../mixins/ColorMixins"
 
 const R = window.R
 
 export default {
   name: "gSVG",
   components: {InlineSvg},
+  mixins:[colorThemeMixin,DimensionsMixin]
   data: function () {
     return {_color: false}
   },
@@ -32,34 +35,6 @@ export default {
     path: {
       default: false,
       type: [Boolean, String]
-    },
-    /** Foreground Color
-     * String - Hex color OR tailwind color variable ex: --color-corn-700
-     */
-    color: {
-      default: false,
-      type: [Boolean, String]
-    },
-    /** Background Color
-     * String - Hex color OR tailwind color variable ex: --color-corn-700
-     */
-    bg_color: {
-      default: false,
-      type: [Boolean, String]
-    },
-    /** Width
-     * String with unit, int will have px added
-     */
-    width: {
-      default: false,
-      type: [Boolean, Number, String]
-    },
-    /** Height
-     * String with unit, int will have px added
-     */
-    height: {
-      default: false,
-      type: [Boolean,Number, String]
     },
     /** Additional CSS classes
      */
@@ -79,19 +54,16 @@ export default {
   },
   computed: {
     getCSS() {
-      console.warn("hhhhhh", [this.$props.addl_css, ...this.svg_color_classes()])
       return [this.$props.addl_css, ...this.svg_color_classes()]
     }
   },
   methods: {
     svg_color_classes(_hex_color = this.$props.color, _bg_hex_color = this.$props.bg_color) {
-      // console.warn("hhhhhh", ( isInteger(_width) ),( isInteger(_width) ) ? `${_width}px` : _width )
       return [...(_bg_hex_color == false || _bg_hex_color == 'false') ? [] : ['svg-bg-color'],
         ...(_hex_color == false || _hex_color == 'false') ? [] : ['svg-fg-color']
       ]
     },
     svg_css(_hex_color = this.$props.color, _bg_hex_color = this.$props.bg_color, _width = this.$props.width, _height = this.$props.height) {
-      console.warn("hhhhhh", (isInteger(_width)), (isInteger(_width)) ? `${_width}px` : _width)
       return {
         ...(_width) ? {'width': (isInteger(_width)) ? `${_width}px` : _width} : {},
         ...(_height) ? {'height': (isInteger(_height)) ? `${_height}px` : _height} : {},

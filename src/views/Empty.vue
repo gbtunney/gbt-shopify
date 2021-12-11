@@ -7,6 +7,13 @@
               slot-scope="{Ready,Quantity , addToCart, QuantityAvailable,loadTest,Product,Variants,SelectedVariant,UpdateOption,Options,OptionValueList,SelectedOptionValue,UpdateInstance,Images,Instance,UpdateVariant}">
             <div class="column1 w-1/2">
               <!-- COLUMN 1 -->
+             <styled-element height="150  "  as="button" width=" var(--w-1-4) " primary  bg_color="red" >I AM A TEST COMPONENT</styled-element>
+              <g-chroma-color hex_color="--color-corn-800">
+                <div slot-scope="{Color ,ContrastMax}">
+                  I am chroma color {{Color}}
+                  <p>constrast : {{ContrastMax}}</p>
+                </div>
+              </g-chroma-color>
               <SfGallery
                   v-if="Images"
                   :current="$data.image_index"
@@ -135,7 +142,8 @@ import ProductChild from '../library/components/product/ProductChild'
 import GroupInstance from '../library/components/product/GroupInstance'
 import gUIColorFrame from '../library/components/ui/gUIColorFrame.vue'
 import gSVG from "../library/components/ui/gSVG.vue"
-
+import styledElement from '../library/components/ui/styled-components/styledElement'
+import gChromaColor from '../library/components/ui/renderless/gChromaColor'
 import {
   SfProductOption,
   SfQuantitySelector,
@@ -151,10 +159,13 @@ import vSelect from 'vue-select'
 import ProductImageGrid from '@/library/components/images/ProductImageGrid.vue';
 import ProductImagePalattePicker from '@/library/components/images/ProductImagePalattePicker.vue';
 import gCSSSelectorNew from "../library/components/ui/gCSSSelectorV3.vue";
+import GChromaColor from "../library/components/ui/renderless/gChromaColor";
 
 export default {
   name: "App",
   components: {
+    gChromaColor,
+    styledElement,
     gSVG,
     gButton,
     InlineSvg,
@@ -198,7 +209,7 @@ export default {
       console.log("-------updated!!!t", styleArr)
       this.$data.selectorTest = styleArr;
     },
-    svg_css(_hex_color = '#FFFF00') {
+    svg_css(_hex_color = '#2c2b2b') {
       return {
         '--fill-color': _hex_color,
         '--height': this.height + 'px'

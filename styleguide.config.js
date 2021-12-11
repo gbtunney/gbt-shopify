@@ -9,6 +9,10 @@ module.exports = {
             components: 'src/components/**/[A-Z]*.vue'
         },
         {
+            name: 'Styled Components',
+            components: 'src/library/components/ui/styled-components/styledElement.js'
+        },
+        {
             name: 'UI Section',
             components: 'src/library/components/ui/gSVG.vue'
         },

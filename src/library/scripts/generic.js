@@ -1,9 +1,15 @@
 import * as R from 'ramda'
 import * as RA from 'ramda-adjunct'
-//import {convToArray} from "../directives";
 
 window.R = R;
 window.RA = RA
+
+export const COMPARATOR_OPTIONS = ['gt', 'gte', 'lt', 'lte', 'eq']
+
+export const testNumComparator = function (value = false, threshold = .3, comparator = 'lte') {
+    if (!value || !RA.isNumber(value) || !validateEnum(comparator, COMPARATOR_OPTIONS)) return false
+    return (R.call(R[comparator], value, threshold))
+}
 
 export function axios_wait(ms, value) {
     //console.log("!!!!!!!axios wait ", ms, value);
@@ -45,12 +51,12 @@ export function stringContainsNumber(str) {
     return /\d/.test(_str);
 }
 
-export function stringContainsUppercase(value  ,_char = "ANY" ){
-    if ( ! stringContainsNumber(_char ) )  return /[A-Z]/.test(String(value))
+export function stringContainsUppercase(value, _char = "ANY") {
+    if (!stringContainsNumber(_char)) return /[A-Z]/.test(String(value))
     return /[A-Z]/.test(String(value).charAt(toInteger(_char)))
 }
 
-export function toInteger(value , _default =0 ) {
+export function toInteger(value, _default = 0) {
     //cast as string and see if it contains a number && no errors
     if (value && stringContainsNumber(value)) return parseInt(value);
     return _default;
@@ -63,15 +69,18 @@ export function isInteger(value) {
 export function getDigitCount(value) {
     return Math.log(toInteger(value)) * Math.LOG10E + 1 | 0;
 }
-export function isFunction(value =false){
-    if (value && (typeof value === "function") ) return true
+
+export function isFunction(value = false) {
+    if (value && (typeof value === "function")) return true
     return
 }
+
 export function isArray(value) {
     if (!R.is(Array, value) && R.is(Object, value)) return false//return [value]
     if (R.is(Array, value)) return true
     return false;
 }
+
 export function toArray(value) {
     if (!R.is(Array, value) && R.is(Object, value)) return [value]
     if (R.is(Array, value)) return value
@@ -106,6 +115,24 @@ export const renameKeys = (keysMap = {}, obj = {}) =>
         }),
         {}
     );
+
+export const STRING_VALIDATE_OPTIONS = ['startsWith', 'includes', 'endsWith']
+export const validateStringByArray = function (_value = false,
+                                               test_array = [],
+                                               _operation = "startsWith",
+                                               opEnumArr = STRING_VALIDATE_OPTIONS) {
+    if (!_value || R.isEmpty(_value) || !validateEnum(_operation, opEnumArr, true)) return false
+    const str_value = (_value).toString()
+    const operation = _operation
+    return test_array.reduce((accumulator, currentValue, currentIndex, array) => {
+        let testBool = true
+        if (R.isEmpty(currentValue)) testBool = false
+        if (str_value[operation]((currentValue).toString()) === false) testBool = false
+        str_value[operation]((currentValue).toString())
+        return (testBool) ? true : accumulator
+    }, false);
+}
+
 /**
  * validateEnum
  * @author=Gillian
@@ -160,6 +187,7 @@ export function slugify(value) {
         .replace(/-+$/, '')             // Trim - from end of text
         .replace(/[\s_-]+/g, '-');
 }
+
 //todo:document
 export const importantConsoleLog = function (message = "MESSAGE",
                                              additional_messages = [],
