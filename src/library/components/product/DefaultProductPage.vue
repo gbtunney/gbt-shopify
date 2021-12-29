@@ -2,7 +2,7 @@
   <div class="DefaultProductPage">
 
     <h1>DefaultProductPage</h1>
-    <product-child @changed="variantChanged" handle="local" :variant_id="8" :load_handle="true">
+    <product-child @changed="variantChanged" handle="local" :variant_id="22589282746486" :load_handle="true">
       <div id="shopify-section-product-template" class="flex container w-full shopify-section"
           slot-scope="{Ready,Quantity , addToCart, QuantityAvailable,loadTest,Product,Variants,SelectedVariant,UpdateOption,Options,OptionValueList,SelectedOptionValue,UpdateInstance,Images,Instance,UpdateVariant}">
 
@@ -193,11 +193,17 @@ export default {
 }
 </script>
 <style lang="postcss" type="text/css" scoped>
+@tailwind components;
+
+@tailwind utilities;
 .g-svg >>> path, .g-svg >>> rect, .g-svg >>> g, .g-svg >>> circle {
   fill: var(--fill-color);
 }
 </style>
-<style lang="scss" type="text/scss" scoped>
+<style lang="scss" type="text/css" scoped>
+@tailwind components;
+
+@tailwind utilities;
 @import "./../../styles/scss/gMixins";
 
 .is_selected {
@@ -213,6 +219,11 @@ export default {
 }
 </style>
 <style lang="scss" type="text/scss">
+
+@tailwind components;
+
+@tailwind utilities;
+
 @import "./../../styles/scss/gMixins";
 
 .sf-gallery {

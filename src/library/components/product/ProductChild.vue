@@ -18,7 +18,7 @@ import {
   VariantOption,
   Cart,
   LineItem, ProductInstanceBase
-} from '../../models'
+} from '../../orm/models'
 import {mapState} from "vuex";
 import Vue from "vue";
 import {getEntity} from "../../orm/functions";
@@ -131,14 +131,14 @@ export default {
     handle: {
       immediate: true,
       async handler(newValue, oldValue) {
-        if (newValue != this.Handle) {
-         // console.log(" Handle changed from " + oldValue + " to " + newValue)
+        //if (newValue != this.Handle) {
+       //  // console.log(" Handle changed from " + oldValue + " to " + newValue)
           //his.initializeInstance()
           if (!this.Instance){
             const entities =this.insertOrUpdateInstance(this.$props);
             console.log("THE HANDLE IS!!! !!!   ", entities)
           }
-        }
+       // }
       }
     }
   },

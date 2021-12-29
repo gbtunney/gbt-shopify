@@ -17,7 +17,7 @@ import {
   ProductGroupBase,
   ProductInstanceGroup,
 
-} from '../../models'
+} from '../../orm/models'
 import Vue from 'vue'
 
 
